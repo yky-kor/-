@@ -14,7 +14,7 @@
         .frog-bg { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); }
     </style>
 </head>
-<body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none" translate="no">
+<body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
 
     <!-- 상단 헤더 -->
     <header class="w-full max-w-md text-center py-4">
@@ -61,7 +61,7 @@
                 <div id="com-hand" class="text-7xl animate-bounce">✊</div>
             </div>
 
-            <!-- 피드백 메시지 -->
+            <!-- 피드백 메시지 (졌는지 이겼는지 표시) -->
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-4 text-center"></div>
 
             <!-- 내 선택 버튼 (가위, 바위, 보) -->
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <!-- 3. 결과 화면 -->
+        <!-- 3. 결과 및 게임 오버 화면 -->
         <div id="screen-result" class="w-full flex flex-col items-center hidden py-4">
             <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2">게임 종료!</h2>
             <p id="result-desc" class="text-gray-500 text-sm mb-6">수고하셨습니다.</p>
@@ -102,24 +102,25 @@
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
             <h2 class="text-2xl font-bold text-amber-600 mb-4">🏆 명예의 전당 (무한모드)</h2>
-            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm"></div>
+            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm">
+                <!-- 랭킹 항목이 동적으로 들어감 -->
+            </div>
             <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow">메인으로 돌아가기</button>
         </div>
 
     </main>
 
+    <!-- 하단 푸터 -->
     <footer class="text-xs text-green-100 py-2">
         Made with Frog Power 🐸
     </footer>
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
-        // 가위바위보 데이터 구조 정의
-        // beats: 내가 이기는 상대, beatenBy: 내가 지는(컴퓨터에게 지는) 상대
         const hands = {
-            'scissor': { emoji: '✌️', name: '가위', beats: 'paper', beatenBy: 'rock' },
-            'rock': { emoji: '✊', name: '바위', beats: 'scissor', beatenBy: 'paper' },
-            'paper': { emoji: '🖐️', name: '보', beats: 'rock', beatenBy: 'scissor' }
+            'scissor': { emoji: '✌️', name: '가위', winsAgainst: 'paper', losesTo: 'rock' },
+            'rock': { emoji: '✊', name: '바위', winsAgainst: 'scissor', losesTo: 'paper' },
+            'paper': { emoji: '🖐️', name: '보', winsAgainst: 'rock', losesTo: 'scissor' }
         };
         const handKeys = ['scissor', 'rock', 'paper'];
 
@@ -131,7 +132,8 @@
             isPlaying: false,
             comChoiceKey: '',
             timer: null,
-            timeLeft: 100
+            timeLeft: 100,
+            roundIntervalTime: 1000
         };
 
         const synth = new Tone.Synth().toDestination();
@@ -233,11 +235,13 @@
             const comHand = hands[comKey];
             const feedbackEl = document.getElementById('feedback-msg');
 
-            // 🐸 청개구리 룰: 컴퓨터에게 '져야' 승리 (내가 낸 손이 컴퓨터 손에게 패배하는 경우)
-            const isUserLoss = (choiceKey === comHand.beatenBy); // 내가 짐 -> 성공! (+점수)
-            const isUserWin = (choiceKey === comHand.beats);     // 내가 이김 -> 실패! (게임 오버 조건)
+            // 🐸 청개구리 룰 명확한 판정:
+            // 1. 내가 져야 점수 획득 (choiceKey === comHand.losesTo)
+            // 2. 내가 이겨버리면 실패 (choiceKey === comHand.winsAgainst)
+            const isUserLost = (choiceKey === comHand.losesTo);
+            const isUserWin = (choiceKey === comHand.winsAgainst);
 
-            if (isUserLoss) {
+            if (isUserLost) {
                 gameState.score += 1;
                 playSound('success');
                 feedbackEl.innerHTML = '<span class="text-green-600">지기 성공! (+1점) 🐸</span>';
