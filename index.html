@@ -38,22 +38,32 @@
         <div id="screen-menu" class="w-full flex flex-col items-center space-y-3 py-6">
             <h2 class="text-2xl font-bold text-green-700 mb-1" data-i18n="selectMode">모드를 선택하세요</h2>
             
-            <button onclick="startGame('practice')" class="w-full py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95 text-left px-5">
+            <button onclick="startGame('practice')" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 🎯 <span data-i18n="practiceMode">연습 모드</span>
-                <span class="block text-xs font-normal text-green-100 mt-0.5" data-i18n="practiceDesc">3초 제한 시간 안에서 10판 지기 연습!</span>
+                <span class="block text-xs font-normal text-green-100" data-i18n="practiceDesc">3초 제한 시간 안에서 10판 지기 연습!</span>
             </button>
             
-            <button onclick="startGame('timeattack')" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95 text-left px-5 relative">
+            <button onclick="startGame('timeattack')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
                 ⏱️ <span data-i18n="timeAttackMode">타임어택 모드</span> <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">NEW</span>
-                <span class="block text-xs font-normal text-indigo-100 mt-0.5" data-i18n="timeAttackDesc">시간 제한 없음! 10점을 가장 빠르게 달성하기</span>
+                <span class="block text-xs font-normal text-indigo-100" data-i18n="timeAttackDesc">시간 제한 없음! 10점을 가장 빠르게 달성하기</span>
+            </button>
+
+            <button onclick="startGame('timeattack_hard')" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
+                ⚡ <span data-i18n="timeAttackHardMode">타임어택 하드 모드</span> <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">HARD</span>
+                <span class="block text-xs font-normal text-purple-100" data-i18n="timeAttackHardDesc">버튼 위치가 매번 랜덤으로 섞이는 타임어택!</span>
             </button>
             
-            <button onclick="startGame('infinite')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95 text-left px-5">
+            <button onclick="startGame('infinite')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 ♾️ <span data-i18n="infiniteMode">무한 모드 (스피드)</span>
-                <span class="block text-xs font-normal text-emerald-100 mt-0.5" data-i18n="infiniteDesc">1초 안에 안 지면 끝! 최고기록 도전</span>
+                <span class="block text-xs font-normal text-emerald-100" data-i18n="infiniteDesc">1초 안에 안 지면 끝! 최고기록 도전</span>
+            </button>
+
+            <button onclick="startGame('infinite_hard')" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95 text-left px-4">
+                🔥 <span data-i18n="infiniteHardMode">무한 하드 모드</span>
+                <span class="block text-xs font-normal text-red-100" data-i18n="infiniteHardDesc">1초 제한 + 매 판 버튼 위치 셔플!</span>
             </button>
             
-            <button onclick="showRanking()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95">
+            <button onclick="showRanking()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95">
                 🏆 <span data-i18n="rankingBtn">명예의 랭킹</span>
             </button>
         </div>
@@ -81,7 +91,7 @@
 
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-3 text-center"></div>
 
-            <div class="grid grid-cols-3 gap-3 w-full mb-2">
+            <div id="rps-buttons-container" class="grid grid-cols-3 gap-3 w-full mb-2">
                 <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✌️</span>
                     <span class="text-xs text-gray-500 mt-1" data-i18n="scissor">가위</span>
@@ -118,8 +128,10 @@
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
             <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
-                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드 랭킹</button>
-                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택 랭킹</button>
+                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
+                <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
+                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
+                <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
             </div>
             <div id="ranking-list" class="w-full max-h-52 overflow-y-auto divide-y divide-gray-100 mb-4 text-sm"></div>
             <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow" data-i18n="goHome">메인으로 돌아가기</button>
@@ -133,7 +145,6 @@
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
-        // 다국어 딕셔너리
         const translations = {
             ko: {
                 title: "🐸 청개구리 가위바위보",
@@ -143,8 +154,12 @@
                 practiceDesc: "3초 제한 시간 안에서 10판 지기 연습!",
                 timeAttackMode: "타임어택 모드",
                 timeAttackDesc: "시간 제한 없음! 10점을 가장 빠르게 달성하기",
+                timeAttackHardMode: "타임어택 하드 모드",
+                timeAttackHardDesc: "버튼 위치가 매번 랜덤으로 섞이는 타임어택!",
                 infiniteMode: "무한 모드 (스피드)",
                 infiniteDesc: "1초 안에 안 지면 끝! 최고기록 도전",
+                infiniteHardMode: "무한 하드 모드",
+                infiniteHardDesc: "1초 제한 + 매 판 버튼 위치 셔플!",
                 rankingBtn: "명예의 랭킹",
                 scoreLabel: "점수",
                 timeElapsed: "경과 시간",
@@ -157,13 +172,17 @@
                 earnedScore: "획득 점수",
                 submitRanking: "랭킹에 기록하기",
                 goHome: "메인으로 돌아가기",
-                tabInfinite: "무한모드 랭킹",
-                tabTimeAttack: "타임어택 랭킹",
+                tabInfinite: "무한모드",
+                tabInfiniteHard: "무한하드",
+                tabTimeAttack: "타임어택",
+                tabTimeAttackHard: "타임하드",
                 loadingRanking: "랭킹을 불러오는 중...",
                 noRanking: "아직 등록된 랭킹 기록이 없습니다.",
                 modePractice: "연습 모드",
                 modeTimeAttack: "타임어택 모드",
+                modeTimeAttackHard: "타임어택 하드",
                 modeInfinite: "무한 모드 (1초)",
+                modeInfiniteHard: "무한 하드 모드",
                 msgSuccess: "지기 성공! (+1점) 🐸",
                 msgWin: "이겨버렸다! ❌",
                 msgDraw: "비겼다! (점수 없음) ➖",
@@ -180,8 +199,12 @@
                 practiceDesc: "10 rounds of losing practice with 3s limit!",
                 timeAttackMode: "Time Attack",
                 timeAttackDesc: "No time limit! Reach 10 points ASAP",
+                timeAttackHardMode: "Time Attack Hard",
+                timeAttackHardDesc: "Random button shuffle Time Attack!",
                 infiniteMode: "Infinite Mode (Speed)",
                 infiniteDesc: "Don't fail within 1s! Beat your high score",
+                infiniteHardMode: "Infinite Hard Mode",
+                infiniteHardDesc: "1s limit + Button Shuffle!",
                 rankingBtn: "Hall of Fame",
                 scoreLabel: "Score",
                 timeElapsed: "Elapsed Time",
@@ -194,13 +217,17 @@
                 earnedScore: "Final Score",
                 submitRanking: "Submit Score",
                 goHome: "Back to Menu",
-                tabInfinite: "Infinite Ranking",
-                tabTimeAttack: "Time Attack Ranking",
+                tabInfinite: "Infinite",
+                tabInfiniteHard: "Inf Hard",
+                tabTimeAttack: "Time Attack",
+                tabTimeAttackHard: "TA Hard",
                 loadingRanking: "Loading rankings...",
                 noRanking: "No ranking records yet.",
                 modePractice: "Practice Mode",
                 modeTimeAttack: "Time Attack Mode",
+                modeTimeAttackHard: "Time Attack Hard",
                 modeInfinite: "Infinite Mode (1s)",
+                modeInfiniteHard: "Infinite Hard Mode",
                 msgSuccess: "Successfully Lost! (+1pt) 🐸",
                 msgWin: "You Won! (Oops) ❌",
                 msgDraw: "Draw! (No pts) ➖",
@@ -217,7 +244,6 @@
             currentLang = currentLang === 'ko' ? 'en' : 'ko';
             document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
             
-            // 일반 HTML 텍스트 업데이트
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) {
@@ -225,25 +251,27 @@
                 }
             });
 
-            // 플레이어 이름 입력창 placeholder 업데이트
             const nameInput = document.getElementById('player-name');
             if(nameInput) {
                 nameInput.placeholder = translations[currentLang].namePlaceholder;
             }
 
-            // 현재 진행 중인 모드 라벨 업데이트
             if (gameState.isPlaying) {
-                if (gameState.mode === 'timeattack') {
-                    document.getElementById('game-mode-label').innerText = translations[currentLang].modeTimeAttack;
-                } else if (gameState.mode === 'infinite') {
-                    document.getElementById('game-mode-label').innerText = translations[currentLang].modeInfinite;
-                } else {
-                    document.getElementById('game-mode-label').innerText = translations[currentLang].modePractice;
-                }
+                updateModeLabel();
             }
         }
 
-        // Firebase 설정 및 초기화
+        function updateModeLabel() {
+            const labels = {
+                'practice': translations[currentLang].modePractice,
+                'timeattack': translations[currentLang].modeTimeAttack,
+                'timeattack_hard': translations[currentLang].modeTimeAttackHard,
+                'infinite': translations[currentLang].modeInfinite,
+                'infinite_hard': translations[currentLang].modeInfiniteHard
+            };
+            document.getElementById('game-mode-label').innerText = labels[gameState.mode] || '';
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyBLy1BrJ5LdgnXlElI2S_WeoqQzC5MSKUk",
             authDomain: "froggame-kor.firebaseapp.com",
@@ -310,8 +338,9 @@
             const timerBarContainer = document.getElementById('timer-bar-container');
             const stopwatchDisplay = document.getElementById('stopwatch-display');
 
-            if (mode === 'timeattack') {
-                document.getElementById('game-mode-label').innerText = translations[currentLang].modeTimeAttack;
+            updateModeLabel();
+
+            if (mode === 'timeattack' || mode === 'timeattack_hard') {
                 timerBarContainer.classList.add('hidden');
                 stopwatchDisplay.classList.remove('hidden');
                 
@@ -319,12 +348,7 @@
                     gameState.elapsedSeconds = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
                     document.getElementById('elapsed-time').innerText = gameState.elapsedSeconds;
                 }, 100);
-            } else if (mode === 'infinite') {
-                document.getElementById('game-mode-label').innerText = translations[currentLang].modeInfinite;
-                timerBarContainer.classList.remove('hidden');
-                stopwatchDisplay.classList.add('hidden');
             } else {
-                document.getElementById('game-mode-label').innerText = translations[currentLang].modePractice;
                 timerBarContainer.classList.remove('hidden');
                 stopwatchDisplay.classList.add('hidden');
             }
@@ -343,7 +367,7 @@
                     return;
                 }
                 document.getElementById('game-progress').innerText = `${currentLang === 'ko' ? '진행도' : 'Progress'}: ${gameState.round}/${gameState.maxRounds}`;
-            } else if (gameState.mode === 'timeattack') {
+            } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                 document.getElementById('game-progress').innerText = `${currentLang === 'ko' ? '진행도' : 'Progress'}: ${gameState.score}/10`;
                 if (gameState.score >= 10) {
                     endGame();
@@ -362,8 +386,24 @@
             gameState.comChoiceKey = randomKey;
             document.getElementById('com-hand').innerText = hands[randomKey].emoji;
 
-            if (gameState.mode !== 'timeattack') {
+            // 하드 모드일 경우 버튼 위치 랜덤 섞기
+            if (gameState.mode === 'infinite_hard' || gameState.mode === 'timeattack_hard') {
+                randomizeButtons();
+            }
+
+            if (gameState.mode !== 'timeattack' && gameState.mode !== 'timeattack_hard') {
                 startTimer();
+            }
+        }
+
+        // 버튼 위치 무작위 셔플 함수
+        function randomizeButtons() {
+            const gridContainer = document.getElementById('rps-buttons-container');
+            if (!gridContainer) return;
+            const buttons = Array.from(gridContainer.children);
+            for (let i = buttons.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                gridContainer.appendChild(buttons[j]);
             }
         }
 
@@ -394,7 +434,7 @@
             playSound('fail');
             document.getElementById('feedback-msg').innerHTML = `<span class="text-red-500">${translations[currentLang].msgTimeout}</span>`;
 
-            if (gameState.mode === 'infinite') {
+            if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                 setTimeout(endGame, 1000);
             } else {
                 setTimeout(nextRound, 1000);
@@ -417,10 +457,10 @@
                 gameState.score += 1;
                 playSound('success');
                 feedbackEl.innerHTML = `<span class="text-green-600">${translations[currentLang].msgSuccess}</span>`;
-                
                 document.getElementById('current-score').innerText = gameState.score;
 
-                if (gameState.mode === 'timeattack') {
+                // 타임어택 및 무한모드 모두 딜레이 없이 즉시 다음 판으로 진행
+                if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                     if (gameState.score >= 10) {
                         setButtonsEnabled(false);
                         setTimeout(endGame, 300);
@@ -428,11 +468,14 @@
                         nextRound();
                     }
                     return;
+                } else if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
+                    nextRound();
+                    return;
                 }
             } else if (isUserWin) {
                 playSound('fail');
                 feedbackEl.innerHTML = `<span class="text-red-500">${translations[currentLang].msgWin}</span>`;
-                if (gameState.mode === 'infinite') {
+                if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                     setButtonsEnabled(false);
                     gameState.isPlaying = false;
                     setTimeout(endGame, 1200);
@@ -441,7 +484,7 @@
             } else {
                 playSound('fail');
                 feedbackEl.innerHTML = `<span class="text-amber-500">${translations[currentLang].msgDraw}</span>`;
-                if (gameState.mode === 'infinite') {
+                if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                     setButtonsEnabled(false);
                     gameState.isPlaying = false;
                     setTimeout(endGame, 1200);
@@ -451,7 +494,7 @@
 
             document.getElementById('current-score').innerText = gameState.score;
 
-            if (gameState.mode !== 'timeattack') {
+            if (gameState.mode !== 'timeattack' && gameState.mode !== 'timeattack_hard') {
                 setButtonsEnabled(false);
                 setTimeout(() => {
                     if (gameState.isPlaying) {
@@ -477,12 +520,12 @@
             const resultLabel = document.getElementById('result-label');
             const finalScoreEl = document.getElementById('final-score');
 
-            if (gameState.mode === 'infinite') {
+            if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                 resultLabel.innerText = currentLang === 'ko' ? '무한 모드 획득 점수' : 'Infinite Score';
                 finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
                 resultDesc.innerText = currentLang === 'ko' ? `무한 모드 기록: ${gameState.score}번 연속 성공!` : `Infinite Streak: ${gameState.score} in a row!`;
                 nameInputContainer.classList.remove('hidden');
-            } else if (gameState.mode === 'timeattack') {
+            } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                 const totalTime = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
                 gameState.elapsedSeconds = totalTime;
                 resultLabel.innerText = currentLang === 'ko' ? '10점 달성 소요 시간' : 'Time for 10 pts';
@@ -501,22 +544,26 @@
             const nameInput = document.getElementById('player-name');
             const name = nameInput.value.trim() || translations[currentLang].anonymousName;
 
-            if (gameState.mode === 'infinite') {
+            let dbPath = '';
+            if (gameState.mode === 'infinite') dbPath = 'rankings_infinite';
+            else if (gameState.mode === 'infinite_hard') dbPath = 'rankings_infinite_hard';
+            else if (gameState.mode === 'timeattack') dbPath = 'rankings_timeattack';
+            else if (gameState.mode === 'timeattack_hard') dbPath = 'rankings_timeattack_hard';
+
+            if (gameState.mode.includes('infinite')) {
                 const score = gameState.score;
                 if (score <= 0) {
                     alert(translations[currentLang].alertZeroScore);
                     return;
                 }
-                const newRef = db.ref('rankings_infinite').push();
-                newRef.set({
+                db.ref(dbPath).push().set({
                     name: name,
                     score: score,
                     date: new Date().toLocaleDateString()
                 });
-            } else if (gameState.mode === 'timeattack') {
+            } else {
                 const timeTaken = parseFloat(gameState.elapsedSeconds);
-                const newRef = db.ref('rankings_timeattack').push();
-                newRef.set({
+                db.ref(dbPath).push().set({
                     name: name,
                     time: timeTaken,
                     date: new Date().toLocaleDateString()
@@ -524,22 +571,23 @@
             }
 
             nameInput.value = '';
-            showRanking('infinite');
+            showRanking(gameState.mode);
         }
 
         let currentRankingTab = 'infinite';
         function switchRankingTab(tab) {
             currentRankingTab = tab;
-            const btnInf = document.getElementById('tab-infinite');
-            const btnTa = document.getElementById('tab-timeattack');
-
-            if (tab === 'infinite') {
-                btnInf.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white text-green-700 shadow-sm";
-                btnTa.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500";
-            } else {
-                btnTa.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white text-indigo-700 shadow-sm";
-                btnInf.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500";
-            }
+            const tabs = ['infinite', 'infinite_hard', 'timeattack', 'timeattack_hard'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t.replace('_', '-')}`);
+                if (!btn) return;
+                if (t === tab) {
+                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500";
+                }
+            });
             renderRankingList();
         }
 
@@ -550,7 +598,13 @@
 
         function renderRankingList() {
             const rankingList = document.getElementById('ranking-list');
-            const dbPath = currentRankingTab === 'infinite' ? 'rankings_infinite' : 'rankings_timeattack';
+            const dbPaths = {
+                'infinite': 'rankings_infinite',
+                'infinite_hard': 'rankings_infinite_hard',
+                'timeattack': 'rankings_timeattack',
+                'timeattack_hard': 'rankings_timeattack_hard'
+            };
+            const dbPath = dbPaths[currentRankingTab];
 
             rankingList.innerHTML = `<p class="text-center text-gray-400 py-4">${translations[currentLang].loadingRanking}</p>`;
 
@@ -566,7 +620,7 @@
                     rankings.push(data[id]);
                 }
 
-                if (currentRankingTab === 'infinite') {
+                if (currentRankingTab.includes('infinite')) {
                     rankings.sort((a, b) => b.score - a.score);
                     rankings = rankings.slice(0, 10);
                     rankingList.innerHTML = rankings.map((item, index) => `
