@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>청개구리 가위바위보 (반대로 지기 게임)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js 사운드 효과 CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        body { font-family: 'Jua', sans-serif; }
+        .frog-bg { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); }
+    </style>
+</head>
+<body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
+
+    <!-- 상단 헤더 -->
+    <header class="w-full max-w-md text-center py-4">
+        <h1 class="text-3xl md:text-4xl font-bold drop-shadow-md">🐸 청개구리 가위바위보</h1>
+        <p class="text-green-100 text-sm mt-1">컴퓨터에게 <b>져야만</b> 점수를 얻는 반대로 게임!</p>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="w-full max-w-md bg-white text-gray-800 rounded-3xl shadow-2xl p-6 flex flex-col items-center relative overflow-hidden">
+
+        <!-- 1. 모드 선택 화면 -->
+        <div id="screen-menu" class="w-full flex flex-col items-center space-y-4 py-8">
+            <h2 class="text-2xl font-bold text-green-700 mb-2">모드를 선택하세요</h2>
+            <button onclick="startGame('10rounds')" class="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold text-xl rounded-2xl shadow-lg transition transform active:scale-95">
+                🎯 10판 모드
+                <span class="block text-xs font-normal text-green-100 mt-1">10번의 기회 동안 최대한 많이 지기!</span>
+            </button>
+            <button onclick="startGame('infinite')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xl rounded-2xl shadow-lg transition transform active:scale-95">
+                ♾️ 무한 모드
+                <span class="block text-xs font-normal text-emerald-100 mt-1">한 번이라도 이기거나 비기면 끝! 최고기록 도전</span>
+            </button>
+            <button onclick="showRanking()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-2xl shadow transition transform active:scale-95">
+                🏆 명예의 랭킹
+            </button>
+        </div>
+
+        <!-- 2. 게임 플레이 화면 -->
+        <div id="screen-game" class="w-full flex flex-col items-center hidden">
+            <!-- 상단 상태바 -->
+            <div class="w-full flex justify-between items-center mb-4 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
+                <span id="game-mode-label">모드</span>
+                <span id="game-progress">진행도: 1/10</span>
+                <span class="text-green-600 font-bold">점수: <span id="current-score">0</span></span>
+            </div>
+
+            <!-- 타이머 바 -->
+            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-6">
+                <div id="timer-bar" class="bg-red-500 h-full w-full transition-all duration-100"></div>
+            </div>
+
+            <!-- 컴퓨터 제시 손 -->
+            <div class="text-center mb-6">
+                <p class="text-sm text-gray-400 mb-2">컴퓨터가 낸 손</p>
+                <div id="com-hand" class="text-7xl animate-bounce">✊</div>
+            </div>
+
+            <!-- 피드백 메시지 (졌는지 이겼는지 표시) -->
+            <div id="feedback-msg" class="h-8 text-xl font-bold mb-4 text-center"></div>
+
+            <!-- 내 선택 버튼 (가위, 바위, 보) -->
+            <div class="grid grid-cols-3 gap-3 w-full mb-4">
+                <button onclick="playerChoice('scissor')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span>✌️</span>
+                    <span class="text-xs text-gray-500 mt-1">가위</span>
+                </button>
+                <button onclick="playerChoice('rock')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span>✊</span>
+                    <span class="text-xs text-gray-500 mt-1">바위</span>
+                </button>
+                <button onclick="playerChoice('paper')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span>🖐️</span>
+                    <span class="text-xs text-gray-500 mt-1">보</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. 결과 및 게임 오버 화면 -->
+        <div id="screen-result" class="w-full flex flex-col items-center hidden py-4">
+            <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2">게임 종료!</h2>
+            <p id="result-desc" class="text-gray-500 text-sm mb-6">수고하셨습니다.</p>
+            
+            <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 w-full text-center mb-6">
+                <p class="text-sm text-green-700">획득 점수</p>
+                <p id="final-score" class="text-5xl font-extrabold text-green-600 mt-1">0점</p>
+            </div>
+
+            <div id="name-input-container" class="w-full mb-4 hidden">
+                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-center font-bold text-lg mb-2 focus:outline
+}
