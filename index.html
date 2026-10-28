@@ -249,6 +249,7 @@
 
         function toggleLanguage() {
             currentLang = currentLang === 'ko' ? 'en' : 'ko';
+            // 현재 언어 상태에 맞춰 버튼에 표시될 다음 언어 안내 텍스트 설정
             document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
