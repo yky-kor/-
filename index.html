@@ -26,17 +26,21 @@
     <main class="w-full max-w-md bg-white text-gray-800 rounded-3xl shadow-2xl p-6 flex flex-col items-center relative overflow-hidden">
 
         <!-- 1. 모드 선택 화면 -->
-        <div id="screen-menu" class="w-full flex flex-col items-center space-y-4 py-8">
-            <h2 class="text-2xl font-bold text-green-700 mb-2">모드를 선택하세요</h2>
-            <button onclick="startGame('practice')" class="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold text-xl rounded-2xl shadow-lg transition transform active:scale-95">
-                🎯 연습 모드 (구 10판)
-                <span class="block text-xs font-normal text-green-100 mt-1">10번의 기회 동안 넉넉하게(3초) 지기 연습!</span>
+        <div id="screen-menu" class="w-full flex flex-col items-center space-y-3 py-6">
+            <h2 class="text-2xl font-bold text-green-700 mb-1">모드를 선택하세요</h2>
+            <button onclick="startGame('practice')" class="w-full py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95">
+                🎯 연습 모드
+                <span class="block text-xs font-normal text-green-100 mt-0.5">3초 제한 시간 안에서 10판 지기 연습!</span>
             </button>
-            <button onclick="startGame('infinite')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xl rounded-2xl shadow-lg transition transform active:scale-95">
+            <button onclick="startGame('timeattack')" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95">
+                ⏱️ 타임어택 모드 <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">NEW</span>
+                <span class="block text-xs font-normal text-indigo-100 mt-0.5">시간 제한 없음! 10점을 가장 빠르게 달성하기</span>
+            </button>
+            <button onclick="startGame('infinite')" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg rounded-2xl shadow-lg transition transform active:scale-95">
                 ♾️ 무한 모드 (스피드)
-                <span class="block text-xs font-normal text-emerald-100 mt-1">1초 안에 안 지면 끝! 최고기록 랭킹 도전</span>
+                <span class="block text-xs font-normal text-emerald-100 mt-0.5">1초 안에 안 지면 끝! 최고기록 도전</span>
             </button>
-            <button onclick="showRanking()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg rounded-2xl shadow transition transform active:scale-95">
+            <button onclick="showRanking()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-base rounded-2xl shadow transition transform active:scale-95">
                 🏆 명예의 랭킹
             </button>
         </div>
@@ -46,13 +50,18 @@
             <!-- 상단 상태바 -->
             <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
-                <span id="game-progress">진행도: 1/10</span>
+                <span id="game-progress">진행도: 0/10</span>
                 <span class="text-green-600 font-bold">점수: <span id="current-score">0</span></span>
             </div>
 
-            <!-- 타이머 바 -->
-            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
+            <!-- 타이머 바 (무한/타임어택 모드에서는 숨김 또는 스톱워치로 표시) -->
+            <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
                 <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-100"></div>
+            </div>
+
+            <!-- 타임어택용 경과 시간 표시 -->
+            <div id="stopwatch-display" class="hidden mb-2 text-indigo-600 font-bold text-lg">
+                ⏱️ 경과 시간: <span id="elapsed-time">0.0</span>초
             </div>
 
             <!-- 컴퓨터 제시 손 -->
@@ -87,7 +96,7 @@
             <p id="result-desc" class="text-gray-500 text-sm mb-6">수고하셨습니다.</p>
             
             <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 w-full text-center mb-6">
-                <p class="text-sm text-green-700">획득 점수</p>
+                <p id="result-label" class="text-sm text-green-700">획득 점수</p>
                 <p id="final-score" class="text-5xl font-extrabold text-green-600 mt-1">0점</p>
             </div>
 
@@ -101,8 +110,12 @@
 
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
-            <h2 class="text-2xl font-bold text-amber-600 mb-4">🏆 명예의 전당 (무한모드)</h2>
-            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm"></div>
+            <!-- 랭킹 탭 전환 버튼 -->
+            <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
+                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white text-green-700 shadow-sm">무한모드 랭킹</button>
+                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500">타임어택 랭킹</button>
+            </div>
+            <div id="ranking-list" class="w-full max-h-52 overflow-y-auto divide-y divide-gray-100 mb-4 text-sm"></div>
             <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow">메인으로 돌아가기</button>
         </div>
 
@@ -122,14 +135,17 @@
         const handKeys = ['scissor', 'rock', 'paper'];
 
         let gameState = {
-            mode: 'practice', // 'practice' 또는 'infinite'
+            mode: 'practice', // 'practice', 'timeattack', 'infinite'
             score: 0,
             round: 0,
             maxRounds: 10,
             isPlaying: false,
             comChoiceKey: '',
             timer: null,
-            timeLeft: 100
+            timeLeft: 100,
+            startTime: 0,
+            stopwatchTimer: null,
+            elapsedSeconds: 0
         };
 
         const synth = new Tone.Synth().toDestination();
@@ -155,8 +171,34 @@
             gameState.score = 0;
             gameState.round = 0;
             gameState.isPlaying = true;
+            gameState.startTime = Date.now();
+            gameState.elapsedSeconds = 0;
 
-            document.getElementById('game-mode-label').innerText = mode === 'practice' ? '연습 모드' : '무한 모드 (1초)';
+            clearInterval(gameState.stopwatchTimer);
+
+            const timerBarContainer = document.getElementById('timer-bar-container');
+            const stopwatchDisplay = document.getElementById('stopwatch-display');
+
+            if (mode === 'timeattack') {
+                document.getElementById('game-mode-label').innerText = '타임어택 모드';
+                timerBarContainer.classList.add('hidden');
+                stopwatchDisplay.classList.remove('hidden');
+                
+                // 스톱워치 시작
+                gameState.stopwatchTimer = setInterval(() => {
+                    gameState.elapsedSeconds = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
+                    document.getElementById('elapsed-time').innerText = gameState.elapsedSeconds;
+                }, 100);
+            } else if (mode === 'infinite') {
+                document.getElementById('game-mode-label').innerText = '무한 모드 (1초)';
+                timerBarContainer.classList.remove('hidden');
+                stopwatchDisplay.classList.add('hidden');
+            } else {
+                document.getElementById('game-mode-label').innerText = '연습 모드';
+                timerBarContainer.classList.remove('hidden');
+                stopwatchDisplay.classList.add('hidden');
+            }
+
             showScreen('screen-game');
             nextRound();
         }
@@ -171,6 +213,12 @@
                     return;
                 }
                 document.getElementById('game-progress').innerText = `진행도: ${gameState.round}/${gameState.maxRounds}`;
+            } else if (gameState.mode === 'timeattack') {
+                document.getElementById('game-progress').innerText = `진행도: ${gameState.score}/10`;
+                if (gameState.score >= 10) {
+                    endGame();
+                    return;
+                }
             } else {
                 gameState.round++;
                 document.getElementById('game-progress').innerText = `성공 콤보: ${gameState.round - 1}`;
@@ -184,7 +232,9 @@
             gameState.comChoiceKey = randomKey;
             document.getElementById('com-hand').innerText = hands[randomKey].emoji;
 
-            startTimer();
+            if (gameState.mode !== 'timeattack') {
+                startTimer();
+            }
         }
 
         function startTimer() {
@@ -194,7 +244,6 @@
             timerBar.style.width = '100%';
 
             const startTime = Date.now();
-            // 모드에 따라 제한 시간 다르게 설정 (연습 모드: 3초 / 무한 모드: 1초)
             const duration = gameState.mode === 'practice' ? 3000 : 1000;
 
             gameState.timer = setInterval(() => {
@@ -233,12 +282,18 @@
             const feedbackEl = document.getElementById('feedback-msg');
 
             const isUserLoss = (choiceKey === comHand.beats);    // 내가 짐 -> 성공 (+점수) 🟢
-            const isUserWin = (choiceKey === comHand.losesTo);   // 내가 이김 -> 실패 (오답/게임오버) ❌
+            const isUserWin = (choiceKey === comHand.losesTo);   // 내가 이김 -> 실패 ❌
 
             if (isUserLoss) {
                 gameState.score += 1;
                 playSound('success');
                 feedbackEl.innerHTML = '<span class="text-green-600">지기 성공! (+1점) 🐸</span>';
+                
+                if (gameState.mode === 'timeattack' && gameState.score >= 10) {
+                    document.getElementById('current-score').innerText = gameState.score;
+                    setTimeout(endGame, 1000);
+                    return;
+                }
             } else if (isUserWin) {
                 playSound('fail');
                 feedbackEl.innerHTML = '<span class="text-red-500">이겨버렸다! ❌</span>';
@@ -274,17 +329,29 @@
         function endGame() {
             gameState.isPlaying = false;
             clearInterval(gameState.timer);
+            clearInterval(gameState.stopwatchTimer);
             showScreen('screen-result');
-
-            document.getElementById('final-score').innerText = gameState.score + '점';
 
             const nameInputContainer = document.getElementById('name-input-container');
             const resultDesc = document.getElementById('result-desc');
+            const resultLabel = document.getElementById('result-label');
+            const finalScoreEl = document.getElementById('final-score');
 
             if (gameState.mode === 'infinite') {
+                resultLabel.innerText = '무한 모드 획득 점수';
+                finalScoreEl.innerText = gameState.score + '점';
                 resultDesc.innerText = `무한 모드 기록: ${gameState.score}번 연속 성공!`;
                 nameInputContainer.classList.remove('hidden');
+            } else if (gameState.mode === 'timeattack') {
+                const totalTime = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
+                gameState.elapsedSeconds = totalTime;
+                resultLabel.innerText = '10점 달성 소요 시간';
+                finalScoreEl.innerText = totalTime + '초';
+                resultDesc.innerText = `타임어택 완료! 총 ${totalTime}초 소요`;
+                nameInputContainer.classList.remove('hidden');
             } else {
+                resultLabel.innerText = '연습 모드 획득 점수';
+                finalScoreEl.innerText = gameState.score + '점';
                 resultDesc.innerText = `연습 모드 총 ${gameState.score}점을 획득했습니다.`;
                 nameInputContainer.classList.add('hidden');
             }
@@ -293,45 +360,89 @@
         function saveRanking() {
             const nameInput = document.getElementById('player-name');
             const name = nameInput.value.trim() || '익명의 청개구리';
-            const score = gameState.score;
 
-            if (score <= 0) {
-                alert('0점은 랭킹에 등록할 수 없습니다!');
-                return;
+            if (gameState.mode === 'infinite') {
+                const score = gameState.score;
+                if (score <= 0) {
+                    alert('0점은 랭킹에 등록할 수 없습니다!');
+                    return;
+                }
+                let rankings = JSON.parse(localStorage.getItem('frog_rankings_infinite') || '[]');
+                rankings.push({ name, score, date: new Date().toLocaleDateString() });
+                rankings.sort((a, b) => b.score - a.score);
+                rankings = rankings.slice(0, 10);
+                localStorage.setItem('frog_rankings_infinite', JSON.stringify(rankings));
+            } else if (gameState.mode === 'timeattack') {
+                const timeTaken = parseFloat(gameState.elapsedSeconds);
+                let rankings = JSON.parse(localStorage.getItem('frog_rankings_timeattack') || '[]');
+                rankings.push({ name, time: timeTaken, date: new Date().toLocaleDateString() });
+                rankings.sort((a, b) => a.time - b.time); // 시간이 적을수록 상위 랭크!
+                rankings = rankings.slice(0, 10);
+                localStorage.setItem('frog_rankings_timeattack', JSON.stringify(rankings));
             }
 
-            let rankings = JSON.parse(localStorage.getItem('frog_rankings') || '[]');
-            rankings.push({ name, score, date: new Date().toLocaleDateString() });
-            rankings.sort((a, b) => b.score - a.score);
-            rankings = rankings.slice(0, 10);
-
-            localStorage.setItem('frog_rankings', JSON.stringify(rankings));
             nameInput.value = '';
-            showRanking();
+            showRanking('infinite');
         }
 
-        function showRanking() {
+        let currentRankingTab = 'infinite';
+        function switchRankingTab(tab) {
+            currentRankingTab = tab;
+            const btnInf = document.getElementById('tab-infinite');
+            const btnTa = document.getElementById('tab-timeattack');
+
+            if (tab === 'infinite') {
+                btnInf.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white text-green-700 shadow-sm";
+                btnTa.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500";
+            } else {
+                btnTa.className = "flex-1 py-2 text-sm font-bold rounded-lg bg-white text-indigo-700 shadow-sm";
+                btnInf.className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-500";
+            }
+            renderRankingList();
+        }
+
+        function showRanking(tab = 'infinite') {
             showScreen('screen-ranking');
+            switchRankingTab(tab);
+        }
+
+        function renderRankingList() {
             const rankingList = document.getElementById('ranking-list');
-            const rankings = JSON.parse(localStorage.getItem('frog_rankings') || '[]');
+            const storageKey = currentRankingTab === 'infinite' ? 'frog_rankings_infinite' : 'frog_rankings_timeattack';
+            const rankings = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
             if (rankings.length === 0) {
                 rankingList.innerHTML = '<p class="text-center text-gray-400 py-4">아직 등록된 랭킹 기록이 없습니다.</p>';
                 return;
             }
 
-            rankingList.innerHTML = rankings.map((item, index) => `
-                <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
-                    <div class="flex items-center space-x-3">
-                        <span class="w-6 text-center">${index + 1}위</span>
-                        <span class="truncate max-w-[120px]">${item.name}</span>
+            if (currentRankingTab === 'infinite') {
+                rankingList.innerHTML = rankings.map((item, index) => `
+                    <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 text-center">${index + 1}위</span>
+                            <span class="truncate max-w-[120px]">${item.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-green-600 font-extrabold">${item.score}점</span>
+                            <span class="text-xs text-gray-400">${item.date}</span>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="text-green-600 font-extrabold">${item.score}점</span>
-                        <span class="text-xs text-gray-400">${item.date}</span>
+                `).join('');
+            } else {
+                rankingList.innerHTML = rankings.map((item, index) => `
+                    <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 text-center">${index + 1}위</span>
+                            <span class="truncate max-w-[120px]">${item.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-indigo-600 font-extrabold">${item.time}초</span>
+                            <span class="text-xs text-gray-400">${item.date}</span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         function goHome() {
