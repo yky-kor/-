@@ -123,7 +123,6 @@
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
-        // Firebase 설정 및 초기화
         const firebaseConfig = {
             apiKey: "AIzaSyBLy1BrJ5LdgnXlElI2S_WeoqQzC5MSKUk",
             authDomain: "froggame-kor.firebaseapp.com",
@@ -284,7 +283,6 @@
         function playerChoice(choiceKey) {
             if (!gameState.isPlaying) return;
             clearInterval(gameState.timer);
-            setButtonsEnabled(false);
             playSound('click');
 
             const comKey = gameState.comChoiceKey;
@@ -299,15 +297,23 @@
                 playSound('success');
                 feedbackEl.innerHTML = '<span class="text-green-600">지기 성공! (+1점) 🐸</span>';
                 
-                if (gameState.mode === 'timeattack' && gameState.score >= 10) {
-                    document.getElementById('current-score').innerText = gameState.score;
-                    setTimeout(endGame, 1000);
+                document.getElementById('current-score').innerText = gameState.score;
+
+                // 타임어택 모드일 때는 딜레이 없이 즉시 다음 라운드로 전환!
+                if (gameState.mode === 'timeattack') {
+                    if (gameState.score >= 10) {
+                        setButtonsEnabled(false);
+                        setTimeout(endGame, 300);
+                    } else {
+                        nextRound(); // 즉시 다음 판 실행
+                    }
                     return;
                 }
             } else if (isUserWin) {
                 playSound('fail');
                 feedbackEl.innerHTML = '<span class="text-red-500">이겨버렸다! ❌</span>';
                 if (gameState.mode === 'infinite') {
+                    setButtonsEnabled(false);
                     gameState.isPlaying = false;
                     setTimeout(endGame, 1200);
                     return;
@@ -316,6 +322,7 @@
                 playSound('fail');
                 feedbackEl.innerHTML = '<span class="text-amber-500">비겼다! (점수 없음) ➖</span>';
                 if (gameState.mode === 'infinite') {
+                    setButtonsEnabled(false);
                     gameState.isPlaying = false;
                     setTimeout(endGame, 1200);
                     return;
@@ -324,11 +331,15 @@
 
             document.getElementById('current-score').innerText = gameState.score;
 
-            setTimeout(() => {
-                if (gameState.isPlaying) {
-                    nextRound();
-                }
-            }, 1000);
+            // 일반 연습 모드 등은 기존처럼 1초 뒤 진행
+            if (gameState.mode !== 'timeattack') {
+                setButtonsEnabled(false);
+                setTimeout(() => {
+                    if (gameState.isPlaying) {
+                        nextRound();
+                    }
+                }, 1000);
+            }
         }
 
         function setButtonsEnabled(enabled) {
@@ -438,7 +449,7 @@
 
                 if (currentRankingTab === 'infinite') {
                     rankings.sort((a, b) => b.score - a.score);
-                    rankings = rankings.ico ? rankings.slice(0, 10) : rankings.slice(0, 10);
+                    rankings = rankings.slice(0, 10);
                     rankingList.innerHTML = rankings.map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
@@ -454,6 +465,7 @@
                 } else {
                     rankings.sort((a, b) => a.time - b.time);
                     rankings = rankings.slice(0, 10);
+                    rankingList.html = '';
                     rankingList.innerHTML = rankings.map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
