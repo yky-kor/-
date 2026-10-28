@@ -14,7 +14,7 @@
         .frog-bg { background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); }
     </style>
 </head>
-<body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
+<body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none" translate="no">
 
     <!-- 상단 헤더 -->
     <header class="w-full max-w-md text-center py-4">
@@ -61,7 +61,7 @@
                 <div id="com-hand" class="text-7xl animate-bounce">✊</div>
             </div>
 
-            <!-- 피드백 메시지 (졌는지 이겼는지 표시) -->
+            <!-- 피드백 메시지 -->
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-4 text-center"></div>
 
             <!-- 내 선택 버튼 (가위, 바위, 보) -->
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <!-- 3. 결과 및 게임 오버 화면 -->
+        <!-- 3. 결과 화면 -->
         <div id="screen-result" class="w-full flex flex-col items-center hidden py-4">
             <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2">게임 종료!</h2>
             <p id="result-desc" class="text-gray-500 text-sm mb-6">수고하셨습니다.</p>
@@ -92,5 +92,252 @@
             </div>
 
             <div id="name-input-container" class="w-full mb-4 hidden">
-                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-center font-bold text-lg mb-2 focus:outline
-}
+                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-center font-bold text-lg mb-2 focus:outline-none focus:border-green-500">
+                <button onclick="saveRanking()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow">랭킹에 기록하기</button>
+            </div>
+
+            <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow">메인으로 돌아가기</button>
+        </div>
+
+        <!-- 4. 랭킹 화면 -->
+        <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
+            <h2 class="text-2xl font-bold text-amber-600 mb-4">🏆 명예의 전당 (무한모드)</h2>
+            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm"></div>
+            <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow">메인으로 돌아가기</button>
+        </div>
+
+    </main>
+
+    <footer class="text-xs text-green-100 py-2">
+        Made with Frog Power 🐸
+    </footer>
+
+    <!-- 자바스크립트 게임 로직 -->
+    <script>
+        const hands = {
+            'scissor': { emoji: '✌️', name: '가위', winsAgainst: 'paper', losesTo: 'rock' },
+            'rock': { emoji: '✊', name: '바위', winsAgainst: 'scissor', losesTo: 'paper' },
+            'paper': { emoji: '🖐️', name: '보', winsAgainst: 'rock', losesTo: 'scissor' }
+        };
+        const handKeys = ['scissor', 'rock', 'paper'];
+
+        let gameState = {
+            mode: '10rounds',
+            score: 0,
+            round: 0,
+            maxRounds: 10,
+            isPlaying: false,
+            comChoiceKey: '',
+            timer: null,
+            timeLeft: 100
+        };
+
+        const synth = new Tone.Synth().toDestination();
+        function playSound(type) {
+            try {
+                Tone.start();
+                if (type === 'success') synth.triggerAttackRelease("C5", "8n");
+                else if (type === 'fail') synth.triggerAttackRelease("C3", "8n");
+                else if (type === 'click') synth.triggerAttackRelease("G4", "32n");
+            } catch(e) {}
+        }
+
+        function showScreen(screenId) {
+            ['screen-menu', 'screen-game', 'screen-result', 'screen-ranking'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function startGame(mode) {
+            playSound('click');
+            gameState.mode = mode;
+            gameState.score = 0;
+            gameState.round = 0;
+            gameState.isPlaying = true;
+
+            document.getElementById('game-mode-label').innerText = mode === '10rounds' ? '10판 모드' : '무한 모드';
+            showScreen('screen-game');
+            nextRound();
+        }
+
+        function nextRound() {
+            if (!gameState.isPlaying) return;
+
+            if (gameState.mode === '10rounds') {
+                gameState.round++;
+                if (gameState.round > gameState.maxRounds) {
+                    endGame();
+                    return;
+                }
+                document.getElementById('game-progress').innerText = `진행도: ${gameState.round}/${gameState.maxRounds}`;
+            } else {
+                gameState.round++;
+                document.getElementById('game-progress').innerText = `성공 콤보: ${gameState.round - 1}`;
+            }
+
+            document.getElementById('current-score').innerText = gameState.score;
+            document.getElementById('feedback-msg').innerText = '';
+            setButtonsEnabled(true);
+
+            const randomKey = handKeys[Math.floor(Math.random() * handKeys.length)];
+            gameState.comChoiceKey = randomKey;
+            document.getElementById('com-hand').innerText = hands[randomKey].emoji;
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timer);
+            gameState.timeLeft = 100;
+            const timerBar = document.getElementById('timer-bar');
+            timerBar.style.width = '100%';
+
+            const startTime = Date.now();
+            const duration = 1000;
+
+            gameState.timer = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                gameState.timeLeft = Math.max(0, 100 - (elapsed / duration) * 100);
+                timerBar.style.width = gameState.timeLeft + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(gameState.timer);
+                    handleTimeout();
+                }
+            }, 20);
+        }
+
+        function handleTimeout() {
+            if (!gameState.isPlaying) return;
+            setButtonsEnabled(false);
+            playSound('fail');
+            document.getElementById('feedback-msg').innerHTML = '<span class="text-red-500">시간 초과! ⏰</span>';
+
+            if (gameState.mode === 'infinite') {
+                setTimeout(endGame, 1000);
+            } else {
+                setTimeout(nextRound, 1000);
+            }
+        }
+
+        function playerChoice(choiceKey) {
+            if (!gameState.isPlaying) return;
+            clearInterval(gameState.timer);
+            setButtonsEnabled(false);
+            playSound('click');
+
+            const comKey = gameState.comChoiceKey;
+            const comHand = hands[comKey];
+            const feedbackEl = document.getElementById('feedback-msg');
+
+            // 지는 것이 정답! (플레이어가 컴퓨터의 losesTo를 냈을 때)
+            const isUserLost = (choiceKey === comHand.losesTo);
+            const isUserWin = (choiceKey === comHand.winsAgainst);
+
+            if (isUserLost) {
+                gameState.score += 1;
+                playSound('success');
+                feedbackEl.innerHTML = '<span class="text-green-600">지기 성공! (+1점) 🐸</span>';
+            } else if (isUserWin) {
+                playSound('fail');
+                feedbackEl.innerHTML = '<span class="text-red-500">이겨버렸다! ❌</span>';
+                if (gameState.mode === 'infinite') {
+                    gameState.isPlaying = false;
+                    setTimeout(endGame, 1200);
+                    return;
+                }
+            } else {
+                playSound('fail');
+                feedbackEl.innerHTML = '<span class="text-amber-500">비겼다! (점수 없음) ➖</span>';
+                if (gameState.mode === 'infinite') {
+                    gameState.isPlaying = false;
+                    setTimeout(endGame, 1200);
+                    return;
+                }
+            }
+
+            document.getElementById('current-score').innerText = gameState.score;
+
+            setTimeout(() => {
+                if (gameState.isPlaying) {
+                    nextRound();
+                }
+            }, 1000);
+        }
+
+        function setButtonsEnabled(enabled) {
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach(btn => btn.disabled = !enabled);
+        }
+
+        function endGame() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            showScreen('screen-result');
+
+            document.getElementById('final-score').innerText = gameState.score + '점';
+
+            const nameInputContainer = document.getElementById('name-input-container');
+            const resultDesc = document.getElementById('result-desc');
+
+            if (gameState.mode === 'infinite') {
+                resultDesc.innerText = `무한 모드 기록: ${gameState.score}번 연속 성공!`;
+                nameInputContainer.classList.remove('hidden');
+            } else {
+                resultDesc.innerText = `10판 중 총 ${gameState.score}점을 획득했습니다.`;
+                nameInputContainer.classList.add('hidden');
+            }
+        }
+
+        function saveRanking() {
+            const nameInput = document.getElementById('player-name');
+            const name = nameInput.value.trim() || '익명의 청개구리';
+            const score = gameState.score;
+
+            if (score <= 0) {
+                alert('0점은 랭킹에 등록할 수 없습니다!');
+                return;
+            }
+
+            let rankings = JSON.parse(localStorage.getItem('frog_rankings') || '[]');
+            rankings.push({ name, score, date: new Date().toLocaleDateString() });
+            rankings.sort((a, b) => b.score - a.score);
+            rankings = rankings.slice(0, 10);
+
+            localStorage.setItem('frog_rankings', JSON.stringify(rankings));
+            nameInput.value = '';
+            showRanking();
+        }
+
+        function showRanking() {
+            showScreen('screen-ranking');
+            const rankingList = document.getElementById('ranking-list');
+            const rankings = JSON.parse(localStorage.getItem('frog_rankings') || '[]');
+
+            if (rankings.length === 0) {
+                rankingList.innerHTML = '<p class="text-center text-gray-400 py-4">아직 등록된 랭킹 기록이 없습니다.</p>';
+                return;
+            }
+
+            rankingList.innerHTML = rankings.map((item, index) => `
+                <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 text-center">${index + 1}위</span>
+                        <span class="truncate max-w-[120px]">${item.name}</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-600 font-extrabold">${item.score}점</span>
+                        <span class="text-xs text-gray-400">${item.date}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function goHome() {
+            playSound('click');
+            showScreen('screen-menu');
+        }
+    </script>
+</body>
+</html>
