@@ -283,6 +283,15 @@
                 updateModeLabel();
             }
         }
+        function goHome() {
+            playSound('click');
+            // 게임 상태를 확실하게 중지하고 타이머들을 전부 초기화합니다
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            clearInterval(gameState.stopwatchTimer);
+            
+            showScreen('screen-menu');
+        }
 
         function updateModeLabel() {
             const labels = {
