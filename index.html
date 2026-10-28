@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js 사운드 효과 CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Firebase SDK 추가 -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body { font-family: 'Jua', sans-serif; }
@@ -47,33 +50,27 @@
 
         <!-- 2. 게임 플레이 화면 -->
         <div id="screen-game" class="w-full flex flex-col items-center hidden">
-            <!-- 상단 상태바 -->
             <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
                 <span id="game-progress">진행도: 0/10</span>
                 <span class="text-green-600 font-bold">점수: <span id="current-score">0</span></span>
             </div>
 
-            <!-- 타이머 바 -->
             <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
                 <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-100"></div>
             </div>
 
-            <!-- 타임어택용 경과 시간 표시 -->
             <div id="stopwatch-display" class="hidden mb-2 text-indigo-600 font-bold text-lg">
                 ⏱️ 경과 시간: <span id="elapsed-time">0.0</span>초
             </div>
 
-            <!-- 컴퓨터 제시 손 -->
             <div class="text-center mb-3">
                 <p class="text-xs text-gray-400 mb-1">컴퓨터가 낸 손 (이 손에 <b>져야</b> 합니다!)</p>
                 <div id="com-hand" class="text-7xl animate-bounce">✊</div>
             </div>
 
-            <!-- 피드백 메시지 -->
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-3 text-center"></div>
 
-            <!-- 내 선택 버튼 (가위, 바위, 보) -->
             <div class="grid grid-cols-3 gap-3 w-full mb-2">
                 <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✌️</span>
@@ -110,7 +107,6 @@
 
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
-            <!-- 랭킹 탭 전환 버튼 -->
             <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
                 <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white text-green-700 shadow-sm">무한모드 랭킹</button>
                 <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500">타임어택 랭킹</button>
@@ -127,6 +123,21 @@
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
+        // Firebase 설정 및 초기화
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLy1BrJ5LdgnXlElI2S_WeoqQzC5MSKUk",
+            authDomain: "froggame-kor.firebaseapp.com",
+            databaseURL: "https://froggame-kor-default-rtdb.firebaseio.com",
+            projectId: "froggame-kor",
+            storageBucket: "froggame-kor.firebasestorage.app",
+            messagingSenderId: "83938472627",
+            appId: "1:83938472627:web:b393e691486de2ac1b36c6",
+            measurementId: "G-1SNF9LS2YJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const hands = {
             'scissor': { emoji: '✌️', name: '가위', beats: 'paper', losesTo: 'rock' },
             'rock': { emoji: '✊', name: '바위', beats: 'scissor', losesTo: 'paper' },
@@ -243,7 +254,6 @@
             timerBar.style.width = '100%';
 
             const startTime = Date.now();
-            // 무한 모드는 1초, 연습 모드는 3초
             const duration = gameState.mode === 'practice' ? 3000 : 1000;
 
             gameState.timer = setInterval(() => {
@@ -367,18 +377,20 @@
                     alert('0점은 랭킹에 등록할 수 없습니다!');
                     return;
                 }
-                let rankings = JSON.parse(localStorage.getItem('frog_rankings_infinite') || '[]');
-                rankings.push({ name, score, date: new Date().toLocaleDateString() });
-                rankings.sort((a, b) => b.score - a.score);
-                rankings = rankings.slice(0, 10);
-                localStorage.setItem('frog_rankings_infinite', JSON.stringify(rankings));
+                const newRef = db.ref('rankings_infinite').push();
+                newRef.set({
+                    name: name,
+                    score: score,
+                    date: new Date().toLocaleDateString()
+                });
             } else if (gameState.mode === 'timeattack') {
                 const timeTaken = parseFloat(gameState.elapsedSeconds);
-                let rankings = JSON.parse(localStorage.getItem('frog_rankings_timeattack') || '[]');
-                rankings.push({ name, time: timeTaken, date: new Date().toLocaleDateString() });
-                rankings.sort((a, b) => a.time - b.time); 
-                rankings = rankings.slice(0, 10);
-                localStorage.setItem('frog_rankings_timeattack', JSON.stringify(rankings));
+                const newRef = db.ref('rankings_timeattack').push();
+                newRef.set({
+                    name: name,
+                    time: timeTaken,
+                    date: new Date().toLocaleDateString()
+                });
             }
 
             nameInput.value = '';
@@ -408,63 +420,60 @@
 
         function renderRankingList() {
             const rankingList = document.getElementById('ranking-list');
-            const storageKey = currentRankingTab === 'infinite' ? 'frog_rankings_infinite' : 'frog_rankings_timeattack';
-            const rankings = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const dbPath = currentRankingTab === 'infinite' ? 'rankings_infinite' : 'rankings_timeattack';
 
-            if (rankings.length === 0) {
-                rankingList.innerHTML = '<p class="text-center text-gray-400 py-4">아직 등록된 랭킹 기록이 없습니다.</p>';
-                return;
-            }
+            rankingList.innerHTML = '<p class="text-center text-gray-400 py-4">랭킹을 불러오는 중...</p>';
 
-            if (currentRankingTab === 'infinite') {
-                rankingList.innerHTML = rankings.map((item, index) => `
-                    <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
-                        <div class="flex items-center space-x-3">
-                            <span class="w-6 text-center">${index + 1}위</span>
-                            <span class="truncate max-w-[120px]">${item.name}</span>
+            db.ref(dbPath).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    rankingList.innerHTML = '<p class="text-center text-gray-400 py-4">아직 등록된 랭킹 기록이 없습니다.</p>';
+                    return;
+                }
+
+                let rankings = [];
+                for (let id in data) {
+                    rankings.push(data[id]);
+                }
+
+                if (currentRankingTab === 'infinite') {
+                    rankings.sort((a, b) => b.score - a.score);
+                    rankings = rankings.ico ? rankings.slice(0, 10) : rankings.slice(0, 10);
+                    rankingList.innerHTML = rankings.map((item, index) => `
+                        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-6 text-center">${index + 1}위</span>
+                                <span class="truncate max-w-[120px]">${item.name}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-green-600 font-extrabold">${item.score}점</span>
+                                <span class="text-xs text-gray-400">${item.date}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-green-600 font-extrabold">${item.score}점</span>
-                            <span class="text-xs text-gray-400">${item.date}</span>
+                    `).join('');
+                } else {
+                    rankings.sort((a, b) => a.time - b.time);
+                    rankings = rankings.slice(0, 10);
+                    rankingList.innerHTML = rankings.map((item, index) => `
+                        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-6 text-center">${index + 1}위</span>
+                                <span class="truncate max-w-[120px]">${item.name}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-indigo-600 font-extrabold">${item.time}초</span>
+                                <span class="text-xs text-gray-400">${item.date}</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
-            } else {
-                rankingList.innerHTML = rankings.map((item, index) => `
-                    <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
-                        <div class="flex items-center space-x-3">
-                            <span class="w-6 text-center">${index + 1}위</span>
-                            <span class="truncate max-w-[120px]">${item.name}</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-indigo-600 font-extrabold">${item.time}초</span>
-                            <span class="text-xs text-gray-400">${item.date}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
+                    `).join('');
+                }
+            });
         }
 
         function goHome() {
             playSound('click');
             showScreen('screen-menu');
         }
-    <script>
-    const firebaseConfig = {
-    apiKey: "AIzaSyBLy1BrJ5LdgnXlElI2S_WeoqQzC5MSKUk",
-    authDomain: "froggame-kor.firebaseapp.com",
-    databaseURL: "https://froggame-kor-default-rtdb.firebaseio.com",
-    projectId: "froggame-kor",
-    storageBucket: "froggame-kor.firebasestorage.app",
-    messagingSenderId: "83938472627",
-    appId: "1:83938472627:web:b393e691486de2ac1b36c6",
-    measurementId: "G-1SNF9LS2YJ"
-  };
-    // Firebase 초기화 및 게임 로직 코드들...
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-    // (이하 생략)
     </script>
 </body>
 </html>
