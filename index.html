@@ -20,18 +20,22 @@
 <body class="frog-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
 
     <!-- 상단 헤더 -->
-    <header class="w-full max-w-md flex justify-between items-center py-4 px-2">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-bold drop-shadow-md" data-i18n="title">🐸 청개구리 가위바위보</h1>
-            <p class="text-green-100 text-sm mt-1" data-i18n="subtitle">컴퓨터에게 져야만 점수를 얻는 반대로 게임!</p>
+    <header class="w-full max-w-md flex justify-between items-center py-3 px-2">
+        <div class="flex items-center space-x-2 min-w-0">
+            <span class="text-2xl md:text-3xl">🐸</span>
+            <div class="min-w-0">
+                <h1 class="text-xl md:text-2xl font-bold truncate drop-shadow-md" data-i18n="title">청개구리 가위바위보</h1>
+                <p class="text-green-100 text-xs mt-0.5 truncate" data-i18n="subtitle">컴퓨터에게 져야만 점수를 얻는 반대로 게임!</p>
+            </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <!-- 언어 변경 버튼을 왼쪽으로 -->
-            <button onclick="toggleLanguage()" class="bg-white/25 hover:bg-white/35 text-white font-bold px-3 py-1.5 rounded-xl text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center space-x-1">
+        <!-- 우측 버튼 그룹 (크기 동일, 줄바꿈 없음) -->
+        <div class="flex items-center space-x-1.5 shrink-0">
+            <!-- 언어 변경 버튼 -->
+            <button onclick="toggleLanguage()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center space-x-1">
                 <span>🌐</span> <span id="lang-btn-text">EN</span>
             </button>
-            <!-- 사운드 토글 버튼을 오른쪽 끝으로 -->
-            <button onclick="toggleSound()" id="sound-btn" class="bg-white/25 hover:bg-white/35 text-white font-bold px-3 py-1.5 rounded-xl text-sm backdrop-blur-sm transition border border-white/30 shadow">
+            <!-- 사운드 토글 버튼 -->
+            <button onclick="toggleSound()" id="sound-btn" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center justify-center">
                 🔊
             </button>
         </div>
