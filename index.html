@@ -490,21 +490,18 @@
             if (!gameState.isPlaying) return;
             clearInterval(gameState.timer);
             playSound('click');
-
             const comKey = gameState.comChoiceKey;
             const comHand = hands[comKey];
             const feedbackEl = document.getElementById('feedback-msg');
-
-            const isUserLoss = (choiceKey === comHand.beats);    
-            const isUserWin = (choiceKey === comHand.losesTo);   
+            const isUserLoss = (choiceKey === comHand.beats);
+            const isUserWin = (choiceKey === comHand.losesTo);
 
             if (isUserLoss) {
                 gameState.score += 1;
                 playSound('success');
                 feedbackEl.innerHTML = `<span class="text-green-600">${translations[currentLang].msgSuccess}</span>`;
                 document.getElementById('current-score').innerText = gameState.score;
-
-                // 타임어택 및 무한모드 모두 딜레이 없이 즉시 다음 판으로 진행
+                
                 if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                     if (gameState.score >= 10) {
                         setButtonsEnabled(false);
@@ -520,6 +517,12 @@
             } else if (isUserWin) {
                 playSound('fail');
                 feedbackEl.innerHTML = `<span class="text-red-500">${translations[currentLang].msgWin}</span>`;
+                
+                // 👇 타임어택 모드에서 실수로 이겼을 때 시간 0.5초 추가 페널티!
+                if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
+                    gameState.startTime -= 500; // 시작 시간을 0.5초 당겨서 경과 시간을 늘림
+                }
+
                 if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                     setButtonsEnabled(false);
                     gameState.isPlaying = false;
@@ -529,6 +532,12 @@
             } else {
                 playSound('fail');
                 feedbackEl.innerHTML = `<span class="text-amber-500">${translations[currentLang].msgDraw}</span>`;
+                
+                // 👇 타임어택 모드에서 실수로 비겼을 때 시간 0.5초 추가 페널티!
+                if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
+                    gameState.startTime -= 500; // 시작 시간을 0.5초 당겨서 경과 시간을 늘림
+                }
+
                 if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
                     setButtonsEnabled(false);
                     gameState.isPlaying = false;
@@ -538,7 +547,6 @@
             }
 
             document.getElementById('current-score').innerText = gameState.score;
-
             if (gameState.mode !== 'timeattack' && gameState.mode !== 'timeattack_hard') {
                 setButtonsEnabled(false);
                 setTimeout(() => {
@@ -546,6 +554,14 @@
                         nextRound();
                     }
                 }, 1000);
+            } else {
+                // 타임어택 모드에서 틀렸을 때 메시지를 잠깐 보여주고 다음 판으로 진행
+                setButtonsEnabled(false);
+                setTimeout(() => {
+                    if (gameState.isPlaying) {
+                        nextRound();
+                    }
+                }, 500);
             }
         }
 
