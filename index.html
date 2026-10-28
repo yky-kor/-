@@ -54,7 +54,7 @@
                 <span class="text-green-600 font-bold">점수: <span id="current-score">0</span></span>
             </div>
 
-            <!-- 타이머 바 (무한/타임어택 모드에서는 숨김 또는 스톱워치로 표시) -->
+            <!-- 타이머 바 -->
             <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
                 <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-100"></div>
             </div>
@@ -135,7 +135,7 @@
         const handKeys = ['scissor', 'rock', 'paper'];
 
         let gameState = {
-            mode: 'practice', // 'practice', 'timeattack', 'infinite'
+            mode: 'practice',
             score: 0,
             round: 0,
             maxRounds: 10,
@@ -184,7 +184,6 @@
                 timerBarContainer.classList.add('hidden');
                 stopwatchDisplay.classList.remove('hidden');
                 
-                // 스톱워치 시작
                 gameState.stopwatchTimer = setInterval(() => {
                     gameState.elapsedSeconds = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
                     document.getElementById('elapsed-time').innerText = gameState.elapsedSeconds;
@@ -244,6 +243,7 @@
             timerBar.style.width = '100%';
 
             const startTime = Date.now();
+            // 무한 모드는 1초, 연습 모드는 3초
             const duration = gameState.mode === 'practice' ? 3000 : 1000;
 
             gameState.timer = setInterval(() => {
@@ -281,8 +281,8 @@
             const comHand = hands[comKey];
             const feedbackEl = document.getElementById('feedback-msg');
 
-            const isUserLoss = (choiceKey === comHand.beats);    // 내가 짐 -> 성공 (+점수) 🟢
-            const isUserWin = (choiceKey === comHand.losesTo);   // 내가 이김 -> 실패 ❌
+            const isUserLoss = (choiceKey === comHand.beats);    
+            const isUserWin = (choiceKey === comHand.losesTo);   
 
             if (isUserLoss) {
                 gameState.score += 1;
@@ -376,7 +376,7 @@
                 const timeTaken = parseFloat(gameState.elapsedSeconds);
                 let rankings = JSON.parse(localStorage.getItem('frog_rankings_timeattack') || '[]');
                 rankings.push({ name, time: timeTaken, date: new Date().toLocaleDateString() });
-                rankings.sort((a, b) => a.time - b.time); // 시간이 적을수록 상위 랭크!
+                rankings.sort((a, b) => a.time - b.time); 
                 rankings = rankings.slice(0, 10);
                 localStorage.setItem('frog_rankings_timeattack', JSON.stringify(rankings));
             }
