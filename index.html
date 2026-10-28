@@ -44,44 +44,44 @@
         <!-- 2. 게임 플레이 화면 -->
         <div id="screen-game" class="w-full flex flex-col items-center hidden">
             <!-- 상단 상태바 -->
-            <div class="w-full flex justify-between items-center mb-4 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
+            <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
                 <span id="game-progress">진행도: 1/10</span>
                 <span class="text-green-600 font-bold">점수: <span id="current-score">0</span></span>
             </div>
 
-            <!-- 타이머 바 -->
-            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-6">
-                <div id="timer-bar" class="bg-red-500 h-full w-full transition-all duration-100"></div>
+            <!-- 타이머 바 (3초) -->
+            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
+                <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-100"></div>
             </div>
 
             <!-- 컴퓨터 제시 손 -->
-            <div class="text-center mb-6">
-                <p class="text-sm text-gray-400 mb-2">컴퓨터가 낸 손</p>
+            <div class="text-center mb-3">
+                <p class="text-xs text-gray-400 mb-1">컴퓨터가 낸 손 (이 손에 <b>져야</b> 합니다!)</p>
                 <div id="com-hand" class="text-7xl animate-bounce">✊</div>
             </div>
 
-            <!-- 피드백 메시지 (졌는지 이겼는지 표시) -->
-            <div id="feedback-msg" class="h-8 text-xl font-bold mb-4 text-center"></div>
+            <!-- 피드백 메시지 -->
+            <div id="feedback-msg" class="h-8 text-xl font-bold mb-3 text-center"></div>
 
             <!-- 내 선택 버튼 (가위, 바위, 보) -->
-            <div class="grid grid-cols-3 gap-3 w-full mb-4">
-                <button onclick="playerChoice('scissor')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+            <div class="grid grid-cols-3 gap-3 w-full mb-2">
+                <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✌️</span>
                     <span class="text-xs text-gray-500 mt-1">가위</span>
                 </button>
-                <button onclick="playerChoice('rock')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                <button onclick="playerChoice('rock')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✊</span>
                     <span class="text-xs text-gray-500 mt-1">바위</span>
                 </button>
-                <button onclick="playerChoice('paper')" class="choice-btn py-5 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                <button onclick="playerChoice('paper')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>🖐️</span>
                     <span class="text-xs text-gray-500 mt-1">보</span>
                 </button>
             </div>
         </div>
 
-        <!-- 3. 결과 및 게임 오버 화면 -->
+        <!-- 3. 결과 화면 -->
         <div id="screen-result" class="w-full flex flex-col items-center hidden py-4">
             <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2">게임 종료!</h2>
             <p id="result-desc" class="text-gray-500 text-sm mb-6">수고하셨습니다.</p>
@@ -102,25 +102,25 @@
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
             <h2 class="text-2xl font-bold text-amber-600 mb-4">🏆 명예의 전당 (무한모드)</h2>
-            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm">
-                <!-- 랭킹 항목이 동적으로 들어감 -->
-            </div>
+            <div id="ranking-list" class="w-full max-h-60 overflow-y-auto divide-y divide-gray-100 mb-6 text-sm"></div>
             <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow">메인으로 돌아가기</button>
         </div>
 
     </main>
 
-    <!-- 하단 푸터 -->
     <footer class="text-xs text-green-100 py-2">
         Made with Frog Power 🐸
     </footer>
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
+        // 올바른 상성 관계 정의:
+        // beats: 내가 이기는 손 (컴퓨터가 이 손을 내면 내가 이겨버려서 오답/게임오버)
+        // losesTo: 내가 지는 손 (컴퓨터가 이 손을 내면 내가 져서 점수 획득! 🟢)
         const hands = {
-            'scissor': { emoji: '✌️', name: '가위', winsAgainst: 'paper', losesTo: 'rock' },
-            'rock': { emoji: '✊', name: '바위', winsAgainst: 'scissor', losesTo: 'paper' },
-            'paper': { emoji: '🖐️', name: '보', winsAgainst: 'rock', losesTo: 'scissor' }
+            'scissor': { emoji: '✌️', name: '가위', beats: 'paper', losesTo: 'rock' },
+            'rock': { emoji: '✊', name: '바위', beats: 'scissor', losesTo: 'paper' },
+            'paper': { emoji: '🖐️', name: '보', beats: 'rock', losesTo: 'scissor' }
         };
         const handKeys = ['scissor', 'rock', 'paper'];
 
@@ -133,7 +133,7 @@
             comChoiceKey: '',
             timer: null,
             timeLeft: 100,
-            roundIntervalTime: 1000
+            roundDuration: 3000 // 3초 제한 시간
         };
 
         const synth = new Tone.Synth().toDestination();
@@ -198,7 +198,7 @@
             timerBar.style.width = '100%';
 
             const startTime = Date.now();
-            const duration = 1000;
+            const duration = gameState.roundDuration;
 
             gameState.timer = setInterval(() => {
                 const elapsed = Date.now() - startTime;
@@ -235,13 +235,13 @@
             const comHand = hands[comKey];
             const feedbackEl = document.getElementById('feedback-msg');
 
-            // 🐸 청개구리 룰 명확한 판정:
-            // 1. 내가 져야 점수 획득 (choiceKey === comHand.losesTo)
-            // 2. 내가 이겨버리면 실패 (choiceKey === comHand.winsAgainst)
-            const isUserLost = (choiceKey === comHand.losesTo);
-            const isUserWin = (choiceKey === comHand.winsAgainst);
+            // 🐸 올바른 청개구리 룰 수정 완료!
+            // 컴퓨터가 주먹('rock')이면 내가 져야 하므로 가위('scissor')를 내야 합니다.
+            // 즉, 내가 컴퓨터에게 지는 손은 comHand.beats (컴퓨터가 나를 이기는 손)입니다!
+            const isUserLoss = (choiceKey === comHand.beats);    // 내가 컴퓨터에게 짐 -> 성공 (+점수) 🟢
+            const isUserWin = (choiceKey === comHand.losesTo);   // 내가 컴퓨터를 이김 -> 실패 (오답/게임오버) ❌
 
-            if (isUserLost) {
+            if (isUserLoss) {
                 gameState.score += 1;
                 playSound('success');
                 feedbackEl.innerHTML = '<span class="text-green-600">지기 성공! (+1점) 🐸</span>';
