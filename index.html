@@ -118,7 +118,7 @@
         <div id="screen-game" class="w-full flex flex-col items-center hidden">
             <div class="w-full flex justify-between items-center mb-3">
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3 py-1.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-1">
-                    <span>🏠</span> <span id="home-btn-text">메인으로</span>
+                    <span>🏠</span> <span id="home-btn-text" data-i18n="goHomeMenu">메인으로</span>
                 </button>
             </div>
             <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
@@ -157,7 +157,7 @@
             <p id="result-desc" class="text-gray-500 text-sm mb-4" data-i18n="wellDone">수고하셨습니다.</p>
             
             <div id="capture-card" class="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-2xl p-5 w-full text-center mb-5 shadow-lg border-2 border-green-300">
-                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> 청개구리 가위바위보</div>
+                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> <span data-i18n="title">청개구리 가위바위보</span></div>
                 <div id="card-mode-name" class="text-xs text-green-200 mb-3">무한 모드</div>
                 <p id="result-label" class="text-sm text-green-100" data-i18n="earnedScore">획득 점수</p>
                 <p id="final-score" class="text-4xl font-extrabold mt-1 mb-2">0점</p>
@@ -192,12 +192,12 @@
     <!-- 모달: 출석체크 -->
     <div id="modal-attendance" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
-            <h3 class="text-xl font-bold text-green-700 mb-2">📅 매일 출석체크</h3>
-            <p class="text-xs text-gray-500 mb-4">매일 접속해서 출석하고 보상 포인트를 받아가세요!</p>
+            <h3 class="text-xl font-bold text-green-700 mb-2" data-i18n="attendanceTitle">📅 매일 출석체크</h3>
+            <p class="text-xs text-gray-500 mb-4" data-i18n="attendanceDesc">매일 접속해서 출석하고 보상 포인트를 받아가세요!</p>
             <div id="attendance-status" class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 mb-4 font-bold text-green-700">
                 출석체크 로딩중...
             </div>
-            <button onclick="closeAttendanceModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl">닫기</button>
+            <button onclick="closeAttendanceModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl" data-i18n="closeBtn">닫기</button>
         </div>
     </div>
 
@@ -205,14 +205,14 @@
     <div id="modal-achievement" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-green-700">🏅 도전과제 & 보상</h3>
+                <h3 class="text-lg font-bold text-green-700" data-i18n="achievementTitle">🏅 도전과제 & 보상</h3>
                 <div class="flex bg-gray-100 p-1 rounded-xl">
-                    <button onclick="switchAchieveTab('infinite')" id="tab-ach-infinite" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm">무한 모드</button>
-                    <button onclick="switchAchieveTab('timeattack')" id="tab-ach-timeattack" class="px-3 py-1 text-xs font-bold rounded-lg text-gray-500">타임어택</button>
+                    <button onclick="switchAchieveTab('infinite')" id="tab-ach-infinite" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm" data-i18n="tabAchInfinite">무한 모드</button>
+                    <button onclick="switchAchieveTab('timeattack')" id="tab-ach-timeattack" class="px-3 py-1 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabAchTimeAttack">타임어택</button>
                 </div>
             </div>
             <div id="achievement-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
-            <button onclick="closeAchievementModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm">닫기</button>
+            <button onclick="closeAchievementModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm" data-i18n="closeBtn">닫기</button>
         </div>
     </div>
 
@@ -223,9 +223,9 @@
                 <h3 class="text-lg font-bold text-purple-700" data-i18n="shopTitle">🛍️ 상점</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
-            <p class="text-xs text-gray-500 mb-3">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
+            <p class="text-xs text-gray-500 mb-3" data-i18n="shopDesc">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
             <div id="shop-char-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
-            <button onclick="closeShopModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm">닫기</button>
+            <button onclick="closeShopModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm" data-i18n="closeBtn">닫기</button>
         </div>
     </div>
 
@@ -246,7 +246,7 @@
                 rankingBtn: "랭킹", attendanceBtn: "출석", achievementBtn: "도전과제", shopBtn: "상점",
                 scoreLabel: "점수", timeElapsed: "경과 시간", comInstruction: "컴퓨터가 낸 손 (이 손에 져야 합니다!)",
                 scissor: "가위", rock: "바위", paper: "보", gameOver: "게임 종료!", wellDone: "수고하셨습니다.",
-                earnedScore: "획득 점수", submitRanking: "랭킹에 기록하기", goHome: "메인으로 돌아가기",
+                earnedScore: "획득 점수", submitRanking: "랭킹에 기록하기", goHome: "메인으로 돌아가기", goHomeMenu: "메인으로",
                 downloadCard: "공유용 캡처 카드 저장하기",
                 tabInfinite: "무한모드", tabInfiniteHard: "무한하드", tabTimeAttack: "타임어택", tabTimeAttackHard: "타임하드",
                 loadingRanking: "랭킹을 불러오는 중...", noRanking: "아직 등록된 랭킹 기록이 없습니다.",
@@ -254,7 +254,16 @@
                 modeInfinite: "무한 모드 (1초)", modeInfiniteHard: "무한 하드 모드",
                 msgSuccess: "지기 성공! (+1점) 🐸", msgWin: "이겨버렸다! ❌", msgDraw: "비겼다! (점수 없음) ➖", msgTimeout: "시간 초과! ⏰",
                 namePlaceholder: "닉네임 입력 (최대 8자)", anonymousName: "익명의 청개구리", alertZeroScore: "0점은 랭킹에 등록할 수 없습니다!",
-                pointsLabel: "✨ 나의 포인트", shopTitle: "🛍️ 상점"
+                pointsLabel: "✨ 나의 포인트", shopTitle: "🛍️ 상점", closeBtn: "닫기",
+                attendanceTitle: "📅 매일 출석체크", attendanceDesc: "매일 접속해서 출석하고 보상 포인트를 받아가세요!",
+                attendanceDone: "✅ 오늘 이미 출석을 완료했습니다!<br><span class='text-xs font-normal text-gray-500'>내일 또 방문해서 포인트를 받아가세요! 🐸</span>",
+                attendanceReward: (count) => `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 포인트 +30 💰 획득!</span>`,
+                achievementTitle: "🏅 도전과제 & 보상", tabAchInfinite: "무한 모드", tabAchTimeAttack: "타임어택",
+                shopDesc: "도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!",
+                statusDone: "✅ 완료", statusInProgress: "🔒 진행중",
+                charDefault: "기본 제공", charPrice: (price) => `${price} 포인트`,
+                equipped: "장착중", equipBtn: "장착하기", buyBtn: (price) => `구매 (${price}P)`,
+                notEnoughPts: "포인트가 부족합니다! 도전과제를 달성해 포인트를 모아보세요."
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -266,7 +275,7 @@
                 rankingBtn: "Ranking", attendanceBtn: "Check", achievementBtn: "Achievements", shopBtn: "Shop",
                 scoreLabel: "Score", timeElapsed: "Elapsed Time", comInstruction: "Computer's hand (You must LOSE to this!)",
                 scissor: "Scissor", rock: "Rock", paper: "Paper", gameOver: "Game Over!", wellDone: "Great job!",
-                earnedScore: "Final Score", submitRanking: "Submit Score", goHome: "Back to Menu",
+                earnedScore: "Final Score", submitRanking: "Submit Score", goHome: "Back to Menu", goHomeMenu: "Home",
                 downloadCard: "Save Shareable Card",
                 tabInfinite: "Infinite", tabInfiniteHard: "Inf Hard", tabTimeAttack: "Time Attack", tabTimeAttackHard: "TA Hard",
                 loadingRanking: "Loading rankings...", noRanking: "No ranking records yet.",
@@ -274,7 +283,16 @@
                 modeInfinite: "Infinite Mode (1s)", modeInfiniteHard: "Infinite Hard Mode",
                 msgSuccess: "Successfully Lost! (+1pt) 🐸", msgWin: "You Won! (Oops) ❌", msgDraw: "Draw! (No pts) ➖", msgTimeout: "Time Out! ⏰",
                 namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Frog", alertZeroScore: "0 points cannot be registered!",
-                pointsLabel: "✨ My Points", shopTitle: "🛍️ Shop"
+                pointsLabel: "✨ My Points", shopTitle: "🛍️ Shop", closeBtn: "Close",
+                attendanceTitle: "📅 Daily Attendance", attendanceDesc: "Check in every day and get reward points!",
+                attendanceDone: "✅ Already checked in today!<br><span class='text-xs font-normal text-gray-500'>Come back tomorrow for more points! 🐸</span>",
+                attendanceReward: (count) => `🎉 Checked in! (${count} days total)<br><span class='text-xs font-extrabold text-amber-600'>🎁 Reward: +30 💰 Points!</span>`,
+                achievementTitle: "🏅 Achievements & Rewards", tabAchInfinite: "Infinite Mode", tabAchTimeAttack: "Time Attack",
+                shopDesc: "Complete achievements and collect points to meet new animal friends!",
+                statusDone: "✅ Done", statusInProgress: "🔒 In Progress",
+                charDefault: "Default", charPrice: (price) => `${price} Points`,
+                equipped: "Equipped", equipBtn: "Equip", buyBtn: (price) => `Buy (${price}P)`,
+                notEnoughPts: "Not enough points! Complete achievements to earn points."
             }
         };
 
@@ -288,10 +306,18 @@
                 if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
             });
             const homeBtnText = document.getElementById('home-btn-text');
-            if (homeBtnText) { homeBtnText.innerText = currentLang === 'ko' ? '메인으로' : 'Home'; }
+            if (homeBtnText) { homeBtnText.innerText = translations[currentLang].goHomeMenu; }
             const nameInput = document.getElementById('player-name');
             if (nameInput) { nameInput.placeholder = translations[currentLang].namePlaceholder; }
             if (gameState.isPlaying) { updateModeLabel(); }
+            
+            // 모달이 열려있는 상태라면 언어 변경 시 즉시 반영
+            if (!document.getElementById('modal-achievement').classList.contains('hidden')) {
+                renderAchievements();
+            }
+            if (!document.getElementById('modal-shop').classList.contains('hidden')) {
+                renderShop();
+            }
         }
 
         function goHome() {
@@ -327,15 +353,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 캐릭터 데이터 정의 (청개구리와 고양이 기본 제공)
         const charactersData = [
-            { id: 'frog', name: '청개구리', emoji: '🐸', price: 0 },
-            { id: 'cat', name: '아기 고양이', emoji: '🐱', price: 0 },
-            { id: 'lion', name: '용감한 사자', emoji: '🦁', price: 50 },
-            { id: 'dino', name: '초록 공룡', emoji: '🦖', price: 80 },
-            { id: 'unicorn', name: '신비로운 유니콘', emoji: '🦄', price: 120 },
-            { id: 'robot', name: '꼬마 로봇', emoji: '🤖', price: 150 },
-            { id: 'ghost', name: '귀여운 유령', emoji: '👻', price: 200 }
+            { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0 },
+            { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0 },
+            { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50 },
+            { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80 },
+            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120 },
+            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150 },
+            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200 }
         ];
 
         let gameState = {
@@ -608,23 +633,23 @@
             cardModeName.innerText = updateModeCardTitle();
 
             if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
-                resultLabel.innerText = '무한 모드 획득 점수';
-                finalScoreEl.innerText = gameState.score + '점';
-                resultDesc.innerText = `무한 모드 기록: ${gameState.score}번 연속 성공!`;
+                resultLabel.innerText = currentLang === 'ko' ? '무한 모드 획득 점수' : 'Infinite Score';
+                finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
+                resultDesc.innerText = currentLang === 'ko' ? `무한 모드 기록: ${gameState.score}번 연속 성공!` : `Infinite record: ${gameState.score} streaks!`;
                 nameInputContainer.classList.remove('hidden');
                 checkAchievementsProgress(gameState.mode, gameState.score, 0);
             } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                 const totalTime = parseFloat(((Date.now() - gameState.startTime) / 1000).toFixed(1));
                 gameState.elapsedSeconds = totalTime;
-                resultLabel.innerText = '10점 달성 소요 시간';
-                finalScoreEl.innerText = totalTime + '초';
-                resultDesc.innerText = `타임어택 완료! 총 ${totalTime}초 소요`;
+                resultLabel.innerText = currentLang === 'ko' ? '10점 달성 소요 시간' : 'Time to 10 points';
+                finalScoreEl.innerText = totalTime + (currentLang === 'ko' ? '초' : 's');
+                resultDesc.innerText = currentLang === 'ko' ? `타임어택 완료! 총 ${totalTime}초 소요` : `Time Attack Complete! ${totalTime}s`;
                 nameInputContainer.classList.remove('hidden');
                 checkAchievementsProgress(gameState.mode, 10, totalTime);
             } else {
-                resultLabel.innerText = '연습 모드 획득 점수';
-                finalScoreEl.innerText = gameState.score + '점';
-                resultDesc.innerText = `연습 모드 총 ${gameState.score}점을 획득했습니다.`;
+                resultLabel.innerText = currentLang === 'ko' ? '연습 모드 획득 점수' : 'Practice Score';
+                finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
+                resultDesc.innerText = currentLang === 'ko' ? `연습 모드 총 ${gameState.score}점을 획득했습니다.` : `Practice score: ${gameState.score}`;
                 nameInputContainer.classList.add('hidden');
             }
             updateUIStats();
@@ -632,13 +657,13 @@
 
         function updateModeCardTitle() {
             const map = {
-                'practice': '🎯 연습 모드',
-                'timeattack': '⏱️ 타임어택 모드',
-                'timeattack_hard': '⚡ 타임어택 하드 모드',
-                'infinite': '♾️ 무한 모드 (스피드)',
-                'infinite_hard': '🔥 무한 하드 모드'
+                'practice': currentLang === 'ko' ? '🎯 연습 모드' : '🎯 Practice Mode',
+                'timeattack': currentLang === 'ko' ? '⏱️ 타임어택 모드' : '⏱️ Time Attack',
+                'timeattack_hard': currentLang === 'ko' ? '⚡ 타임어택 하드 모드' : '⚡ Time Attack Hard',
+                'infinite': currentLang === 'ko' ? '♾️ 무한 모드 (스피드)' : '♾️ Infinite (Speed)',
+                'infinite_hard': currentLang === 'ko' ? '🔥 무한 하드 모드' : '🔥 Infinite Hard'
             };
-            return map[gameState.mode] || '게임 결과';
+            return map[gameState.mode] || 'Game Result';
         }
 
         function downloadCaptureCard() {
@@ -660,16 +685,16 @@
             const statusEl = document.getElementById('attendance-status');
 
             if (lastCheck === today) {
-                statusEl.innerHTML = "✅ 오늘 이미 출석을 완료했습니다!<br><span class='text-xs font-normal text-gray-500'>내일 또 방문해서 포인트를 받아가세요! 🐸</span>";
+                statusEl.innerHTML = translations[currentLang].attendanceDone;
             } else {
                 localStorage.setItem('frog_friends_last_attendance', today);
                 let count = parseInt(localStorage.getItem('frog_friends_attendance_count') || '0') + 1;
                 localStorage.setItem('frog_friends_attendance_count', count);
                 addUserPoints(30);
                 playSound('reward');
-                statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 포인트 +30 💰 획득!</span>`;
+                statusEl.innerHTML = translations[currentLang].attendanceReward(count);
             }
-            document.getElementById('modal-attendance').classList.remove('hidden');
+            document.getElementById('modal-attendance').classList.contains('hidden') && document.getElementById('modal-attendance').classList.remove('hidden');
         }
         function closeAttendanceModal() {
             playSound('click');
@@ -677,16 +702,16 @@
             updateUIStats();
         }
 
-        // 도전과제 시스템
+        // 도전과제 데이터
         const achievementsData = {
             infinite: [
-                { id: 'inf_5', title: '🌱 초보 청개구리', desc: '무한 모드에서 5점 달성하기', reward: 30, check: (score) => score >= 5 },
-                { id: 'inf_15', title: '⚡ 스피드 마스터', desc: '무한 모드에서 15점 달성하기', reward: 80, check: (score) => score >= 15 },
-                { id: 'inf_30', title: '🏆 전설의 반대로러', desc: '무한 모드에서 30점 달성하기', reward: 200, check: (score) => score >= 30 }
+                { id: 'inf_5', titleKo: '🌱 초보 청개구리', titleEn: '🌱 Beginner Frog', descKo: '무한 모드에서 5점 달성하기', descEn: 'Reach 5 pts in Infinite Mode', reward: 30, check: (score) => score >= 5 },
+                { id: 'inf_15', titleKo: '⚡ 스피드 마스터', titleEn: '⚡ Speed Master', descKo: '무한 모드에서 15점 달성하기', descEn: 'Reach 15 pts in Infinite Mode', reward: 80, check: (score) => score >= 15 },
+                { id: 'inf_30', titleKo: '🏆 전설의 반대로러', titleEn: '🏆 Legendary Reverse', descKo: '무한 모드에서 30점 달성하기', descEn: 'Reach 30 pts in Infinite Mode', reward: 200, check: (score) => score >= 30 }
             ],
             timeattack: [
-                { id: 'ta_10', title: '⏱️ 타임어택 입문', desc: '타임어택 모드 10초 이내 클리어', reward: 50, check: (score, time) => time <= 10.0 },
-                { id: 'ta_7', title: '🚀 빛의 속도', desc: '타임어택 모드 7초 이내 클리어', reward: 120, check: (score, time) => time <= 7.0 }
+                { id: 'ta_10', titleKo: '⏱️ 타임어택 입문', titleEn: '⏱️ TA Beginner', descKo: '타임어택 모드 10초 이내 클리어', descEn: 'Clear Time Attack within 10s', reward: 50, check: (score, time) => time <= 10.0 },
+                { id: 'ta_7', titleKo: '🚀 빛의 속도', titleEn: '🚀 Speed of Light', descKo: '타임어택 모드 7초 이내 클리어', descEn: 'Clear Time Attack within 7s', reward: 120, check: (score, time) => time <= 7.0 }
             ]
         };
 
@@ -735,13 +760,16 @@
 
             listEl.innerHTML = list.map(ach => {
                 const isDone = claimed[ach.id];
+                const title = currentLang === 'ko' ? ach.titleKo : ach.titleEn;
+                const desc = currentLang === 'ko' ? ach.descKo : ach.descEn;
+                const statusText = isDone ? translations[currentLang].statusDone : translations[currentLang].statusInProgress;
                 return `
                     <div class="flex items-center justify-between p-2.5 rounded-xl ${isDone ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
                         <div>
-                            <div class="font-bold text-gray-800">${ach.title} <span class="text-amber-600 font-extrabold">+${ach.reward}P</span></div>
-                            <div class="text-gray-500 text-[11px]">${ach.desc}</div>
+                            <div class="font-bold text-gray-800">${title} <span class="text-amber-600 font-extrabold">+${ach.reward}P</span></div>
+                            <div class="text-gray-500 text-[11px]">${desc}</div>
                         </div>
-                        <div class="text-sm font-bold">${isDone ? '✅ 완료' : '🔒 진행중'}</div>
+                        <div class="text-sm font-bold">${statusText}</div>
                     </div>
                 `;
             }).join('');
@@ -770,23 +798,26 @@
             listEl.innerHTML = charactersData.map(c => {
                 const isUnlocked = unlockedChars.includes(c.id);
                 const isEquipped = (c.emoji === equippedChar);
+                const charName = currentLang === 'ko' ? c.name : c.nameEn;
 
                 let btnHtml = '';
                 if (isEquipped) {
-                    btnHtml = `<span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-xl text-xs">장착중</span>`;
+                    btnHtml = `<span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipped}</span>`;
                 } else if (isUnlocked) {
-                    btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl text-xs">장착하기</button>`;
+                    btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipBtn}</button>`;
                 } else {
-                    btnHtml = `<button onclick="buyChar('${c.id}', ${c.price})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1 rounded-xl text-xs">구매 (${c.price}P)</button>`;
+                    btnHtml = `<button onclick="buyChar('${c.id}', ${c.price})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].buyBtn(c.price)}</button>`;
                 }
+
+                const priceText = c.price === 0 ? translations[currentLang].charDefault : translations[currentLang].charPrice(c.price);
 
                 return `
                     <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
                         <div class="flex items-center space-x-3">
                             <span class="text-2xl">${c.emoji}</span>
                             <div>
-                                <div class="font-bold text-gray-800">${c.name}</div>
-                                <div class="text-gray-400 text-[11px]">${c.price === 0 ? '기본 제공' : c.price + ' 포인트'}</div>
+                                <div class="font-bold text-gray-800">${charName}</div>
+                                <div class="text-gray-400 text-[11px]">${priceText}</div>
                             </div>
                         </div>
                         <div>${btnHtml}</div>
@@ -798,7 +829,7 @@
         function buyChar(charId, price) {
             const pts = getUserPoints();
             if (pts < price) {
-                alert('포인트가 부족합니다! 도전과제를 달성해 포인트를 모아보세요.');
+                alert(translations[currentLang].notEnoughPts);
                 return;
             }
             localStorage.setItem('frog_friends_points', pts - price);
@@ -900,7 +931,7 @@
                     rankingList.innerHTML = rankings.map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
-                                <span class="w-6 text-center">${index + 1}위</span>
+                                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
                                 <span class="truncate max-w-[140px]">${item.name}</span>
                             </div>
                             <div class="flex items-center space-x-3">
@@ -915,7 +946,7 @@
                     rankingList.innerHTML = rankings.map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
-                                <span class="w-6 text-center">${index + 1}위</span>
+                                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
                                 <span class="truncate max-w-[140px]">${item.name}</span>
                             </div>
                             <div class="flex items-center space-x-3">
