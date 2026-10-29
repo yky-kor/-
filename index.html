@@ -40,7 +40,7 @@
     <header class="w-full max-w-md flex justify-between items-center py-3 px-2">
         <div class="flex items-center space-x-2 min-w-0">
             <!-- 클릭 시 스킨 상점이 열리는 메인 캐릭터 아바타 -->
-            <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="캐릭터 상점 열기">
+            <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="상점 열기">
                 <span id="header-char-avatar">🐸</span>
                 <span class="absolute -bottom-1 -right-1 text-xs bg-amber-400 text-gray-900 rounded-full px-1 font-bold shadow">🛍️</span>
             </div>
@@ -68,7 +68,7 @@
 
         <!-- 유저 포인트 표시 바 -->
         <div class="w-full bg-amber-50 border-2 border-amber-200 rounded-2xl py-2 px-4 mb-3 flex justify-between items-center shadow-sm">
-            <span class="text-xs font-bold text-amber-800">✨ 나의 친구 포인트</span>
+            <span class="text-xs font-bold text-amber-800" data-i18n="pointsLabel">✨ 나의 포인트</span>
             <span id="user-points" class="text-base font-extrabold text-amber-600">0 💰 P</span>
         </div>
 
@@ -157,7 +157,7 @@
             <p id="result-desc" class="text-gray-500 text-sm mb-4" data-i18n="wellDone">수고하셨습니다.</p>
             
             <div id="capture-card" class="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-2xl p-5 w-full text-center mb-5 shadow-lg border-2 border-green-300">
-                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> 청개구리와 친구들</div>
+                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> 청개구리 가위바위보</div>
                 <div id="card-mode-name" class="text-xs text-green-200 mb-3">무한 모드</div>
                 <p id="result-label" class="text-sm text-green-100" data-i18n="earnedScore">획득 점수</p>
                 <p id="final-score" class="text-4xl font-extrabold mt-1 mb-2">0점</p>
@@ -220,7 +220,7 @@
     <div id="modal-shop" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-purple-700">🛍️ 청개구리와 친구들 상점</h3>
+                <h3 class="text-lg font-bold text-purple-700">🛍️ 상점</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
             <p class="text-xs text-gray-500 mb-3">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
@@ -254,6 +254,8 @@
                 modeInfinite: "무한 모드 (1초)", modeInfiniteHard: "무한 하드 모드",
                 msgSuccess: "지기 성공! (+1점) 🐸", msgWin: "이겨버렸다! ❌", msgDraw: "비겼다! (점수 없음) ➖", msgTimeout: "시간 초과! ⏰",
                 namePlaceholder: "닉네임 입력 (최대 8자)", anonymousName: "익명의 청개구리", alertZeroScore: "0점은 랭킹에 등록할 수 없습니다!"
+                pointsLabel: "✨ 나의 포인트",
+                shopTitle: "🛍️ 상점"
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -273,6 +275,8 @@
                 modeInfinite: "Infinite Mode (1s)", modeInfiniteHard: "Infinite Hard Mode",
                 msgSuccess: "Successfully Lost! (+1pt) 🐸", msgWin: "You Won! (Oops) ❌", msgDraw: "Draw! (No pts) ➖", msgTimeout: "Time Out! ⏰",
                 namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Frog", alertZeroScore: "0 points cannot be registered!"
+                pointsLabel: "✨ My Points",
+                shopTitle: "🛍️ Shop"
             }
         };
 
@@ -668,7 +672,7 @@
                 localStorage.setItem('frog_friends_attendance_count', count);
                 addUserPoints(30);
                 playSound('reward');
-                statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 친구 포인트 +30 💰 획득!</span>`;
+                statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 포인트 +30 💰 획득!</span>`;
             }
             document.getElementById('modal-attendance').classList.remove('hidden');
         }
@@ -755,7 +759,7 @@
             updateUIStats();
         }
 
-        // 🛍️ 캐릭터 상점 기능
+        // 🛍️ 상점 기능
         function openShopModal() {
             playSound('click');
             renderShop();
