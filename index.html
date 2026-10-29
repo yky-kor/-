@@ -39,7 +39,7 @@
     <!-- 상단 헤더 -->
     <header class="w-full max-w-md flex justify-between items-center py-3 px-2">
         <div class="flex items-center space-x-2 min-w-0">
-            <!-- 클릭 시 스킨 상점이 열리는 메인 캐릭터 아바타 -->
+            <!-- 클릭 시 상점이 열리는 메인 캐릭터 아바타 -->
             <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="상점 열기">
                 <span id="header-char-avatar">🐸</span>
                 <span class="absolute -bottom-1 -right-1 text-xs bg-amber-400 text-gray-900 rounded-full px-1 font-bold shadow">🛍️</span>
@@ -201,7 +201,7 @@
         </div>
     </div>
 
-    <!-- 모달: 도전과제 (무한모드 / 타임어택모드) -->
+    <!-- 모달: 도전과제 -->
     <div id="modal-achievement" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
@@ -220,7 +220,7 @@
     <div id="modal-shop" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-purple-700">🛍️ 상점</h3>
+                <h3 class="text-lg font-bold text-purple-700" data-i18n="shopTitle">🛍️ 상점</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
             <p class="text-xs text-gray-500 mb-3">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
@@ -254,8 +254,7 @@
                 modeInfinite: "무한 모드 (1초)", modeInfiniteHard: "무한 하드 모드",
                 msgSuccess: "지기 성공! (+1점) 🐸", msgWin: "이겨버렸다! ❌", msgDraw: "비겼다! (점수 없음) ➖", msgTimeout: "시간 초과! ⏰",
                 namePlaceholder: "닉네임 입력 (최대 8자)", anonymousName: "익명의 청개구리", alertZeroScore: "0점은 랭킹에 등록할 수 없습니다!",
-                pointsLabel: "✨ 나의 포인트",
-                shopTitle: "🛍️ 상점"
+                pointsLabel: "✨ 나의 포인트", shopTitle: "🛍️ 상점"
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -274,9 +273,8 @@
                 modePractice: "Practice Mode", modeTimeAttack: "Time Attack Mode", modeTimeAttackHard: "Time Attack Hard",
                 modeInfinite: "Infinite Mode (1s)", modeInfiniteHard: "Infinite Hard Mode",
                 msgSuccess: "Successfully Lost! (+1pt) 🐸", msgWin: "You Won! (Oops) ❌", msgDraw: "Draw! (No pts) ➖", msgTimeout: "Time Out! ⏰",
-                namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Frog", alertZeroScore: "0 points cannot be registered!"
-                pointsLabel: "✨ My Points",
-                shopTitle: "🛍️ Shop"
+                namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Frog", alertZeroScore: "0 points cannot be registered!",
+                pointsLabel: "✨ My Points", shopTitle: "🛍️ Shop"
             }
         };
 
@@ -329,7 +327,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 🛍️ 캐릭터 데이터 정의
+        // 캐릭터 데이터 정의 (청개구리와 고양이 기본 제공)
         const charactersData = [
             { id: 'frog', name: '청개구리', emoji: '🐸', price: 0 },
             { id: 'cat', name: '아기 고양이', emoji: '🐱', price: 0 },
@@ -541,7 +539,6 @@
                 
                 showComboEffect(gameState.streak);
                 
-                // 플레이 중 무한모드 점수 도전과제 실시간 체크
                 if (gameState.mode.includes('infinite')) {
                     checkAchievementsProgress(gameState.mode, gameState.score, 0);
                 }
@@ -615,7 +612,6 @@
                 finalScoreEl.innerText = gameState.score + '점';
                 resultDesc.innerText = `무한 모드 기록: ${gameState.score}번 연속 성공!`;
                 nameInputContainer.classList.remove('hidden');
-                // 무한모드 종료 시 최종 점수 체크
                 checkAchievementsProgress(gameState.mode, gameState.score, 0);
             } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                 const totalTime = parseFloat(((Date.now() - gameState.startTime) / 1000).toFixed(1));
@@ -624,7 +620,6 @@
                 finalScoreEl.innerText = totalTime + '초';
                 resultDesc.innerText = `타임어택 완료! 총 ${totalTime}초 소요`;
                 nameInputContainer.classList.remove('hidden');
-                // 타임어택 완료 시 소요 시간 체크
                 checkAchievementsProgress(gameState.mode, 10, totalTime);
             } else {
                 resultLabel.innerText = '연습 모드 획득 점수';
@@ -657,7 +652,7 @@
             });
         }
 
-        // 📅 출석체크 기능
+        // 출석체크 기능
         function openAttendanceModal() {
             playSound('click');
             const today = new Date().toDateString();
@@ -682,7 +677,7 @@
             updateUIStats();
         }
 
-        // 🏅 새로운 도전과제 시스템 (무한모드 점수 & 타임어택 시간)
+        // 도전과제 시스템
         const achievementsData = {
             infinite: [
                 { id: 'inf_5', title: '🌱 초보 청개구리', desc: '무한 모드에서 5점 달성하기', reward: 30, check: (score) => score >= 5 },
@@ -711,7 +706,6 @@
 
         function checkAchievementsProgress(mode, score, time) {
             let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
-            
             let category = '';
             if (mode.includes('infinite')) category = 'infinite';
             else if (mode.includes('timeattack')) category = 'timeattack';
@@ -759,7 +753,7 @@
             updateUIStats();
         }
 
-        // 🛍️ 상점 기능
+        // 상점 기능
         function openShopModal() {
             playSound('click');
             renderShop();
@@ -837,7 +831,7 @@
             updateUIStats();
         }
 
-        // 랭킹 저장 시 선택한 캐릭터 이모지 적용
+        // 랭킹 저장
         function saveRanking() {
             const nameInput = document.getElementById('player-name');
             const rawName = nameInput.value.trim() || translations[currentLang].anonymousName;
