@@ -201,14 +201,14 @@
         </div>
     </div>
 
-    <!-- 모달: 도전과제 (일일 / 주간) -->
+    <!-- 모달: 도전과제 (무한모드 / 타임어택모드) -->
     <div id="modal-achievement" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-lg font-bold text-green-700">🏅 도전과제 & 보상</h3>
                 <div class="flex bg-gray-100 p-1 rounded-xl">
-                    <button onclick="switchAchieveTab('daily')" id="tab-ach-daily" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm">일일</button>
-                    <button onclick="switchAchieveTab('weekly')" id="tab-ach-weekly" class="px-3 py-1 text-xs font-bold rounded-lg text-gray-500">주간</button>
+                    <button onclick="switchAchieveTab('infinite')" id="tab-ach-infinite" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm">무한 모드</button>
+                    <button onclick="switchAchieveTab('timeattack')" id="tab-ach-timeattack" class="px-3 py-1 text-xs font-bold rounded-lg text-gray-500">타임어택</button>
                 </div>
             </div>
             <div id="achievement-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
@@ -223,7 +223,7 @@
                 <h3 class="text-lg font-bold text-purple-700">🛍️ 청개구리와 친구들 상점</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
-            <p class="text-xs text-gray-500 mb-3">출석체크와 도전과제로 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
+            <p class="text-xs text-gray-500 mb-3">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
             <div id="shop-char-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
             <button onclick="closeShopModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm">닫기</button>
         </div>
@@ -325,7 +325,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 🛍️ 캐릭터 데이터 정의 (청개구리와 고양이가 기본 무료 제공)
+        // 🛍️ 캐릭터 데이터 정의
         const charactersData = [
             { id: 'frog', name: '청개구리', emoji: '🐸', price: 0 },
             { id: 'cat', name: '아기 고양이', emoji: '🐱', price: 0 },
@@ -342,7 +342,6 @@
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0
         };
 
-        // 포인트 및 캐릭터 불러오기 (기본 해제 목록에 'frog', 'cat' 포함)
         function getUserPoints() {
             return parseInt(localStorage.getItem('frog_friends_points') || '0');
         }
@@ -537,7 +536,11 @@
                 document.getElementById('current-score').innerText = gameState.score;
                 
                 showComboEffect(gameState.streak);
-                checkAchievementsProgress(gameState.score, gameState.streak);
+                
+                // 플레이 중 무한모드 점수 도전과제 실시간 체크
+                if (gameState.mode.includes('infinite')) {
+                    checkAchievementsProgress(gameState.mode, gameState.score, 0);
+                }
 
                 if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                     if (gameState.score >= 10) {
@@ -608,13 +611,17 @@
                 finalScoreEl.innerText = gameState.score + '점';
                 resultDesc.innerText = `무한 모드 기록: ${gameState.score}번 연속 성공!`;
                 nameInputContainer.classList.remove('hidden');
+                // 무한모드 종료 시 최종 점수 체크
+                checkAchievementsProgress(gameState.mode, gameState.score, 0);
             } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
-                const totalTime = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
+                const totalTime = parseFloat(((Date.now() - gameState.startTime) / 1000).toFixed(1));
                 gameState.elapsedSeconds = totalTime;
                 resultLabel.innerText = '10점 달성 소요 시간';
                 finalScoreEl.innerText = totalTime + '초';
                 resultDesc.innerText = `타임어택 완료! 총 ${totalTime}초 소요`;
                 nameInputContainer.classList.remove('hidden');
+                // 타임어택 완료 시 소요 시간 체크
+                checkAchievementsProgress(gameState.mode, 10, totalTime);
             } else {
                 resultLabel.innerText = '연습 모드 획득 점수';
                 finalScoreEl.innerText = gameState.score + '점';
@@ -671,22 +678,23 @@
             updateUIStats();
         }
 
-        // 🏅 도전과제 시스템 (일일 / 주간)
+        // 🏅 새로운 도전과제 시스템 (무한모드 점수 & 타임어택 시간)
         const achievementsData = {
-            daily: [
-                { id: 'daily_play', title: '🌱 일일 첫 플레이', desc: '오늘 게임 1회 이상 플레이하기', reward: 20, check: () => true },
-                { id: 'daily_score_5', title: '⚡ 일일 5점 달성', desc: '한 판에 5점 이상 달성하기', reward: 40, check: (s) => s.score >= 5 }
+            infinite: [
+                { id: 'inf_5', title: '🌱 초보 청개구리', desc: '무한 모드에서 5점 달성하기', reward: 30, check: (score) => score >= 5 },
+                { id: 'inf_15', title: '⚡ 스피드 마스터', desc: '무한 모드에서 15점 달성하기', reward: 80, check: (score) => score >= 15 },
+                { id: 'inf_30', title: '🏆 전설의 반대로러', desc: '무한 모드에서 30점 달성하기', reward: 200, check: (score) => score >= 30 }
             ],
-            weekly: [
-                { id: 'weekly_combo_10', title: '🔥 주간 10콤보 마스터', desc: '무한 모드에서 10콤보 이상 달성하기', reward: 100, check: (s, str) => str >= 10 },
-                { id: 'weekly_score_20', title: '🏆 주간 20점 정복', desc: '한 판에 20점 이상 달성하기', reward: 150, check: (s) => s.score >= 20 }
+            timeattack: [
+                { id: 'ta_10', title: '⏱️ 타임어택 입문', desc: '타임어택 모드 10초 이내 클리어', reward: 50, check: (score, time) => time <= 10.0 },
+                { id: 'ta_7', title: '🚀 빛의 속도', desc: '타임어택 모드 7초 이내 클리어', reward: 120, check: (score, time) => time <= 7.0 }
             ]
         };
 
-        let currentAchieveTab = 'daily';
+        let currentAchieveTab = 'infinite';
         function switchAchieveTab(tab) {
             currentAchieveTab = tab;
-            ['daily', 'weekly'].forEach(t => {
+            ['infinite', 'timeattack'].forEach(t => {
                 const btn = document.getElementById(`tab-ach-${t}`);
                 if (t === tab) {
                     btn.className = "px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm";
@@ -697,18 +705,22 @@
             renderAchievements();
         }
 
-        function checkAchievementsProgress(score, streak) {
+        function checkAchievementsProgress(mode, score, time) {
             let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
-            ['daily', 'weekly'].forEach(cat => {
-                achievementsData[cat].forEach(ach => {
-                    if (!claimed[ach.id]) {
-                        if (ach.check(score, streak)) {
-                            claimed[ach.id] = true;
-                            localStorage.setItem('frog_friends_claimed_achievements', JSON.stringify(claimed));
-                            addUserPoints(ach.reward);
-                        }
+            
+            let category = '';
+            if (mode.includes('infinite')) category = 'infinite';
+            else if (mode.includes('timeattack')) category = 'timeattack';
+            else return;
+
+            achievementsData[category].forEach(ach => {
+                if (!claimed[ach.id]) {
+                    if (ach.check(score, time)) {
+                        claimed[ach.id] = true;
+                        localStorage.setItem('frog_friends_claimed_achievements', JSON.stringify(claimed));
+                        addUserPoints(ach.reward);
                     }
-                });
+                }
             });
         }
 
@@ -743,7 +755,7 @@
             updateUIStats();
         }
 
-        // 🛍️ 캐릭터 상점 기능 (기본 해제 목록에 frog, cat 포함)
+        // 🛍️ 캐릭터 상점 기능
         function openShopModal() {
             playSound('click');
             renderShop();
@@ -788,7 +800,7 @@
         function buyChar(charId, price) {
             const pts = getUserPoints();
             if (pts < price) {
-                alert('포인트가 부족합니다! 출석체크와 도전과제를 완료해 보세요.');
+                alert('포인트가 부족합니다! 도전과제를 달성해 포인트를 모아보세요.');
                 return;
             }
             localStorage.setItem('frog_friends_points', pts - price);
