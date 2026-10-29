@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>동물 친구들 가위바위보 (반대로 지기 게임)</title>
+    <title>청개구리와 친구들 가위바위보</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js 사운드 효과 CDN -->
@@ -16,7 +16,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body { font-family: 'Jua', sans-serif; }
-        .game-bg { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .game-bg { background: linear-gradient(135deg, #22c55e 0%, #1d4ed8 100%); }
         @keyframes popUp {
             0% { transform: scale(0.5); opacity: 0; }
             50% { transform: scale(1.2); opacity: 1; }
@@ -40,14 +40,14 @@
     <header class="w-full max-w-md flex justify-between items-center py-3 px-2">
         <div class="flex items-center space-x-2 min-w-0">
             <!-- 클릭 시 스킨 상점이 열리는 메인 캐릭터 아바타 -->
-            <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="스킨 상점 열기">
-                <span id="header-char-avatar">🐱</span>
+            <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="캐릭터 상점 열기">
+                <span id="header-char-avatar">🐸</span>
                 <span class="absolute -bottom-1 -right-1 text-xs bg-amber-400 text-gray-900 rounded-full px-1 font-bold shadow">🛍️</span>
             </div>
             <div class="min-w-0">
-                <h1 class="text-xl md:text-2xl font-bold truncate drop-shadow-md" data-i18n="title">동물 친구들 가위바위보</h1>
+                <h1 class="text-xl md:text-2xl font-bold truncate drop-shadow-md" data-i18n="title">청개구리와 친구들</h1>
                 <div class="flex items-center space-x-2">
-                    <p class="text-blue-100 text-xs mt-0.5 truncate" data-i18n="subtitle">컴퓨터에게 져야만 점수를 얻는 반대로 게임!</p>
+                    <p class="text-green-100 text-xs mt-0.5 truncate" data-i18n="subtitle">컴퓨터에게 져야만 점수를 얻는 반대로 게임!</p>
                 </div>
             </div>
         </div>
@@ -74,11 +74,11 @@
 
         <!-- 1. 모드 선택 화면 -->
         <div id="screen-menu" class="w-full flex flex-col items-center space-y-2.5 py-2">
-            <h2 class="text-xl font-bold text-blue-700 mb-1" data-i18n="selectMode">모드를 선택하세요</h2>
+            <h2 class="text-xl font-bold text-green-700 mb-1" data-i18n="selectMode">모드를 선택하세요</h2>
             
-            <button onclick="startGame('practice')" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
+            <button onclick="startGame('practice')" class="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 🎯 <span data-i18n="practiceMode">연습 모드</span>
-                <span class="block text-xs font-normal text-blue-100" data-i18n="practiceDesc">3초 제한 시간 안에서 10판 지기 연습!</span>
+                <span class="block text-xs font-normal text-green-100" data-i18n="practiceDesc">3초 제한 시간 안에서 10판 지기 연습!</span>
             </button>
             <button onclick="startGame('timeattack')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
                 ⏱️ <span data-i18n="timeAttackMode">타임어택 모드</span> <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">NEW</span>
@@ -124,10 +124,10 @@
             <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
                 <span id="game-progress">진행도: 0/10</span>
-                <span class="text-blue-600 font-bold"><span data-i18n="scoreLabel">점수</span>: <span id="current-score">0</span></span>
+                <span class="text-green-600 font-bold"><span data-i18n="scoreLabel">점수</span>: <span id="current-score">0</span></span>
             </div>
             <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
-                <div id="timer-bar" class="bg-blue-500 h-full w-full transition-all duration-100"></div>
+                <div id="timer-bar" class="bg-green-500 h-full w-full transition-all duration-100"></div>
             </div>
             <div id="stopwatch-display" class="hidden mb-2 text-indigo-600 font-bold text-lg">
                 ⏱️ <span data-i18n="timeElapsed">경과 시간</span>: <span id="elapsed-time">0.0</span>s
@@ -139,13 +139,13 @@
             </div>
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-3 text-center"></div>
             <div id="rps-buttons-container" class="grid grid-cols-3 gap-3 w-full mb-2">
-                <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✌️</span> <span class="text-xs text-gray-500 mt-1" data-i18n="scissor">가위</span>
                 </button>
-                <button onclick="playerChoice('rock')" class="choice-btn py-4 bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                <button onclick="playerChoice('rock')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✊</span> <span class="text-xs text-gray-500 mt-1" data-i18n="rock">바위</span>
                 </button>
-                <button onclick="playerChoice('paper')" class="choice-btn py-4 bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
+                <button onclick="playerChoice('paper')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>🖐️</span> <span class="text-xs text-gray-500 mt-1" data-i18n="paper">보</span>
                 </button>
             </div>
@@ -156,12 +156,12 @@
             <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2" data-i18n="gameOver">게임 종료!</h2>
             <p id="result-desc" class="text-gray-500 text-sm mb-4" data-i18n="wellDone">수고하셨습니다.</p>
             
-            <div id="capture-card" class="bg-gradient-to-br from-blue-500 to-indigo-700 text-white rounded-2xl p-5 w-full text-center mb-5 shadow-lg border-2 border-blue-300">
-                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐱</span> 동물 친구들 가위바위보</div>
-                <div id="card-mode-name" class="text-xs text-blue-200 mb-3">무한 모드</div>
-                <p id="result-label" class="text-sm text-blue-100" data-i18n="earnedScore">획득 점수</p>
+            <div id="capture-card" class="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-2xl p-5 w-full text-center mb-5 shadow-lg border-2 border-green-300">
+                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> 청개구리와 친구들</div>
+                <div id="card-mode-name" class="text-xs text-green-200 mb-3">무한 모드</div>
+                <p id="result-label" class="text-sm text-green-100" data-i18n="earnedScore">획득 점수</p>
                 <p id="final-score" class="text-4xl font-extrabold mt-1 mb-2">0점</p>
-                <div class="text-xs text-blue-200">https://yky-kor.github.io/-/</div>
+                <div class="text-xs text-green-200">https://yky-kor.github.io/-/</div>
             </div>
 
             <button onclick="downloadCaptureCard()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow mb-2 flex items-center justify-center space-x-2">
@@ -169,8 +169,8 @@
             </button>
 
             <div id="name-input-container" class="w-full mb-3">
-                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl text-center font-bold text-base mb-2 focus:outline-none focus:border-blue-500">
-                <button onclick="saveRanking()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow" data-i18n="submitRanking">랭킹에 기록하기</button>
+                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl text-center font-bold text-base mb-2 focus:outline-none focus:border-green-500">
+                <button onclick="saveRanking()" class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow" data-i18n="submitRanking">랭킹에 기록하기</button>
             </div>
             <button onclick="goHome()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow" data-i18n="goHome">메인으로 돌아가기</button>
         </div>
@@ -178,7 +178,7 @@
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
             <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
-                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-blue-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
+                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
                 <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
                 <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
                 <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
@@ -192,9 +192,9 @@
     <!-- 모달: 출석체크 -->
     <div id="modal-attendance" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
-            <h3 class="text-xl font-bold text-blue-700 mb-2">📅 매일 출석체크</h3>
+            <h3 class="text-xl font-bold text-green-700 mb-2">📅 매일 출석체크</h3>
             <p class="text-xs text-gray-500 mb-4">매일 접속해서 출석하고 보상 포인트를 받아가세요!</p>
-            <div id="attendance-status" class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 mb-4 font-bold text-blue-700">
+            <div id="attendance-status" class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 mb-4 font-bold text-green-700">
                 출석체크 로딩중...
             </div>
             <button onclick="closeAttendanceModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl">닫기</button>
@@ -205,9 +205,9 @@
     <div id="modal-achievement" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-blue-700">🏅 도전과제 & 보상</h3>
+                <h3 class="text-lg font-bold text-green-700">🏅 도전과제 & 보상</h3>
                 <div class="flex bg-gray-100 p-1 rounded-xl">
-                    <button onclick="switchAchieveTab('daily')" id="tab-ach-daily" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-blue-600 shadow-sm">일일</button>
+                    <button onclick="switchAchieveTab('daily')" id="tab-ach-daily" class="px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm">일일</button>
                     <button onclick="switchAchieveTab('weekly')" id="tab-ach-weekly" class="px-3 py-1 text-xs font-bold rounded-lg text-gray-500">주간</button>
                 </div>
             </div>
@@ -220,24 +220,24 @@
     <div id="modal-shop" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-purple-700">🛍️ 동물 친구들 상점</h3>
+                <h3 class="text-lg font-bold text-purple-700">🛍️ 청개구리와 친구들 상점</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 🪙 P</span>
             </div>
-            <p class="text-xs text-gray-500 mb-3">출석체크와 도전과제로 모은 포인트로 좋아하는 캐릭터를 골라보세요!</p>
+            <p class="text-xs text-gray-500 mb-3">출석체크와 도전과제로 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
             <div id="shop-char-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
             <button onclick="closeShopModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm">닫기</button>
         </div>
     </div>
 
-    <footer class="text-xs text-blue-100 py-2">
-        Made with Friends Power 🐾
+    <footer class="text-xs text-green-100 py-2">
+        Made with Frog & Friends 🐸🐱
     </footer>
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
         const translations = {
             ko: {
-                title: "🐾 동물 친구들 가위바위보", subtitle: "컴퓨터에게 져야만 점수를 얻는 반대로 게임!",
+                title: "🐸 청개구리와 친구들", subtitle: "컴퓨터에게 져야만 점수를 얻는 반대로 게임!",
                 selectMode: "모드를 선택하세요", practiceMode: "연습 모드", practiceDesc: "3초 제한 시간 안에서 10판 지기 연습!",
                 timeAttackMode: "타임어택 모드", timeAttackDesc: "시간 제한 없음! 10점을 가장 빠르게 달성하기",
                 timeAttackHardMode: "타임어택 하드 모드", timeAttackHardDesc: "버튼 위치가 매번 랜덤으로 섞이는 타임어택!",
@@ -252,11 +252,11 @@
                 loadingRanking: "랭킹을 불러오는 중...", noRanking: "아직 등록된 랭킹 기록이 없습니다.",
                 modePractice: "연습 모드", modeTimeAttack: "타임어택 모드", modeTimeAttackHard: "타임어택 하드",
                 modeInfinite: "무한 모드 (1초)", modeInfiniteHard: "무한 하드 모드",
-                msgSuccess: "지기 성공! (+1점) 🎉", msgWin: "이겨버렸다! ❌", msgDraw: "비겼다! (점수 없음) ➖", msgTimeout: "시간 초과! ⏰",
-                namePlaceholder: "닉네임 입력 (최대 8자)", anonymousName: "익명의 친구", alertZeroScore: "0점은 랭킹에 등록할 수 없습니다!"
+                msgSuccess: "지기 성공! (+1점) 🐸", msgWin: "이겨버렸다! ❌", msgDraw: "비겼다! (점수 없음) ➖", msgTimeout: "시간 초과! ⏰",
+                namePlaceholder: "닉네임 입력 (최대 8자)", anonymousName: "익명의 청개구리", alertZeroScore: "0점은 랭킹에 등록할 수 없습니다!"
             },
             en: {
-                title: "🐾 Animal Friends RPS", subtitle: "The opposite game: Lose to the computer to score!",
+                title: "🐸 Frog & Friends", subtitle: "The opposite game: Lose to the computer to score!",
                 selectMode: "Select Mode", practiceMode: "Practice Mode", practiceDesc: "10 rounds of losing practice with 3s limit!",
                 timeAttackMode: "Time Attack", timeAttackDesc: "No time limit! Reach 10 points ASAP",
                 timeAttackHardMode: "Time Attack Hard", timeAttackHardDesc: "Random button shuffle Time Attack!",
@@ -271,8 +271,8 @@
                 loadingRanking: "Loading rankings...", noRanking: "No ranking records yet.",
                 modePractice: "Practice Mode", modeTimeAttack: "Time Attack Mode", modeTimeAttackHard: "Time Attack Hard",
                 modeInfinite: "Infinite Mode (1s)", modeInfiniteHard: "Infinite Hard Mode",
-                msgSuccess: "Successfully Lost! (+1pt) 🎉", msgWin: "You Won! (Oops) ❌", msgDraw: "Draw! (No pts) ➖", msgTimeout: "Time Out! ⏰",
-                namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Friend", alertZeroScore: "0 points cannot be registered!"
+                msgSuccess: "Successfully Lost! (+1pt) 🐸", msgWin: "You Won! (Oops) ❌", msgDraw: "Draw! (No pts) ➖", msgTimeout: "Time Out! ⏰",
+                namePlaceholder: "Enter name (max 8 chars)", anonymousName: "Anonymous Frog", alertZeroScore: "0 points cannot be registered!"
             }
         };
 
@@ -325,8 +325,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 🛍️ 독립 개체 캐릭터(스킨) 데이터 정의
+        // 🛍️ 캐릭터 데이터 정의 (청개구리와 고양이가 기본 무료 제공)
         const charactersData = [
+            { id: 'frog', name: '청개구리', emoji: '🐸', price: 0 },
             { id: 'cat', name: '아기 고양이', emoji: '🐱', price: 0 },
             { id: 'lion', name: '용감한 사자', emoji: '🦁', price: 50 },
             { id: 'dino', name: '초록 공룡', emoji: '🦖', price: 80 },
@@ -341,17 +342,17 @@
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0
         };
 
-        // 포인트 및 캐릭터 불러오기
+        // 포인트 및 캐릭터 불러오기 (기본 해제 목록에 'frog', 'cat' 포함)
         function getUserPoints() {
-            return parseInt(localStorage.getItem('game_points') || '0');
+            return parseInt(localStorage.getItem('frog_friends_points') || '0');
         }
         function addUserPoints(amount) {
             let pts = getUserPoints() + amount;
-            localStorage.setItem('game_points', pts);
+            localStorage.setItem('frog_friends_points', pts);
             updateUIStats();
         }
         function getCurrentChar() {
-            return localStorage.getItem('game_equipped_char') || '🐱';
+            return localStorage.getItem('frog_friends_equipped_char') || '🐸';
         }
 
         function updateUIStats() {
@@ -532,7 +533,7 @@
                 gameState.score += 1;
                 gameState.streak += 1;
                 playSound('success');
-                feedbackEl.innerHTML = `<span class="text-blue-600">${translations[currentLang].msgSuccess}</span>`;
+                feedbackEl.innerHTML = `<span class="text-green-600">${translations[currentLang].msgSuccess}</span>`;
                 document.getElementById('current-score').innerText = gameState.score;
                 
                 showComboEffect(gameState.streak);
@@ -639,7 +640,7 @@
             const card = document.getElementById('capture-card');
             html2canvas(card, { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'animal_game_score.png';
+                link.download = 'frog_friends_score.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
@@ -649,15 +650,15 @@
         function openAttendanceModal() {
             playSound('click');
             const today = new Date().toDateString();
-            const lastCheck = localStorage.getItem('game_last_attendance');
+            const lastCheck = localStorage.getItem('frog_friends_last_attendance');
             const statusEl = document.getElementById('attendance-status');
 
             if (lastCheck === today) {
-                statusEl.innerHTML = "✅ 오늘 이미 출석을 완료했습니다!<br><span class='text-xs font-normal text-gray-500'>내일 또 방문해서 포인트를 받아가세요! 🐾</span>";
+                statusEl.innerHTML = "✅ 오늘 이미 출석을 완료했습니다!<br><span class='text-xs font-normal text-gray-500'>내일 또 방문해서 포인트를 받아가세요! 🐸</span>";
             } else {
-                localStorage.setItem('game_last_attendance', today);
-                let count = parseInt(localStorage.getItem('game_attendance_count') || '0') + 1;
-                localStorage.setItem('game_attendance_count', count);
+                localStorage.setItem('frog_friends_last_attendance', today);
+                let count = parseInt(localStorage.getItem('frog_friends_attendance_count') || '0') + 1;
+                localStorage.setItem('frog_friends_attendance_count', count);
                 addUserPoints(30);
                 playSound('reward');
                 statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 친구 포인트 +30 🪙 획득!</span>`;
@@ -688,7 +689,7 @@
             ['daily', 'weekly'].forEach(t => {
                 const btn = document.getElementById(`tab-ach-${t}`);
                 if (t === tab) {
-                    btn.className = "px-3 py-1 text-xs font-bold rounded-lg bg-white text-blue-600 shadow-sm";
+                    btn.className = "px-3 py-1 text-xs font-bold rounded-lg bg-white text-green-600 shadow-sm";
                 } else {
                     btn.className = "px-3 py-1 text-xs font-bold rounded-lg text-gray-500";
                 }
@@ -697,13 +698,13 @@
         }
 
         function checkAchievementsProgress(score, streak) {
-            let claimed = JSON.parse(localStorage.getItem('game_claimed_achievements') || '{}');
+            let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
             ['daily', 'weekly'].forEach(cat => {
                 achievementsData[cat].forEach(ach => {
                     if (!claimed[ach.id]) {
                         if (ach.check(score, streak)) {
                             claimed[ach.id] = true;
-                            localStorage.setItem('game_claimed_achievements', JSON.stringify(claimed));
+                            localStorage.setItem('frog_friends_claimed_achievements', JSON.stringify(claimed));
                             addUserPoints(ach.reward);
                         }
                     }
@@ -718,14 +719,14 @@
         }
 
         function renderAchievements() {
-            let claimed = JSON.parse(localStorage.getItem('game_claimed_achievements') || '{}');
+            let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
             const listEl = document.getElementById('achievement-list');
             const list = achievementsData[currentAchieveTab];
 
             listEl.innerHTML = list.map(ach => {
                 const isDone = claimed[ach.id];
                 return `
-                    <div class="flex items-center justify-between p-2.5 rounded-xl ${isDone ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50'}">
+                    <div class="flex items-center justify-between p-2.5 rounded-xl ${isDone ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}">
                         <div>
                             <div class="font-bold text-gray-800">${ach.title} <span class="text-amber-600 font-extrabold">+${ach.reward}P</span></div>
                             <div class="text-gray-500 text-[11px]">${ach.desc}</div>
@@ -742,7 +743,7 @@
             updateUIStats();
         }
 
-        // 🛍️ 캐릭터 상점 기능
+        // 🛍️ 캐릭터 상점 기능 (기본 해제 목록에 frog, cat 포함)
         function openShopModal() {
             playSound('click');
             renderShop();
@@ -753,7 +754,7 @@
             const pts = getUserPoints();
             document.getElementById('shop-user-points').innerText = `${pts} 🪙 P`;
             const listEl = document.getElementById('shop-char-list');
-            let unlockedChars = JSON.parse(localStorage.getItem('game_unlocked_chars') || '["cat"]');
+            let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
             const equippedChar = getCurrentChar();
 
             listEl.innerHTML = charactersData.map(c => {
@@ -762,9 +763,9 @@
 
                 let btnHtml = '';
                 if (isEquipped) {
-                    btnHtml = `<span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-xl text-xs">장착중</span>`;
+                    btnHtml = `<span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-xl text-xs">장착중</span>`;
                 } else if (isUnlocked) {
-                    btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1 rounded-xl text-xs">장착하기</button>`;
+                    btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl text-xs">장착하기</button>`;
                 } else {
                     btnHtml = `<button onclick="buyChar('${c.id}', ${c.price})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1 rounded-xl text-xs">구매 (${c.price}P)</button>`;
                 }
@@ -790,14 +791,14 @@
                 alert('포인트가 부족합니다! 출석체크와 도전과제를 완료해 보세요.');
                 return;
             }
-            localStorage.setItem('game_points', pts - price);
-            let unlockedChars = JSON.parse(localStorage.getItem('game_unlocked_chars') || '["cat"]');
+            localStorage.setItem('frog_friends_points', pts - price);
+            let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
             unlockedChars.push(charId);
-            localStorage.setItem('game_unlocked_chars', JSON.stringify(unlockedChars));
+            localStorage.setItem('frog_friends_unlocked_chars', JSON.stringify(unlockedChars));
             
             const charObj = charactersData.find(c => c.id === charId);
             if (charObj) {
-                localStorage.setItem('game_equipped_char', charObj.emoji);
+                localStorage.setItem('frog_friends_equipped_char', charObj.emoji);
             }
             playSound('reward');
             renderShop();
@@ -807,7 +808,7 @@
         function equipChar(charId) {
             const charObj = charactersData.find(c => c.id === charId);
             if (charObj) {
-                localStorage.setItem('game_equipped_char', charObj.emoji);
+                localStorage.setItem('frog_friends_equipped_char', charObj.emoji);
                 playSound('click');
                 renderShop();
                 updateUIStats();
@@ -852,7 +853,7 @@
                 const btn = document.getElementById(`tab-${t.replace('_', '-')}`);
                 if (!btn) return;
                 if (t === tab) {
-                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-blue-700 shadow-sm";
+                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
                 } else {
                     btn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500";
                 }
@@ -893,7 +894,7 @@
                                 <span class="truncate max-w-[140px]">${item.name}</span>
                             </div>
                             <div class="flex items-center space-x-3">
-                                <span class="text-blue-600 font-extrabold">${item.score} pts</span>
+                                <span class="text-green-600 font-extrabold">${item.score} pts</span>
                                 <span class="text-xs text-gray-400">${item.date}</span>
                             </div>
                         </div>
