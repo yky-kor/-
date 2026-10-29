@@ -69,7 +69,7 @@
         <!-- 유저 포인트 표시 바 -->
         <div class="w-full bg-amber-50 border-2 border-amber-200 rounded-2xl py-2 px-4 mb-3 flex justify-between items-center shadow-sm">
             <span class="text-xs font-bold text-amber-800">✨ 나의 친구 포인트</span>
-            <span id="user-points" class="text-base font-extrabold text-amber-600">0 🪙 P</span>
+            <span id="user-points" class="text-base font-extrabold text-amber-600">0 💰 P</span>
         </div>
 
         <!-- 1. 모드 선택 화면 -->
@@ -221,7 +221,7 @@
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-lg font-bold text-purple-700">🛍️ 청개구리와 친구들 상점</h3>
-                <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 🪙 P</span>
+                <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
             <p class="text-xs text-gray-500 mb-3">출석체크와 도전과제로 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
             <div id="shop-char-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
@@ -357,7 +357,7 @@
 
         function updateUIStats() {
             const pts = getUserPoints();
-            document.getElementById('user-points').innerText = `${pts} 🪙 P`;
+            document.getElementById('user-points').innerText = `${pts} 💰 P`;
             const currentChar = getCurrentChar();
             document.getElementById('header-char-avatar').innerText = currentChar;
             document.getElementById('card-char-display').innerText = currentChar;
@@ -661,7 +661,7 @@
                 localStorage.setItem('frog_friends_attendance_count', count);
                 addUserPoints(30);
                 playSound('reward');
-                statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 친구 포인트 +30 🪙 획득!</span>`;
+                statusEl.innerHTML = `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 친구 포인트 +30 💰 획득!</span>`;
             }
             document.getElementById('modal-attendance').classList.remove('hidden');
         }
@@ -752,7 +752,7 @@
 
         function renderShop() {
             const pts = getUserPoints();
-            document.getElementById('shop-user-points').innerText = `${pts} 🪙 P`;
+            document.getElementById('shop-user-points').innerText = `${pts} 💰 P`;
             const listEl = document.getElementById('shop-char-list');
             let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
             const equippedChar = getCurrentChar();
