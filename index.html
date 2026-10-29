@@ -32,6 +32,11 @@
             50% { transform: translateY(-8px); }
         }
         .animate-float { animation: floatChar 2s ease-in-out infinite; }
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow { animation: spinSlow 3s linear infinite; }
     </style>
 </head>
 <body class="game-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
@@ -73,42 +78,45 @@
         </div>
 
         <!-- 1. 모드 선택 화면 -->
-        <div id="screen-menu" class="w-full flex flex-col items-center space-y-2.5 py-2">
-            <h2 class="text-xl font-bold text-green-700 mb-1" data-i18n="selectMode">모드를 선택하세요</h2>
+        <div id="screen-menu" class="w-full flex flex-col items-center space-y-2 py-1">
+            <h2 class="text-lg font-bold text-green-700 mb-1" data-i18n="selectMode">모드를 선택하세요</h2>
             
-            <button onclick="startGame('practice')" class="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
+            <button onclick="startGame('practice')" class="w-full py-2 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 🎯 <span data-i18n="practiceMode">연습 모드</span>
                 <span class="block text-xs font-normal text-green-100" data-i18n="practiceDesc">3초 제한 시간 안에서 10판 지기 연습!</span>
             </button>
-            <button onclick="startGame('timeattack')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
+            <button onclick="startGame('timeattack')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
                 ⏱️ <span data-i18n="timeAttackMode">타임어택 모드</span> <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">NEW</span>
                 <span class="block text-xs font-normal text-indigo-100" data-i18n="timeAttackDesc">시간 제한 없음! 10점을 가장 빠르게 달성하기</span>
             </button>
-            <button onclick="startGame('timeattack_hard')" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
+            <button onclick="startGame('timeattack_hard')" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4 relative">
                 ⚡ <span data-i18n="timeAttackHardMode">타임어택 하드 모드</span> <span class="text-xs bg-amber-400 text-gray-900 px-2 py-0.5 rounded-full ml-1">HARD</span>
                 <span class="block text-xs font-normal text-purple-100" data-i18n="timeAttackHardDesc">버튼 위치가 매번 랜덤으로 섞이는 타임어택!</span>
             </button>
-            <button onclick="startGame('infinite')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
+            <button onclick="startGame('infinite')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 ♾️ <span data-i18n="infiniteMode">무한 모드 (스피드)</span>
                 <span class="block text-xs font-normal text-emerald-100" data-i18n="infiniteDesc">1초 안에 안 지면 끝! 최고기록 도전</span>
             </button>
-            <button onclick="startGame('infinite_hard')" class="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
+            <button onclick="startGame('infinite_hard')" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-2xl shadow transition transform active:scale-95 text-left px-4">
                 🔥 <span data-i18n="infiniteHardMode">무한 하드 모드</span>
                 <span class="block text-xs font-normal text-red-100" data-i18n="infiniteHardDesc">1초 제한 + 매 판 버튼 위치 셔플!</span>
             </button>
 
-            <!-- 하단 메뉴 버튼들 (출석체크, 도전과제, 상점, 랭킹) -->
-            <div class="grid grid-cols-4 gap-1.5 w-full pt-1">
-                <button onclick="openAttendanceModal()" class="py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow transition transform active:scale-95">
+            <!-- 하단 메뉴 버튼들 (출석체크, 일일미션, 도전과제, 상점, 랭킹) -->
+            <div class="grid grid-cols-5 gap-1 w-full pt-1">
+                <button onclick="openAttendanceModal()" class="py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     📅 <span data-i18n="attendanceBtn">출석</span>
                 </button>
-                <button onclick="openAchievementModal()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow transition transform active:scale-95">
+                <button onclick="openMissionModal()" class="py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
+                    🎯 <span data-i18n="missionBtn">미션</span>
+                </button>
+                <button onclick="openAchievementModal()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🏅 <span data-i18n="achievementBtn">도전과제</span>
                 </button>
-                <button onclick="openShopModal()" class="py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold text-xs rounded-xl shadow transition transform active:scale-95">
+                <button onclick="openShopModal()" class="py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🛍️ <span data-i18n="shopBtn">상점</span>
                 </button>
-                <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-xs rounded-xl shadow transition transform active:scale-95">
+                <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🏆 <span data-i18n="rankingBtn">랭킹</span>
                 </button>
             </div>
@@ -116,28 +124,31 @@
 
         <!-- 2. 게임 플레이 화면 -->
         <div id="screen-game" class="w-full flex flex-col items-center hidden">
-            <div class="w-full flex justify-between items-center mb-3">
+            <div class="w-full flex justify-between items-center mb-2">
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3 py-1.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-1">
                     <span>🏠</span> <span id="home-btn-text" data-i18n="goHomeMenu">메인으로</span>
                 </button>
+                <div id="active-buff-display" class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-xl hidden">
+                    🛡️ 보호막 ON
+                </div>
             </div>
-            <div class="w-full flex justify-between items-center mb-3 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
+            <div class="w-full flex justify-between items-center mb-2 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
                 <span id="game-progress">진행도: 0/10</span>
                 <span class="text-green-600 font-bold"><span data-i18n="scoreLabel">점수</span>: <span id="current-score">0</span></span>
             </div>
-            <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-4">
+            <div id="timer-bar-container" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-3">
                 <div id="timer-bar" class="bg-green-500 h-full w-full transition-all duration-100"></div>
             </div>
             <div id="stopwatch-display" class="hidden mb-2 text-indigo-600 font-bold text-lg">
                 ⏱️ <span data-i18n="timeElapsed">경과 시간</span>: <span id="elapsed-time">0.0</span>s
             </div>
-            <div class="text-center mb-3 relative">
+            <div class="text-center mb-2 relative">
                 <p class="text-xs text-gray-400 mb-1" data-i18n="comInstruction">컴퓨터가 낸 손 (이 손에 져야 합니다!)</p>
                 <div id="com-hand" class="text-7xl animate-bounce">✊</div>
                 <div id="combo-popup-area" class="absolute inset-0 flex items-center justify-center pointer-events-none"></div>
             </div>
-            <div id="feedback-msg" class="h-8 text-xl font-bold mb-3 text-center"></div>
+            <div id="feedback-msg" class="h-8 text-xl font-bold mb-2 text-center"></div>
             <div id="rps-buttons-container" class="grid grid-cols-3 gap-3 w-full mb-2">
                 <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
                     <span>✌️</span> <span class="text-xs text-gray-500 mt-1" data-i18n="scissor">가위</span>
@@ -152,39 +163,44 @@
         </div>
 
         <!-- 3. 결과 화면 -->
-        <div id="screen-result" class="w-full flex flex-col items-center hidden py-4">
-            <h2 id="result-title" class="text-3xl font-bold text-gray-800 mb-2" data-i18n="gameOver">게임 종료!</h2>
-            <p id="result-desc" class="text-gray-500 text-sm mb-4" data-i18n="wellDone">수고하셨습니다.</p>
+        <div id="screen-result" class="w-full flex flex-col items-center hidden py-3">
+            <h2 id="result-title" class="text-2xl font-bold text-gray-800 mb-1" data-i18n="gameOver">게임 종료!</h2>
+            <p id="result-desc" class="text-gray-500 text-xs mb-3" data-i18n="wellDone">수고하셨습니다.</p>
             
-            <div id="capture-card" class="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-2xl p-5 w-full text-center mb-5 shadow-lg border-2 border-green-300">
-                <div class="text-xl font-bold mb-1"><span id="card-char-display">🐸</span> <span data-i18n="title">청개구리 가위바위보</span></div>
-                <div id="card-mode-name" class="text-xs text-green-200 mb-3">무한 모드</div>
-                <p id="result-label" class="text-sm text-green-100" data-i18n="earnedScore">획득 점수</p>
-                <p id="final-score" class="text-4xl font-extrabold mt-1 mb-2">0점</p>
-                <div class="text-xs text-green-200">https://yky-kor.github.io/-/</div>
+            <div id="capture-card" class="bg-gradient-to-br from-green-500 to-emerald-700 text-white rounded-2xl p-4 w-full text-center mb-4 shadow-lg border-2 border-green-300">
+                <div class="text-lg font-bold mb-1"><span id="card-char-display">🐸</span> <span data-i18n="title">청개구리 가위바위보</span></div>
+                <div id="card-mode-name" class="text-xs text-green-200 mb-2">무한 모드</div>
+                <p id="result-label" class="text-xs text-green-100" data-i18n="earnedScore">획득 점수</p>
+                <p id="final-score" class="text-3xl font-extrabold mt-1 mb-1">0점</p>
+                <div class="text-[11px] text-green-200">https://yky-kor.github.io/-/</div>
             </div>
 
-            <button onclick="downloadCaptureCard()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow mb-2 flex items-center justify-center space-x-2">
+            <button onclick="downloadCaptureCard()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow mb-2 flex items-center justify-center space-x-2 text-xs">
                 <span>📸</span> <span data-i18n="downloadCard">공유용 캡처 카드 저장하기</span>
             </button>
 
-            <div id="name-input-container" class="w-full mb-3">
-                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl text-center font-bold text-base mb-2 focus:outline-none focus:border-green-500">
-                <button onclick="saveRanking()" class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow" data-i18n="submitRanking">랭킹에 기록하기</button>
+            <div id="name-input-container" class="w-full mb-2">
+                <input type="text" id="player-name" placeholder="닉네임을 입력하세요 (최대 8자)" maxlength="8" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl text-center font-bold text-sm mb-2 focus:outline-none focus:border-green-500">
+                <button onclick="saveRanking()" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow text-xs" data-i18n="submitRanking">랭킹에 기록하기</button>
             </div>
-            <button onclick="goHome()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow" data-i18n="goHome">메인으로 돌아가기</button>
+            <button onclick="goHome()" class="w-full py-2 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow text-xs" data-i18n="goHome">메인으로 돌아가기</button>
         </div>
 
         <!-- 4. 랭킹 화면 -->
-        <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-2">
-            <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
-                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
-                <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
-                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
-                <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
+        <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-1">
+            <!-- 랭킹 카테고리 탭 (누적 / 주간) -->
+            <div class="flex w-full mb-2 bg-gray-100 p-1 rounded-xl">
+                <button onclick="switchRankType('all')" id="rank-type-all" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="rankTypeAll">누적 랭킹</button>
+                <button onclick="switchRankType('weekly')" id="rank-type-weekly" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="rankTypeWeekly">주간 랭킹</button>
             </div>
-            <div id="ranking-list" class="w-full max-h-52 overflow-y-auto divide-y divide-gray-100 mb-4 text-sm"></div>
-            <button onclick="goHome()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow" data-i18n="goHome">메인으로 돌아가기</button>
+            <div class="flex w-full mb-2 bg-gray-100 p-1 rounded-xl">
+                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
+                <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
+                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
+                <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
+            </div>
+            <div id="ranking-list" class="w-full max-h-44 overflow-y-auto divide-y divide-gray-100 mb-3 text-xs"></div>
+            <button onclick="goHome()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow text-xs" data-i18n="goHome">메인으로 돌아가기</button>
         </div>
 
     </main>
@@ -194,10 +210,22 @@
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
             <h3 class="text-xl font-bold text-green-700 mb-2" data-i18n="attendanceTitle">📅 매일 출석체크</h3>
             <p class="text-xs text-gray-500 mb-4" data-i18n="attendanceDesc">매일 접속해서 출석하고 보상 포인트를 받아가세요!</p>
-            <div id="attendance-status" class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 mb-4 font-bold text-green-700">
+            <div id="attendance-status" class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 mb-4 font-bold text-green-700 text-sm">
                 출석체크 로딩중...
             </div>
-            <button onclick="closeAttendanceModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl" data-i18n="closeBtn">닫기</button>
+            <button onclick="closeAttendanceModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm" data-i18n="closeBtn">닫기</button>
+        </div>
+    </div>
+
+    <!-- 모달: 일일 미션 -->
+    <div id="modal-mission" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-bold text-rose-600" data-i18n="missionTitle">🎯 오늘의 일일 미션</h3>
+                <span class="text-xs text-gray-400" data-i18n="missionResetDesc">매일 자정 갱신</span>
+            </div>
+            <div id="mission-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
+            <button onclick="closeMissionModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm" data-i18n="closeBtn">닫기</button>
         </div>
     </div>
 
@@ -216,15 +244,19 @@
         </div>
     </div>
 
-    <!-- 모달: 캐릭터 상점 -->
+    <!-- 모달: 캐릭터 상점 및 아이템 샵 -->
     <div id="modal-shop" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-lg font-bold text-purple-700" data-i18n="shopTitle">🛍️ 상점</h3>
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-lg font-bold text-purple-700" data-i18n="shopTitle">🛍️ 상점 & 아이템 샵</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
-            <p class="text-xs text-gray-500 mb-3" data-i18n="shopDesc">도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!</p>
-            <div id="shop-char-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100 mb-4 text-xs space-y-2"></div>
+            <!-- 상점 내부 탭 (캐릭터 / 소모품) -->
+            <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
+                <button onclick="switchShopTab('chars')" id="shop-tab-chars" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-purple-700 shadow-sm" data-i18n="shopTabChars">캐릭터 상점</button>
+                <button onclick="switchShopTab('items')" id="shop-tab-items" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="shopTabItems">치트/버프 아이템</button>
+            </div>
+            <div id="shop-content-area" class="max-h-56 overflow-y-auto divide-y divide-gray-100 mb-3 text-xs space-y-2"></div>
             <button onclick="closeShopModal()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl text-sm" data-i18n="closeBtn">닫기</button>
         </div>
     </div>
@@ -243,12 +275,13 @@
                 timeAttackHardMode: "타임어택 하드 모드", timeAttackHardDesc: "버튼 위치가 매번 랜덤으로 섞이는 타임어택!",
                 infiniteMode: "무한 모드 (스피드)", infiniteDesc: "1초 안에 안 지면 끝! 최고기록 도전",
                 infiniteHardMode: "무한 하드 모드", infiniteHardDesc: "1초 제한 + 매 판 버튼 위치 셔플!",
-                rankingBtn: "랭킹", attendanceBtn: "출석", achievementBtn: "도전과제", shopBtn: "상점",
+                rankingBtn: "랭킹", attendanceBtn: "출석", missionBtn: "미션", achievementBtn: "도전과제", shopBtn: "상점",
                 scoreLabel: "점수", timeElapsed: "경과 시간", comInstruction: "컴퓨터가 낸 손 (이 손에 져야 합니다!)",
                 scissor: "가위", rock: "바위", paper: "보", gameOver: "게임 종료!", wellDone: "수고하셨습니다.",
                 earnedScore: "획득 점수", submitRanking: "랭킹에 기록하기", goHome: "메인으로 돌아가기", goHomeMenu: "메인으로",
                 downloadCard: "공유용 캡처 카드 저장하기",
                 tabInfinite: "무한모드", tabInfiniteHard: "무한하드", tabTimeAttack: "타임어택", tabTimeAttackHard: "타임하드",
+                rankTypeAll: "누적 랭킹", rankTypeWeekly: "주간 랭킹",
                 loadingRanking: "랭킹을 불러오는 중...", noRanking: "아직 등록된 랭킹 기록이 없습니다.",
                 modePractice: "연습 모드", modeTimeAttack: "타임어택 모드", modeTimeAttackHard: "타임어택 하드",
                 modeInfinite: "무한 모드 (1초)", modeInfiniteHard: "무한 하드 모드",
@@ -258,12 +291,17 @@
                 attendanceTitle: "📅 매일 출석체크", attendanceDesc: "매일 접속해서 출석하고 보상 포인트를 받아가세요!",
                 attendanceDone: "✅ 오늘 이미 출석을 완료했습니다!<br><span class='text-xs font-normal text-gray-500'>내일 또 방문해서 포인트를 받아가세요! 🐸</span>",
                 attendanceReward: (count) => `🎉 출석 완료! (누적 ${count}일)<br><span class='text-xs font-extrabold text-amber-600'>🎁 보상: 포인트 +30 💰 획득!</span>`,
+                missionTitle: "🎯 오늘의 일일 미션", missionResetDesc: "매일 자정 갱신",
+                missionRewardBtn: "보상 받기", missionDone: "완료됨",
                 achievementTitle: "🏅 도전과제 & 보상", tabAchInfinite: "무한 모드", tabAchTimeAttack: "타임어택",
                 shopDesc: "도전과제를 달성하고 포인트를 모아 새로운 동물 친구들을 만나보세요!",
                 statusDone: "✅ 완료", statusInProgress: "🔒 진행중",
                 charDefault: "기본 제공", charPrice: (price) => `${price} 포인트`,
                 equipped: "장착중", equipBtn: "장착하기", buyBtn: (price) => `구매 (${price}P)`,
-                notEnoughPts: "포인트가 부족합니다! 도전과제를 달성해 포인트를 모아보세요."
+                notEnoughPts: "포인트가 부족합니다! 미션과 도전과제를 달성해 포인트를 모아보세요.",
+                shopTabChars: "캐릭터 상점", shopTabItems: "치트/버프 아이템",
+                itemUseBtn: "사용하기", itemOwned: (count) => `보유: ${count}개`,
+                shieldSaved: "🛡️ 보호막 발동! 실수가 방어되었습니다!"
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -272,12 +310,13 @@
                 timeAttackHardMode: "Time Attack Hard", timeAttackHardDesc: "Random button shuffle Time Attack!",
                 infiniteMode: "Infinite Mode (Speed)", infiniteDesc: "Don't fail within 1s! Beat your high score",
                 infiniteHardMode: "Infinite Hard Mode", infiniteHardDesc: "1s limit + Button Shuffle!",
-                rankingBtn: "Ranking", attendanceBtn: "Check", achievementBtn: "Achievements", shopBtn: "Shop",
+                rankingBtn: "Ranking", attendanceBtn: "Check", missionBtn: "Mission", achievementBtn: "Achievements", shopBtn: "Shop",
                 scoreLabel: "Score", timeElapsed: "Elapsed Time", comInstruction: "Computer's hand (You must LOSE to this!)",
                 scissor: "Scissor", rock: "Rock", paper: "Paper", gameOver: "Game Over!", wellDone: "Great job!",
                 earnedScore: "Final Score", submitRanking: "Submit Score", goHome: "Back to Menu", goHomeMenu: "Home",
                 downloadCard: "Save Shareable Card",
                 tabInfinite: "Infinite", tabInfiniteHard: "Inf Hard", tabTimeAttack: "Time Attack", tabTimeAttackHard: "TA Hard",
+                rankTypeAll: "All-Time", rankTypeWeekly: "Weekly",
                 loadingRanking: "Loading rankings...", noRanking: "No ranking records yet.",
                 modePractice: "Practice Mode", modeTimeAttack: "Time Attack Mode", modeTimeAttackHard: "Time Attack Hard",
                 modeInfinite: "Infinite Mode (1s)", modeInfiniteHard: "Infinite Hard Mode",
@@ -287,12 +326,17 @@
                 attendanceTitle: "📅 Daily Attendance", attendanceDesc: "Check in every day and get reward points!",
                 attendanceDone: "✅ Already checked in today!<br><span class='text-xs font-normal text-gray-500'>Come back tomorrow for more points! 🐸</span>",
                 attendanceReward: (count) => `🎉 Checked in! (${count} days total)<br><span class='text-xs font-extrabold text-amber-600'>🎁 Reward: +30 💰 Points!</span>`,
+                missionTitle: "🎯 Daily Missions", missionResetDesc: "Resets daily",
+                missionRewardBtn: "Claim", missionDone: "Done",
                 achievementTitle: "🏅 Achievements & Rewards", tabAchInfinite: "Infinite Mode", tabAchTimeAttack: "Time Attack",
                 shopDesc: "Complete achievements and collect points to meet new animal friends!",
                 statusDone: "✅ Done", statusInProgress: "🔒 In Progress",
                 charDefault: "Default", charPrice: (price) => `${price} Points`,
                 equipped: "Equipped", equipBtn: "Equip", buyBtn: (price) => `Buy (${price}P)`,
-                notEnoughPts: "Not enough points! Complete achievements to earn points."
+                notEnoughPts: "Not enough points! Complete missions & achievements.",
+                shopTabChars: "Characters", shopTabItems: "Buff Items",
+                itemUseBtn: "Use", itemOwned: (count) => `Owned: ${count}`,
+                shieldSaved: "🛡️ Shield Activated! Mistake blocked!"
             }
         };
 
@@ -311,13 +355,9 @@
             if (nameInput) { nameInput.placeholder = translations[currentLang].namePlaceholder; }
             if (gameState.isPlaying) { updateModeLabel(); }
             
-            // 모달이 열려있는 상태라면 언어 변경 시 즉시 반영
-            if (!document.getElementById('modal-achievement').classList.contains('hidden')) {
-                renderAchievements();
-            }
-            if (!document.getElementById('modal-shop').classList.contains('hidden')) {
-                renderShop();
-            }
+            if (!document.getElementById('modal-achievement').classList.contains('hidden')) { renderAchievements(); }
+            if (!document.getElementById('modal-shop').classList.contains('hidden')) { renderShopContent(); }
+            if (!document.getElementById('modal-mission').classList.contains('hidden')) { renderMissions(); }
         }
 
         function goHome() {
@@ -353,6 +393,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // 캐릭터 데이터
         const charactersData = [
             { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0 },
             { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0 },
@@ -363,23 +404,26 @@
             { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200 }
         ];
 
+        // 소모성 버프 아이템 데이터
+        const itemsData = [
+            { id: 'shield', nameKo: '🛡️ 실수 방어 보호막', nameEn: '🛡️ Mistake Shield', descKo: '무한 모드에서 오답/시간초과 1회 방어', descEn: 'Block 1 mistake/timeout in Infinite', price: 40 },
+            { id: 'time_minus', nameKo: '⏱️ 타임어택 -2초 앰플', nameEn: '⏱️ TA -2s Booster', descKo: '타임어택 시작 시 기록 2초 보정(할인)', descEn: 'Start TA with 2s bonus deduction', price: 30 }
+        ];
+
         let gameState = {
             mode: 'practice', score: 0, round: 0, maxRounds: 10,
             isPlaying: false, comChoiceKey: '', timer: null, timeLeft: 100,
-            startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0
+            startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0,
+            hasShield: false
         };
 
-        function getUserPoints() {
-            return parseInt(localStorage.getItem('frog_friends_points') || '0');
-        }
+        function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
         function addUserPoints(amount) {
             let pts = getUserPoints() + amount;
             localStorage.setItem('frog_friends_points', pts);
             updateUIStats();
         }
-        function getCurrentChar() {
-            return localStorage.getItem('frog_friends_equipped_char') || '🐸';
-        }
+        function getCurrentChar() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
 
         function updateUIStats() {
             const pts = getUserPoints();
@@ -429,6 +473,28 @@
             gameState.elapsedSeconds = 0;
             clearInterval(gameState.stopwatchTimer);
 
+            // 소모성 방어막 적용 확인
+            let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
+            const shieldDisplay = document.getElementById('active-buff-display');
+            if ((mode === 'infinite' || mode === 'infinite_hard') && items['shield'] && items['shield'] > 0) {
+                gameState.hasShield = true;
+                items['shield']--;
+                localStorage.setItem('frog_friends_items', JSON.stringify(items));
+                shieldDisplay.classList.remove('hidden');
+            } else {
+                gameState.hasShield = false;
+                shieldDisplay.classList.add('hidden');
+            }
+
+            // 타임어택 아이템(-2초) 확인
+            if (mode === 'timeattack' || mode === 'timeattack_hard') {
+                if (items['time_minus'] && items['time_minus'] > 0) {
+                    items['time_minus']--;
+                    localStorage.setItem('frog_friends_items', JSON.stringify(items));
+                    gameState.startTime -= 2000; // 2초 앞당겨서 시작
+                }
+            }
+
             const timerBarContainer = document.getElementById('timer-bar-container');
             const stopwatchDisplay = document.getElementById('stopwatch-display');
             updateModeLabel();
@@ -437,7 +503,7 @@
                 timerBarContainer.classList.add('hidden');
                 stopwatchDisplay.classList.remove('hidden');
                 gameState.stopwatchTimer = setInterval(() => {
-                    gameState.elapsedSeconds = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
+                    gameState.elapsedSeconds = Math.max(0, ((Date.now() - gameState.startTime) / 1000).toFixed(1));
                     document.getElementById('elapsed-time').innerText = gameState.elapsedSeconds;
                 }, 100);
             } else {
@@ -519,6 +585,16 @@
         function handleTimeout() {
             if (!gameState.isPlaying) return;
             setButtonsEnabled(false);
+            
+            if (gameState.hasShield && (gameState.mode.includes('infinite'))) {
+                gameState.hasShield = false;
+                document.getElementById('active-buff-display').classList.add('hidden');
+                playSound('reward');
+                document.getElementById('feedback-msg').innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].shieldSaved}</span>`;
+                setTimeout(nextRound, 1000);
+                return;
+            }
+
             gameState.streak = 0;
             playSound('fail');
             document.getElementById('feedback-msg').innerHTML = `<span class="text-red-500">${translations[currentLang].msgTimeout}</span>`;
@@ -566,9 +642,11 @@
                 
                 if (gameState.mode.includes('infinite')) {
                     checkAchievementsProgress(gameState.mode, gameState.score, 0);
+                    checkMissionsProgress('infinite', gameState.score);
                 }
 
                 if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
+                    checkMissionsProgress('timeattack', gameState.score);
                     if (gameState.score >= 10) {
                         setButtonsEnabled(false);
                         setTimeout(endGame, 300);
@@ -581,6 +659,16 @@
                     return;
                 }
             } else {
+                if (gameState.hasShield && (gameState.mode.includes('infinite'))) {
+                    gameState.hasShield = false;
+                    document.getElementById('active-buff-display').classList.add('hidden');
+                    playSound('reward');
+                    feedbackEl.innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].shieldSaved}</span>`;
+                    setButtonsEnabled(false);
+                    setTimeout(nextRound, 1000);
+                    return;
+                }
+
                 gameState.streak = 0;
                 playSound('fail');
                 if (isUserWin) {
@@ -638,6 +726,7 @@
                 resultDesc.innerText = currentLang === 'ko' ? `무한 모드 기록: ${gameState.score}번 연속 성공!` : `Infinite record: ${gameState.score} streaks!`;
                 nameInputContainer.classList.remove('hidden');
                 checkAchievementsProgress(gameState.mode, gameState.score, 0);
+                checkMissionsProgress(gameState.mode, gameState.score);
             } else if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                 const totalTime = parseFloat(((Date.now() - gameState.startTime) / 1000).toFixed(1));
                 gameState.elapsedSeconds = totalTime;
@@ -646,6 +735,7 @@
                 resultDesc.innerText = currentLang === 'ko' ? `타임어택 완료! 총 ${totalTime}초 소요` : `Time Attack Complete! ${totalTime}s`;
                 nameInputContainer.classList.remove('hidden');
                 checkAchievementsProgress(gameState.mode, 10, totalTime);
+                checkMissionsProgress(gameState.mode, 10);
             } else {
                 resultLabel.innerText = currentLang === 'ko' ? '연습 모드 획득 점수' : 'Practice Score';
                 finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
@@ -693,8 +783,9 @@
                 addUserPoints(30);
                 playSound('reward');
                 statusEl.innerHTML = translations[currentLang].attendanceReward(count);
+                checkMissionsProgress('attendance', 1);
             }
-            document.getElementById('modal-attendance').classList.contains('hidden') && document.getElementById('modal-attendance').classList.remove('hidden');
+            document.getElementById('modal-attendance').classList.remove('hidden');
         }
         function closeAttendanceModal() {
             playSound('click');
@@ -702,7 +793,91 @@
             updateUIStats();
         }
 
-        // 도전과제 데이터
+        // 일일 미션 시스템
+        const dailyMissionsData = [
+            { id: 'mission_login', titleKo: '📅 매일 출석하기', titleEn: '📅 Daily Attendance', reward: 20, goal: 1, type: 'attendance' },
+            { id: 'mission_inf5', titleKo: '♾️ 무한 모드 5점 달성', titleEn: '♾️ Reach 5 pts in Infinite', reward: 30, goal: 5, type: 'infinite' },
+            { id: 'mission_ta', titleKo: '⏱️ 타임어택 1회 완주', titleEn: '⏱️ Finish Time Attack', reward: 40, goal: 10, type: 'timeattack' }
+        ];
+
+        function getTodayKey() { return new Date().toDateString(); }
+
+        function getMissionProgress() {
+            let data = JSON.parse(localStorage.getItem('frog_friends_missions') || '{}');
+            if (data.date !== getTodayKey()) {
+                data = { date: getTodayKey(), progress: {}, claimed: {} };
+                localStorage.setItem('frog_friends_missions', JSON.stringify(data));
+            }
+            return data;
+        }
+
+        function checkMissionsProgress(type, val) {
+            let data = getMissionProgress();
+            dailyMissionsData.forEach(m => {
+                if (m.type === type && !data.claimed[m.id]) {
+                    if (type === 'infinite' || type === 'timeattack') {
+                        if (val >= m.goal) data.progress[m.id] = m.goal;
+                    } else if (type === 'attendance') {
+                        data.progress[m.id] = 1;
+                    }
+                }
+            });
+            localStorage.setItem('frog_friends_missions', JSON.stringify(data));
+        }
+
+        function openMissionModal() {
+            playSound('click');
+            renderMissions();
+            document.getElementById('modal-mission').classList.remove('hidden');
+        }
+
+        function renderMissions() {
+            let data = getMissionProgress();
+            const listEl = document.getElementById('mission-list');
+
+            listEl.innerHTML = dailyMissionsData.map(m => {
+                const cur = data.progress[m.id] || 0;
+                const isDone = cur >= m.goal;
+                const isClaimed = data.claimed[m.id];
+                const title = currentLang === 'ko' ? m.titleKo : m.titleEn;
+
+                let btnHtml = '';
+                if (isClaimed) {
+                    btnHtml = `<span class="text-gray-400 font-bold">${translations[currentLang].missionDone}</span>`;
+                } else if (isDone) {
+                    btnHtml = `<button onclick="claimMission('${m.id}', ${m.reward})" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].missionRewardBtn}</button>`;
+                } else {
+                    btnHtml = `<span class="text-gray-400 text-xs">${cur}/${m.goal}</span>`;
+                }
+
+                return `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
+                        <div>
+                            <div class="font-bold text-gray-800">${title} <span class="text-amber-600 font-extrabold">+${m.reward}P</span></div>
+                        </div>
+                        <div>${btnHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function claimMission(missionId, reward) {
+            let data = getMissionProgress();
+            data.claimed[missionId] = true;
+            localStorage.setItem('frog_friends_missions', JSON.stringify(data));
+            addUserPoints(reward);
+            playSound('reward');
+            renderMissions();
+            updateUIStats();
+        }
+
+        function closeMissionModal() {
+            playSound('click');
+            document.getElementById('modal-mission').classList.add('hidden');
+            updateUIStats();
+        }
+
+        // 도전과제 시스템
         const achievementsData = {
             infinite: [
                 { id: 'inf_5', titleKo: '🌱 초보 청개구리', titleEn: '🌱 Beginner Frog', descKo: '무한 모드에서 5점 달성하기', descEn: 'Reach 5 pts in Infinite Mode', reward: 30, check: (score) => score >= 5 },
@@ -781,68 +956,100 @@
             updateUIStats();
         }
 
-        // 상점 기능
+        // 상점 및 아이템 샵 기능
+        let currentShopTab = 'chars';
+        function switchShopTab(tab) {
+            currentShopTab = tab;
+            ['chars', 'items'].forEach(t => {
+                const btn = document.getElementById(`shop-tab-${t}`);
+                if (t === tab) {
+                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-purple-700 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
+                }
+            });
+            renderShopContent();
+        }
+
         function openShopModal() {
             playSound('click');
-            renderShop();
+            renderShopContent();
             document.getElementById('modal-shop').classList.remove('hidden');
         }
 
-        function renderShop() {
+        function renderShopContent() {
             const pts = getUserPoints();
             document.getElementById('shop-user-points').innerText = `${pts} 💰 P`;
-            const listEl = document.getElementById('shop-char-list');
-            let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
-            const equippedChar = getCurrentChar();
+            const listEl = document.getElementById('shop-content-area');
 
-            listEl.innerHTML = charactersData.map(c => {
-                const isUnlocked = unlockedChars.includes(c.id);
-                const isEquipped = (c.emoji === equippedChar);
-                const charName = currentLang === 'ko' ? c.name : c.nameEn;
+            if (currentShopTab === 'chars') {
+                let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
+                const equippedChar = getCurrentChar();
 
-                let btnHtml = '';
-                if (isEquipped) {
-                    btnHtml = `<span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipped}</span>`;
-                } else if (isUnlocked) {
-                    btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipBtn}</button>`;
-                } else {
-                    btnHtml = `<button onclick="buyChar('${c.id}', ${c.price})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].buyBtn(c.price)}</button>`;
-                }
+                listEl.innerHTML = charactersData.map(c => {
+                    const isUnlocked = unlockedChars.includes(c.id);
+                    const isEquipped = (c.emoji === equippedChar);
+                    const charName = currentLang === 'ko' ? c.name : c.nameEn;
 
-                const priceText = c.price === 0 ? translations[currentLang].charDefault : translations[currentLang].charPrice(c.price);
+                    let btnHtml = '';
+                    if (isEquipped) {
+                        btnHtml = `<span class="bg-green-100 text-green-700 font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipped}</span>`;
+                    } else if (isUnlocked) {
+                        btnHtml = `<button onclick="equipChar('${c.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].equipBtn}</button>`;
+                    } else {
+                        btnHtml = `<button onclick="buyChar('${c.id}', ${c.price})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1 rounded-xl text-xs">${translations[currentLang].buyBtn(c.price)}</button>`;
+                    }
 
-                return `
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
-                        <div class="flex items-center space-x-3">
-                            <span class="text-2xl">${c.emoji}</span>
+                    const priceText = c.price === 0 ? translations[currentLang].charDefault : translations[currentLang].charPrice(c.price);
+
+                    return `
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">${c.emoji}</span>
+                                <div>
+                                    <div class="font-bold text-gray-800">${charName}</div>
+                                    <div class="text-gray-400 text-[11px]">${priceText}</div>
+                                </div>
+                            </div>
+                            <div>${btnHtml}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
+                listEl.innerHTML = itemsData.map(item => {
+                    const name = currentLang === 'ko' ? item.nameKo : item.nameEn;
+                    const desc = currentLang === 'ko' ? item.descKo : item.descEn;
+                    const count = items[item.id] || 0;
+
+                    return `
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
                             <div>
-                                <div class="font-bold text-gray-800">${charName}</div>
-                                <div class="text-gray-400 text-[11px]">${priceText}</div>
+                                <div class="font-bold text-gray-800">${name} <span class="text-xs text-amber-600">(${item.price}P)</span></div>
+                                <div class="text-gray-500 text-[11px] mb-1">${desc}</div>
+                                <div class="text-xs text-indigo-600 font-bold">${translations[currentLang].itemOwned(count)}</div>
+                            </div>
+                            <div>
+                                <button onclick="buyItem('${item.id}', ${item.price})" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs">${translations[currentLang].buyBtn(item.price)}</button>
                             </div>
                         </div>
-                        <div>${btnHtml}</div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            }
         }
 
         function buyChar(charId, price) {
             const pts = getUserPoints();
-            if (pts < price) {
-                alert(translations[currentLang].notEnoughPts);
-                return;
-            }
+            if (pts < price) { alert(translations[currentLang].notEnoughPts); return; }
             localStorage.setItem('frog_friends_points', pts - price);
             let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
             unlockedChars.push(charId);
             localStorage.setItem('frog_friends_unlocked_chars', JSON.stringify(unlockedChars));
             
             const charObj = charactersData.find(c => c.id === charId);
-            if (charObj) {
-                localStorage.setItem('frog_friends_equipped_char', charObj.emoji);
-            }
+            if (charObj) { localStorage.setItem('frog_friends_equipped_char', charObj.emoji); }
             playSound('reward');
-            renderShop();
+            renderShopContent();
             updateUIStats();
         }
 
@@ -851,9 +1058,21 @@
             if (charObj) {
                 localStorage.setItem('frog_friends_equipped_char', charObj.emoji);
                 playSound('click');
-                renderShop();
+                renderShopContent();
                 updateUIStats();
             }
+        }
+
+        function buyItem(itemId, price) {
+            const pts = getUserPoints();
+            if (pts < price) { alert(translations[currentLang].notEnoughPts); return; }
+            localStorage.setItem('frog_friends_points', pts - price);
+            let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
+            items[itemId] = (items[itemId] || 0) + 1;
+            localStorage.setItem('frog_friends_items', JSON.stringify(items));
+            playSound('reward');
+            renderShopContent();
+            updateUIStats();
         }
 
         function closeShopModal() {
@@ -862,41 +1081,67 @@
             updateUIStats();
         }
 
-        // 랭킹 저장
+        // 랭킹 저장 및 주간 랭킹 지원
         function saveRanking() {
             const nameInput = document.getElementById('player-name');
             const rawName = nameInput.value.trim() || translations[currentLang].anonymousName;
             const currentChar = getCurrentChar();
             const name = `${currentChar} ${rawName}`;
 
-            let dbPath = '';
-            if (gameState.mode === 'infinite') dbPath = 'rankings_infinite';
-            else if (gameState.mode === 'infinite_hard') dbPath = 'rankings_infinite_hard';
-            else if (gameState.mode === 'timeattack') dbPath = 'rankings_timeattack';
-            else if (gameState.mode === 'timeattack_hard') dbPath = 'rankings_timeattack_hard';
+            let baseDbPath = '';
+            if (gameState.mode === 'infinite') baseDbPath = 'rankings_infinite';
+            else if (gameState.mode === 'infinite_hard') baseDbPath = 'rankings_infinite_hard';
+            else if (gameState.mode === 'timeattack') baseDbPath = 'rankings_timeattack';
+            else if (gameState.mode === 'timeattack_hard') baseDbPath = 'rankings_timeattack_hard';
+
+            const weekKey = getWeekKey();
 
             if (gameState.mode.includes('infinite')) {
                 const score = gameState.score;
                 if (score <= 0) { alert(translations[currentLang].alertZeroScore); return; }
-                db.ref(dbPath).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
+                db.ref(baseDbPath).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
+                db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
             } else {
                 const timeTaken = parseFloat(gameState.elapsedSeconds);
-                db.ref(dbPath).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
+                db.ref(baseDbPath).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
+                db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
             }
             nameInput.value = '';
             showRanking(gameState.mode);
         }
 
+        function getWeekKey() {
+            const now = new Date();
+            const onejan = new Date(now.getFullYear(), 0, 1);
+            const week = Math.ceil((((now - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+            return `${now.getFullYear()}_W${week}`;
+        }
+
+        let currentRankType = 'all'; // all or weekly
         let currentRankingTab = 'infinite';
+
+        function switchRankType(type) {
+            currentRankType = type;
+            ['all', 'weekly'].forEach(t => {
+                const btn = document.getElementById(`rank-type-${t}`);
+                if (t === type) {
+                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
+                }
+            });
+            renderRankingList();
+        }
+
         function switchRankingTab(tab) {
             currentRankingTab = tab;
             ['infinite', 'infinite_hard', 'timeattack', 'timeattack_hard'].forEach(t => {
                 const btn = document.getElementById(`tab-${t.replace('_', '-')}`);
                 if (!btn) return;
                 if (t === tab) {
-                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
+                    btn.className = "flex-1 py-1.5 text-[11px] font-bold rounded-lg bg-white text-green-700 shadow-sm";
                 } else {
-                    btn.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-500";
+                    btn.className = "flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500";
                 }
             });
             renderRankingList();
@@ -913,7 +1158,11 @@
                 'infinite': 'rankings_infinite', 'infinite_hard': 'rankings_infinite_hard',
                 'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard'
             };
-            const dbPath = dbPaths[currentRankingTab];
+            let dbPath = dbPaths[currentRankingTab];
+            if (currentRankType === 'weekly') {
+                dbPath = `weekly_${getWeekKey()}_${dbPath}`;
+            }
+
             rankingList.innerHTML = `<p class="text-center text-gray-400 py-4">${translations[currentLang].loadingRanking}</p>`;
 
             db.ref(dbPath).once('value', (snapshot) => {
@@ -932,11 +1181,11 @@
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
                                 <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
-                                <span class="truncate max-w-[140px]">${item.name}</span>
+                                <span class="truncate max-w-[130px]">${item.name}</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <span class="text-green-600 font-extrabold">${item.score} pts</span>
-                                <span class="text-xs text-gray-400">${item.date}</span>
+                                <span class="text-[11px] text-gray-400">${item.date}</span>
                             </div>
                         </div>
                     `).join('');
@@ -947,11 +1196,11 @@
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
                                 <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
-                                <span class="truncate max-w-[140px]">${item.name}</span>
+                                <span class="truncate max-w-[130px]">${item.name}</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <span class="text-indigo-600 font-extrabold">${item.time}s</span>
-                                <span class="text-xs text-gray-400">${item.date}</span>
+                                <span class="text-[11px] text-gray-400">${item.date}</span>
                             </div>
                         </div>
                     `).join('');
