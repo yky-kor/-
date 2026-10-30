@@ -36,33 +36,32 @@
 </head>
 <body class="game-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
 
-    <!-- 상단 헤더 -->
-    <header class="w-full max-w-md flex justify-between items-center py-3 px-2">
-        <div class="flex items-center space-x-2 min-w-0">
-            <!-- 클릭 시 상점이 열리는 메인 캐릭터 아바타 -->
-            <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group" title="상점 열기">
-                <span id="header-char-avatar">🐸</span>
-                <span class="absolute -bottom-1 -right-1 text-xs bg-amber-400 text-gray-900 rounded-full px-1 font-bold shadow">🛍️</span>
-            </div>
-            <div class="min-w-0">
-                <h1 class="text-xl md:text-2xl font-bold truncate drop-shadow-md" data-i18n="title">청개구리 가위바위보</h1>
-                <div class="flex items-center space-x-2">
+    <!-- 상단 헤더 (2단 구조) -->
+    <header class="w-full max-w-md flex flex-col py-2 px-2 space-y-2">
+        <div class="flex justify-between items-center w-full">
+            <div class="flex items-center space-x-2 min-w-0">
+                <!-- 클릭 시 상점이 열리는 메인 캐릭터 아바타 -->
+                <div onclick="openShopModal()" class="text-3xl md:text-4xl animate-float cursor-pointer relative group shrink-0" title="상점 열기">
+                    <span id="header-char-avatar">🐸</span>
+                    <span class="absolute -bottom-1 -right-1 text-xs bg-amber-400 text-gray-900 rounded-full px-1 font-bold shadow">🛍️</span>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-xl md:text-2xl font-bold truncate drop-shadow-md" data-i18n="title">청개구리 가위바위보</h1>
                     <p class="text-green-100 text-xs mt-0.5 truncate" data-i18n="subtitle">컴퓨터에게 져야만 점수를 얻는 반대로 게임!</p>
                 </div>
             </div>
         </div>
-        <!-- 우측 버튼 그룹 -->
-        <div class="flex items-center space-x-1.5 shrink-0">
-            <!-- 동물 이모티콘 개수 모드 토글 버튼 -->
-            <button onclick="toggleEmojiCountMode()" id="emoji-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1" title="이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)">
+        <!-- 하단 컨트롤 버튼 그룹 -->
+        <div class="flex justify-end items-center space-x-1.5 w-full">
+            <button onclick="toggleEmojiCountMode()" id="emoji-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1" title="이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)">
                 <span>🔢</span>
                 <span id="emoji-mode-text">동물개수ON</span>
             </button>
-            <button onclick="toggleLanguage()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center space-x-1">
+            <button onclick="toggleLanguage()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-white/30 shadow flex items-center space-x-1">
                 <span>🌐</span>
                 <span id="lang-btn-text">EN</span>
             </button>
-            <button onclick="toggleSound()" id="sound-btn" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center justify-center">
+            <button onclick="toggleSound()" id="sound-btn" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-white/30 shadow flex items-center justify-center">
                 🔊
             </button>
         </div>
@@ -296,7 +295,8 @@
                 notEnoughPts: "포인트가 부족합니다! 미션과 도전과제를 달성해 포인트를 모아보세요.",
                 shopTabChars: "캐릭터 상점", shopTabItems: "치트/버프 아이템",
                 itemUseBtn: "사용하기", itemOwned: (count) => `보유: ${count}개`,
-                shieldSaved: "🛡️ 보호막 발동! 실수가 방어되었습니다!"
+                shieldSaved: "🛡️ 보호막 발동! 실수가 방어되었습니다!",
+                emojiOnText: "동물개수ON", defaultOnText: "기본손ON"
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -331,28 +331,55 @@
                 notEnoughPts: "Not enough points! Complete missions & achievements.",
                 shopTabChars: "Characters", shopTabItems: "Buff Items",
                 itemUseBtn: "Use", itemOwned: (count) => `Owned: ${count}`,
-                shieldSaved: "🛡️ Shield Activated! Mistake blocked!"
+                shieldSaved: "🛡️ Shield Activated! Mistake blocked!",
+                emojiOnText: "Count ON", defaultOnText: "Default ON"
             }
         };
 
         let currentLang = 'ko';
+        let isEmojiCountMode = true;
 
         function toggleLanguage() {
             currentLang = currentLang === 'ko' ? 'en' : 'ko';
             document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
+            
+            // 모든 일반 data-i18n 텍스트 번역
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
             });
+
             const homeBtnText = document.getElementById('home-btn-text');
             if (homeBtnText) { homeBtnText.innerText = translations[currentLang].goHomeMenu; }
             const nameInput = document.getElementById('player-name');
             if (nameInput) { nameInput.placeholder = translations[currentLang].namePlaceholder; }
             if (gameState.isPlaying) { updateModeLabel(); }
+
+            // 동물개수 / 기본손 토글 버튼 텍스트도 언어에 맞게 즉시 동기화!
+            updateEmojiButtonText();
             
             if (!document.getElementById('modal-achievement').classList.contains('hidden')) { renderAchievements(); }
             if (!document.getElementById('modal-shop').classList.contains('hidden')) { renderShopContent(); }
             if (!document.getElementById('modal-mission').classList.contains('hidden')) { renderMissions(); }
+        }
+
+        function updateEmojiButtonText() {
+            const btnText = document.getElementById('emoji-mode-text');
+            const btn = document.getElementById('emoji-mode-btn');
+            if (isEmojiCountMode) {
+                btnText.innerText = translations[currentLang].emojiOnText;
+                btn.className = "bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1";
+            } else {
+                btnText.innerText = translations[currentLang].defaultOnText;
+                btn.className = "bg-gray-600 hover:bg-gray-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-gray-400 shadow flex items-center space-x-1";
+            }
+        }
+
+        function toggleEmojiCountMode() {
+            isEmojiCountMode = !isEmojiCountMode;
+            playSound('click');
+            updateEmojiButtonText();
+            updateUIStats();
         }
 
         function goHome() {
@@ -388,15 +415,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 캐릭터 데이터 정의
         const charactersData = [
             { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0 },
             { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0 },
             { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50 },
             { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80 },
-            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120 },
-            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150 },
-            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200 }
+            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000 },
+            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000 },
+            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000 }
         ];
 
         const itemsData = [
@@ -410,24 +436,6 @@
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0,
             hasShield: false
         };
-
-        // 이모티콘 개수 모드 토글 상태 (true: 가위=개수2개, 주먹=개수1개, 보=개수3개 / false: 기본 ✌️✊🖐️)
-        let isEmojiCountMode = true;
-
-        function toggleEmojiCountMode() {
-            isEmojiCountMode = !isEmojiCountMode;
-            playSound('click');
-            const btnText = document.getElementById('emoji-mode-text');
-            const btn = document.getElementById('emoji-mode-btn');
-            if (isEmojiCountMode) {
-                btnText.innerText = currentLang === 'ko' ? '동물개수ON' : 'Count ON';
-                btn.className = "bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1";
-            } else {
-                btnText.innerText = currentLang === 'ko' ? '기본손ON' : 'Default ON';
-                btn.className = "bg-gray-600 hover:bg-gray-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-gray-400 shadow flex items-center space-x-1";
-            }
-            updateUIStats();
-        }
 
         function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
         function addUserPoints(amount) {
@@ -543,14 +551,12 @@
         function getHandsForCurrentChar() {
             const charEmoji = getCurrentCharEmoji();
             if (isEmojiCountMode) {
-                // 가위=2개, 주먹=1개, 보=3개 형식
                 return {
                     'scissor': { emoji: charEmoji + charEmoji, beats: 'paper', losesTo: 'rock' },
                     'rock': { emoji: charEmoji, beats: 'scissor', losesTo: 'paper' },
                     'paper': { emoji: charEmoji + charEmoji + charEmoji, beats: 'rock', losesTo: 'scissor' }
                 };
             } else {
-                // 기본 손 모양 스타일 (✌️, ✊, 🖐️)
                 return {
                     'scissor': { emoji: '✌️', beats: 'paper', losesTo: 'rock' },
                     'rock': { emoji: '✊', beats: 'scissor', losesTo: 'paper' },
@@ -1010,7 +1016,7 @@
         function openShopModal() {
             playSound('click');
             renderShopContent();
-            document.getElementById('modal-shop').classList.add('hidden');
+            document.getElementById('modal-shop').classList.remove('hidden');
         }
 
         function renderShopContent() {
@@ -1167,6 +1173,7 @@
                     btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
                 }
             });
+            renderRankingList();
         }
 
         function switchRankingTab(tab) {
