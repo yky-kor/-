@@ -129,7 +129,7 @@
             </button>
 
             <!-- 하단 메뉴 버튼들 -->
-            <div class="grid grid-cols-5 gap-1 w-full pt-1">
+            <div class="grid grid-cols-5 gap-1 w-full pt-1 mb-2"> <!-- 💡 mb-2 여백 추가 -->
                 <button onclick="openAttendanceModal()" class="py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     📅 <span data-i18n="attendanceBtn">출석</span>
                 </button>
@@ -145,6 +145,11 @@
                 <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95"> 
                     🏆 <span data-i18n="rankingBtn">랭킹</span> 
                 </button>
+            </div>
+
+            <!-- 💡 [추가] 모드 선택 화면 하단 안내 문구 (다국어 지원) -->
+            <div id="hidden-unlock-guide" class="text-[11px] text-gray-400 text-center font-medium" data-i18n="hiddenUnlockGuide">
+                🔒 모든 도전과제 완료 시 신들의 영역(히든모드) 오픈!
             </div>
         </div>
 
@@ -319,6 +324,7 @@
         const translations = {
             ko: {
                 title: "🐸 청개구리 가위바위보", subtitle: "컴퓨터에게 져야만 점수를 얻는 반대로 게임!",
+                hiddenUnlockGuide: "🔒 모든 도전과제 완료 시 신들의 영역(히든모드) 오픈!",
                 selectMode: "모드를 선택하세요", practiceMode: "연습 모드", practiceDesc: "3초 제한 시간 안에서 10판 지기 연습!",
                 timeAttackMode: "타임어택 모드", timeAttackDesc: "시간 제한 없음! 10점을 가장 빠르게 달성하기",
                 timeAttackHardMode: "타임어택 하드 모드", timeAttackHardDesc: "버튼 위치가 매번 랜덤으로 섞이는 타임어택!",
@@ -367,6 +373,7 @@ autoOff: "자동OFF",
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
+                hiddenUnlockGuide: "🔒 Complete all achievements to unlock the Realm of Gods!",
                 selectMode: "Select Mode", practiceMode: "Practice Mode", practiceDesc: "10 rounds of losing practice with 3s limit!",
                 timeAttackMode: "Time Attack", timeAttackDesc: "No time limit! Reach 10 points ASAP",
                 timeAttackHardMode: "Time Attack Hard", timeAttackHardDesc: "Random button shuffle Time Attack!",
