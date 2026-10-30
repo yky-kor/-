@@ -1489,7 +1489,8 @@
                 Tone.Transport.stop();
             } catch(e) {}
         }
-
+ // 💡 전역 변수로 대기 타이머를 관리할 변수 추가
+        let memoTimer = null;
         function initHiddenRound() {
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
@@ -1507,12 +1508,19 @@
             let count = 2;
             if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
 
-            let memoTimer = setInterval(() => {
+            // 기존에 돌던 타이머가 있다면 확실하게 제거
+            if (memoTimer) {
+                clearInterval(memoTimer);
+                memoTimer = null;
+            }
+
+            memoTimer = setInterval(() => {
                 count--;
                 if (count > 0) {
                     if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
                 } else {
                     clearInterval(memoTimer);
+                    memoTimer = null;
                     if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
                     setHiddenButtonsEnabled(true); 
                     startHiddenTimer(); 
@@ -1611,7 +1619,11 @@
         }
 
 function exitHiddenMode() {
-            // 💡 모든 히든 모드 타이머와 인터벌을 완전히 정지 및 초기화
+            // 💡 대기 타이머(memoTimer)와 게임 타이머(hiddenTimer) 모두 확실하게 정지 및 초기화
+            if (memoTimer) {
+                clearInterval(memoTimer);
+                memoTimer = null;
+            }
             if (hiddenTimer) {
                 clearInterval(hiddenTimer);
                 hiddenTimer = null;
@@ -1624,7 +1636,7 @@ function exitHiddenMode() {
             stopHiddenBgm(); 
             document.body.classList.remove('hidden-universe-theme');
             
-            // 메인 화면으로 안전하게 복귀
+            // 메인 화면 복귀 및 UI 포인트/스킨 강제 즉시 갱신
             showScreen('screen-menu');
             checkAndUnlockHiddenMode();
             updateUIStats();
