@@ -1416,20 +1416,21 @@ clearCountScore: "Clear Count",
                 for (let id in data) { rankings.push(data[id]); }
 
                 if (currentRankingTab.includes('infinite') || currentRankingTab === 'hidden') {
-    rankings.sort((a, b) => b.score - a.score);
-    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
-        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-purple-50 font-bold text-purple-700 rounded-lg' : ''}">
-            <div class="flex items-center space-x-3">
-                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
-                <span class="truncate max-w-[130px]">${item.name}</span>
-            </div>
-            <div class="flex items-center space-x-3">
-                <span class="text-purple-600 font-extrabold">${item.score}회 클리어</span>
-                <span class="text-[11px] text-gray-400">${item.date}</span>
-            </div>
-        </div>
-    `).join('');
-} else {
+                    rankings.sort((a, b) => b.score - a.score);
+                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
+                        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-purple-50 font-bold text-purple-700 rounded-lg' : ''}">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
+                                <span class="truncate max-w-[130px]">${item.name}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <!-- 💡 [수정] '회 클리어' -> '단계 클리어' 로 표기 변경 -->
+                                <span class="text-purple-600 font-extrabold">${item.score}단계 클리어</span>
+                                <span class="text-[11px] text-gray-400">${item.date}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
                     rankings.sort((a, b) => a.time - b.time);
                     rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
@@ -1453,6 +1454,8 @@ clearCountScore: "Clear Count",
         let hiddenSequence = []; 
         let hiddenCurrentIndex = 0; 
         let hiddenPlayerChoices = []; 
+        let hiddenScore = 0;         // 👈 이 변수 꼭 필요합니다!
+        let hiddenMaxSteps = 5;      // 👈 이 변수 꼭 필요합니다!
         let hiddenBgmSynth = null;
         let hiddenBgmLoop = null;
 
@@ -1637,6 +1640,29 @@ clearCountScore: "Clear Count",
                 }
             }, 50); 
         }
+        function triggerHiddenGameOver() {
+            stopHiddenBgm();
+            document.body.classList.remove('hidden-universe-theme');
+            
+            gameState.mode = 'hidden';
+            gameState.score = hiddenScore; 
+            
+            showScreen('screen-result');
+            
+            const nameInputContainer = document.getElementById('name-input-container');
+            const resultDesc = document.getElementById('result-desc');
+            const resultLabel = document.getElementById('result-label');
+            const finalScoreEl = document.getElementById('final-score');
+            const cardModeName = document.getElementById('card-mode-name');
+
+            cardModeName.innerText = "🌌 신들의 영역 (히든 모드)";
+            // 💡 [수정] 랭킹 단위 변경
+            resultLabel.innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
+            finalScoreEl.innerText = hiddenScore + (currentLang === 'ko' ? '단계' : ' stages');
+            resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 도전 실패! 총 ${hiddenScore}단계 달성` : `Realm Over! Total ${hiddenScore} Stages`;
+            nameInputContainer.classList.remove('hidden');
+            updateUIStats();
+        }
 
         function checkHiddenPlayerChoice(playerChoiceIndex) {
             const computerVal = hiddenSequence[hiddenCurrentIndex];
@@ -1653,37 +1679,29 @@ clearCountScore: "Clear Count",
                 hiddenPlayerChoices.push(playerChoiceIndex); 
                 hiddenCurrentIndex++;
                 
-                if (hiddenCurrentIndex >= 5) {
-    clearInterval(hiddenTimer);
-    playSound('reward');
-    
-    // 히든 모드 클리어 시 점수를 1점(또는 누적 클리어 횟수)으로 설정하고 결과 화면 호출
-    gameState.mode = 'hidden';
-    gameState.score = (gameState.score || 0) + 1;
-    
-    stopHiddenBgm();
-    document.body.classList.remove('hidden-universe-theme');
-    showScreen('screen-result');
-    
-    const nameInputContainer = document.getElementById('name-input-container');
-    const resultDesc = document.getElementById('result-desc');
-    const resultLabel = document.getElementById('result-label');
-    const finalScoreEl = document.getElementById('final-score');
-    const cardModeName = document.getElementById('card-mode-name');
-
-    cardModeName.innerText = "신들의 영역 (히든 모드)";
-    resultLabel.innerText = currentLang === 'ko' ? '히든 모드 클리어 횟수' : 'Hidden Clear Count';
-    finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '회' : ' times');
-    resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 클리어 성공! 총 ${gameState.score}회 달성` : `Realm Cleared! Total ${gameState.score}`;
-    nameInputContainer.classList.remove('hidden');
-    updateUIStats();
-} else {
+                // 💡 [수정] 5개가 아니라 현재 시퀀스 길이 전체를 다 맞혔을 때 다음 단계로 연쇄 진입!
+                if (hiddenCurrentIndex >= hiddenSequence.length) {
+                    clearInterval(hiddenTimer);
+                    playSound('reward');
+                    
+                    hiddenScore += 1;          // 달성 단계 1 증가
+                    hiddenMaxSteps += 1;       // 다음 판엔 순서 개수 1개 추가!
+                    
+                    const instructionEl = document.getElementById('hidden-instruction-msg');
+                    if (instructionEl) instructionEl.innerHTML = `🎉 성공! 다음 단계로 진입합니다! (${hiddenScore}단계 달성)`;
+                    
+                    setHiddenButtonsEnabled(false);
+                    setTimeout(() => {
+                        initHiddenRound(); // 다음 난이도 라운드 자동 시작!
+                    }, 1200);
+                } else {
                     renderHiddenUI();
                 }
             } else {
                 clearInterval(hiddenTimer);
-                alert("틀렸습니다! (컴퓨터에게 져야 합니다)");
-                exitHiddenMode();
+                playSound('fail');
+                alert("틀렸습니다! 히든 모드 게임 종료!");
+                triggerHiddenGameOver(); // 💡 틀리면 게임 오버 및 랭킹 등록 화면으로 이동
             }
         }
 
