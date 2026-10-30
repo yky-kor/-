@@ -1541,7 +1541,7 @@ clearCountScore: "Clear Count",
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
             hiddenPlayerChoices = []; 
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<hiddenMaxSteps; i++) {
                 hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
@@ -1554,7 +1554,6 @@ clearCountScore: "Clear Count",
             let count = 2;
             if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
 
-            // 기존에 돌던 타이머가 있다면 확실하게 제거
             if (memoTimer) {
                 clearInterval(memoTimer);
                 memoTimer = null;
@@ -1569,7 +1568,7 @@ clearCountScore: "Clear Count",
                     memoTimer = null;
                     if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
                     setHiddenButtonsEnabled(true); 
-                    startHiddenTimer(); 
+                    startHiddenTimer(); // 👈 여기서 타이머 시작
                 }
             }, 1000);
         }
@@ -1608,7 +1607,11 @@ clearCountScore: "Clear Count",
         }
 
         function startHiddenTimer() {
-            hiddenTimeLeft = 2.0;
+            // 💡 [핵심 수정] 기본 2.5초 + (현재 순서 개수 - 5) * 0.5초 또는 개당 0.5초 비례 계산
+            // 예: 5개일 때 2.5초, 6개일 때 3.0초, 7개일 때 3.5초...
+            let targetDuration = 2500 + (hiddenSequence.length - 5) * 500;
+            
+            hiddenTimeLeft = targetDuration / 1000;
             clearInterval(hiddenTimer);
             
             const progressBar = document.getElementById('hidden-progress');
@@ -1617,20 +1620,20 @@ clearCountScore: "Clear Count",
             }
             
             let startTime = Date.now();
-            let duration = 2000; 
 
             hiddenTimer = setInterval(() => {
                 let elapsed = Date.now() - startTime;
-                hiddenTimeLeft = Math.max(0, 2.0 - (elapsed / 1000));
+                hiddenTimeLeft = Math.max(0, (targetDuration - elapsed) / 1000);
                 
                 if (progressBar) {
-                    progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
+                    progressBar.style.width = (hiddenTimeLeft / (targetDuration / 1000) * 100) + '%';
                 }
 
-                if (elapsed >= duration) {
+                if (elapsed >= targetDuration) {
                     clearInterval(hiddenTimer);
-                    alert("시간 초과! 히든 모드 실패!");
-                    exitHiddenMode();
+                    playSound('fail');
+                    alert("시간 초과! 히든 모드 게임 종료!");
+                    triggerHiddenGameOver();
                 }
             }, 50); 
         }
