@@ -507,13 +507,27 @@
             shieldsLeft: 0, shieldAuto: true, timeAmpAuto: true
         };
 
-        function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
+       function getUserPoints() { 
+            let pts = localStorage.getItem('frog_friends_points');
+            if (pts === null) {
+                localStorage.setItem('frog_friends_points', '0');
+                return 0;
+            }
+            return parseInt(pts); 
+        }
         function addUserPoints(amount) {
             let pts = getUserPoints() + amount;
             localStorage.setItem('frog_friends_points', pts);
             updateUIStats();
         }
-        function getCurrentCharEmoji() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
+        function getCurrentCharEmoji() { 
+            let emoji = localStorage.getItem('frog_friends_equipped_char');
+            if (!emoji) {
+                emoji = '🐸';
+                localStorage.setItem('frog_friends_equipped_char', emoji);
+            }
+            return emoji; 
+        }
         function getCurrentCharObj() {
             const emoji = getCurrentCharEmoji();
             return charactersData.find(c => c.emoji === emoji) || charactersData[0];
