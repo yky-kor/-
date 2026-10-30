@@ -923,7 +923,6 @@ startBgm('menu'); // 💡 메인 화면 BGM 재생
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
 
-            // 💡 화면 전환 및 BGM 재생 (중복 제거)
             showScreen('screen-result');
             startBgm('result');
 
@@ -956,9 +955,12 @@ startBgm('menu'); // 💡 메인 화면 BGM 재생
                     checkMissionsProgress('timeattack_hard', 10);
                 }
             } else if (gameState.mode === 'hidden') {
+                // 💡 [수정] 언어(currentLang)에 맞게 단계 및 설명 텍스트가 영어/한국어로 완벽히 바뀌도록 수정
                 resultLabel.innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
-                finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '단계' : ' stages');
-                resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 도전 실패! 총 ${gameState.score}단계 달성` : `Realm Over! Total ${gameState.score} Stages`;
+                finalScoreEl.innerText = currentLang === 'ko' ? `${gameState.score}단계` : `${gameState.score} Stages`;
+                resultDesc.innerText = currentLang === 'ko' 
+                    ? `신들의 영역 도전 실패! 총 ${gameState.score}단계 달성` 
+                    : `Realm Over! Total ${gameState.score} Stages Reached`;
                 nameInputContainer.classList.remove('hidden');
             } else {
                 resultLabel.innerText = currentLang === 'ko' ? '연습 모드 획득 점수' : 'Practice Score';
