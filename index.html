@@ -432,7 +432,7 @@
             mode: 'practice', score: 0, round: 0, maxRounds: 10,
             isPlaying: false, comChoiceKey: '', timer: null, timeLeft: 100,
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0,
-            shieldsLeft: 0, shieldAuto: true
+            shieldsLeft: 0, shieldAuto: true, timeAmpAuto: true
         };
 
         function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
@@ -524,7 +524,7 @@
                 shieldDisplay.classList.add('hidden');
             }
 
-            let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charObj.id === 'robot' || charObj.id === 'ghost'));
+            let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0 && gameState.timeAmpAuto) || charObj.id === 'robot' || charObj.id === 'ghost'));
             if (applyAmp) {
                 gameState.startTime += 2000;
                 if (items['time_minus'] && items['time_minus'] > 0 && charObj.id !== 'robot' && charObj.id !== 'ghost') {
@@ -1111,12 +1111,15 @@
                     const desc = currentLang === 'ko' ? item.descKo : item.descEn;
                     const count = items[item.id] || 0;
 
-                    // 보호막 아이템(shield)인 경우에만 보유 개수 옆에 자동 사용 버튼 추가
                     let extraHtml = '';
                     if (item.id === 'shield') {
                         const autoText = gameState.shieldAuto ? "자동ON" : "자동OFF";
                         const autoClass = gameState.shieldAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
                         extraHtml = ` <button onclick="toggleShieldAuto()" id="shop-shield-auto-btn" class="${autoClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${autoText}</button>`;
+                    } else if (item.id === 'time_minus') {
+                        const ampText = gameState.timeAmpAuto ? "자동ON" : "자동OFF";
+                        const ampClass = gameState.timeAmpAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
+                        extraHtml = ` <button onclick="toggleTimeAmpAuto()" id="shop-amp-auto-btn" class="${ampClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${ampText}</button>`;
                     }
 
                     return `
@@ -1135,6 +1138,20 @@
             }
         }
 
+        function toggleTimeAmpAuto() {
+            playSound('click');
+            gameState.timeAmpAuto = !gameState.timeAmpAuto;
+            const shopBtn = document.getElementById('shop-amp-auto-btn');
+            if (shopBtn) {
+                if (gameState.timeAmpAuto) {
+                    shopBtn.innerText = "자동ON";
+                    shopBtn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
+                } else {
+                    shopBtn.innerText = "자동OFF";
+                    shopBtn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
+                }
+            }
+        }
         function buyChar(charId, price) {
             const pts = getUserPoints();
             if (pts < price) { alert(translations[currentLang].notEnoughPts); return; }
