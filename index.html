@@ -128,7 +128,7 @@
                     <span>🏠</span> <span id="home-btn-text" data-i18n="goHomeMenu">메인으로</span>
                 </button>
                 <div id="active-buff-display" class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-xl hidden">
-                    🛡️ 보호막 ON
+                    🛡️ 보호막 ON (<span id="shield-count">0</span>)
                 </div>
             </div>
             <div class="w-full flex justify-between items-center mb-2 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
@@ -413,15 +413,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 요청하신 가격 반영 (유니콘: 1000, 로봇: 1000, 유령: 2000)
+        // 캐릭터 데이터 반영: 사자/공룡(500P, 보호막1), 유니콘(보호막2개), 로봇(앰플 + 보호막1), 유령(앰플 + 보호막2)
         const charactersData = [
-            { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0, descKo: '기본 캐릭터', descEn: 'Default Character' },
-            { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0, descKo: '귀여운 아기 고양이', descEn: 'Cute Baby Cat' },
-            { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50, descKo: '용맹한 사자 스킨', descEn: 'Brave Lion Skin' },
-            { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80, descKo: '귀여운 공룡 스킨', descEn: 'Green Dino Skin' },
-            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000, descKo: '🛡️ 무한모드 영구 보호막 능력!', descEn: '🛡️ Permanent Infinite Shield!' },
-            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000, descKo: '⏱️ 타임어택 -2초 앰플 효과!', descEn: '⏱️ TA -2s Time Booster!' },
-            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000, descKo: '🛡️보호막 + ⏱️타임어택 앰플 동시 적용!', descEn: '🛡️ Shield + ⏱️ TA Booster both!' }
+            { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0, shieldCount: 0, descKo: '기본 캐릭터', descEn: 'Default Character' },
+            { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0, shieldCount: 0, descKo: '귀여운 아기 고양이', descEn: 'Cute Baby Cat' },
+            { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 500, shieldCount: 1, descKo: '🛡️ 무한모드 보호막 1개 포함!', descEn: '🛡️ Includes 1 Infinite Shield!' },
+            { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 500, shieldCount: 1, descKo: '🛡️ 무한모드 보호막 1개 포함!', descEn: '🛡️ Includes 1 Infinite Shield!' },
+            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000, shieldCount: 2, descKo: '🛡️ 무한모드 영구보호막 + 추가 보호막 2개!', descEn: '🛡️ Infinite Perm-Shield + 2 Extra Shields!' },
+            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000, shieldCount: 1, descKo: '⏱️ 타임어택 -2초 앰플 + 🛡️ 보호막 1개!', descEn: '⏱️ TA -2s Booster + 🛡️ 1 Shield!' },
+            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000, shieldCount: 2, descKo: '🛡️ 보호막 2개 + ⏱️ 타임어택 -2초 앰플 동시 적용!', descEn: '🛡️ 2 Shields + ⏱️ TA Booster both!' }
         ];
 
         const itemsData = [
@@ -433,7 +433,7 @@
             mode: 'practice', score: 0, round: 0, maxRounds: 10,
             isPlaying: false, comChoiceKey: '', timer: null, timeLeft: 100,
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0,
-            hasShield: false
+            shieldsLeft: 0
         };
 
         function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
@@ -443,6 +443,10 @@
             updateUIStats();
         }
         function getCurrentCharEmoji() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
+        function getCurrentCharObj() {
+            const emoji = getCurrentCharEmoji();
+            return charactersData.find(c => c.emoji === emoji) || charactersData[0];
+        }
 
         function updateUIStats() {
             const pts = getUserPoints();
@@ -499,26 +503,33 @@
 
             let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
             const shieldDisplay = document.getElementById('active-buff-display');
-            const charEmoji = getCurrentCharEmoji();
+            const shieldCountSpan = document.getElementById('shield-count');
+            const charObj = getCurrentCharObj();
 
-            let applyShield = (mode.includes('infinite') && ((items['shield'] && items['shield'] > 0) || charEmoji === '🦄' || charEmoji === '👻'));
-            let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charEmoji === '🤖' || charEmoji === '👻'));
-
-            if (applyShield) {
-                gameState.hasShield = true;
-                shieldDisplay.classList.remove('hidden');
-                if (items['shield'] && items['shield'] > 0 && charEmoji !== '🦄' && charEmoji !== '👻') {
-                    items['shield']--;
+            let totalShields = 0;
+            if (mode.includes('infinite')) {
+                if (items['shield'] && items['shield'] > 0) {
+                    totalShields += items['shield'];
+                    items['shield'] = 0;
                     localStorage.setItem('frog_friends_items', JSON.stringify(items));
                 }
+                totalShields += (charObj.shieldCount || 0);
+                if (charObj.id === 'unicorn') totalShields += 99; // 유니콘 영구 보호막 표현용
+            }
+
+            gameState.shieldsLeft = totalShields;
+            if (totalShields > 0) {
+                shieldDisplay.classList.remove('hidden');
+                shieldCountSpan.innerText = (charObj.id === 'unicorn') ? '무한(영구)' : totalShields;
             } else {
-                gameState.hasShield = false;
                 shieldDisplay.classList.add('hidden');
             }
 
+            // 타임어택 -2초 앰플 적용 (시작 시간에서 2초를 미리 보정하여 차감)
+            let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charObj.id === 'robot' || charObj.id === 'ghost'));
             if (applyAmp) {
-                gameState.startTime -= 2000;
-                if (items['time_minus'] && items['time_minus'] > 0 && charEmoji !== '🤖' && charEmoji !== '👻') {
+                gameState.startTime += 2000;
+                if (items['time_minus'] && items['time_minus'] > 0 && charObj.id !== 'robot' && charObj.id !== 'ghost') {
                     items['time_minus']--;
                     localStorage.setItem('frog_friends_items', JSON.stringify(items));
                 }
@@ -630,9 +641,12 @@
             if (!gameState.isPlaying) return;
             setButtonsEnabled(false);
             
-            if (gameState.hasShield && (gameState.mode.includes('infinite'))) {
-                gameState.hasShield = false;
-                document.getElementById('active-buff-display').classList.add('hidden');
+            const charObj = getCurrentCharObj();
+            if (gameState.shieldsLeft > 0 && (gameState.mode.includes('infinite'))) {
+                if (charObj.id !== 'unicorn') {
+                    gameState.shieldsLeft--;
+                }
+                document.getElementById('shield-count').innerText = (charObj.id === 'unicorn') ? '무한(영구)' : gameState.shieldsLeft;
                 playSound('reward');
                 document.getElementById('feedback-msg').innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].shieldSaved}</span>`;
                 setTimeout(nextRound, 1000);
@@ -691,7 +705,7 @@
                 }
 
                 if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
-                    checkMissionsProgress('timeattack', gameState.score);
+                    checkMissionsProgress('timeattack_hard', gameState.score);
                     if (gameState.score >= 10) {
                         setButtonsEnabled(false);
                         setTimeout(endGame, 300);
@@ -704,9 +718,12 @@
                     return;
                 }
             } else {
-                if (gameState.hasShield && (gameState.mode.includes('infinite'))) {
-                    gameState.hasShield = false;
-                    document.getElementById('active-buff-display').classList.add('hidden');
+                const charObj = getCurrentCharObj();
+                if (gameState.shieldsLeft > 0 && (gameState.mode.includes('infinite'))) {
+                    if (charObj.id !== 'unicorn') {
+                        gameState.shieldsLeft--;
+                    }
+                    document.getElementById('shield-count').innerText = (charObj.id === 'unicorn') ? '무한(영구)' : gameState.shieldsLeft;
                     playSound('reward');
                     feedbackEl.innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].shieldSaved}</span>`;
                     setButtonsEnabled(false);
@@ -718,14 +735,8 @@
                 playSound('fail');
                 if (isUserWin) {
                     feedbackEl.innerHTML = `<span class="text-red-500">${translations[currentLang].msgWin}</span>`;
-                    if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
-                        gameState.startTime -= 500;
-                    }
                 } else {
                     feedbackEl.innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].msgDraw}</span>`;
-                    if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
-                        gameState.startTime -= 500;
-                    }
                 }
 
                 if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
@@ -780,7 +791,9 @@
                 resultDesc.innerText = currentLang === 'ko' ? `타임어택 완료! 총 ${totalTime}초 소요` : `Time Attack Complete! ${totalTime}s`;
                 nameInputContainer.classList.remove('hidden');
                 checkAchievementsProgress(gameState.mode, 10, totalTime);
-                checkMissionsProgress(gameState.mode, 10);
+                if (gameState.mode === 'timeattack_hard') {
+                    checkMissionsProgress('timeattack_hard', 10);
+                }
             } else {
                 resultLabel.innerText = currentLang === 'ko' ? '연습 모드 획득 점수' : 'Practice Score';
                 finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
@@ -829,7 +842,7 @@
                 statusEl.innerHTML = translations[currentLang].attendanceReward(count);
                 checkMissionsProgress('attendance', 1);
             }
-            document.getElementById('modal-attendance').classList.remove('hidden');
+            document.getElementById('modal-attendance').classList.add('hidden');
         }
         function closeAttendanceModal() {
             playSound('click');
@@ -837,10 +850,11 @@
             updateUIStats();
         }
 
+        // 일일 미션 내용 변경: 타임어택 1회 완주 -> 타임어택 하드 모드 1회 완주
         const dailyMissionsData = [
             { id: 'mission_login', titleKo: '📅 매일 출석하기', titleEn: '📅 Daily Attendance', reward: 20, goal: 1, type: 'attendance' },
             { id: 'mission_inf5', titleKo: '♾️ 무한 모드 5점 달성', titleEn: '♾️ Reach 5 pts in Infinite', reward: 30, goal: 5, type: 'infinite' },
-            { id: 'mission_ta', titleKo: '⏱️ 타임어택 1회 완주', titleEn: '⏱️ Finish Time Attack', reward: 40, goal: 10, type: 'timeattack' }
+            { id: 'mission_tahard', titleKo: '⚡ 타임어택 하드 1회 완주', titleEn: '⚡ Finish TA Hard Mode', reward: 50, goal: 10, type: 'timeattack_hard' }
         ];
 
         function getTodayKey() { return new Date().toDateString(); }
@@ -858,7 +872,7 @@
             let data = getMissionProgress();
             dailyMissionsData.forEach(m => {
                 if (m.type === type && !data.claimed[m.id]) {
-                    if (type === 'infinite' || type === 'timeattack') {
+                    if (type === 'infinite' || type === 'timeattack_hard') {
                         if (val >= m.goal) data.progress[m.id] = m.goal;
                     } else if (type === 'attendance') {
                         data.progress[m.id] = 1;
@@ -1217,7 +1231,6 @@
 
                 if (currentRankingTab.includes('infinite')) {
                     rankings.sort((a, b) => b.score - a.score);
-                    rankingList.items = rankings.slice(0, 10);
                     rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
