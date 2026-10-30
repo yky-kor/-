@@ -475,7 +475,8 @@ autoOff: "Auto OFF",
         function goHome() {
             playSound('click');
             gameState.isPlaying = false;
-            
+            showScreen('screen-menu');
+startBgm('menu'); // 💡 메인 화면 BGM 재생
             // 일반 게임 모드 및 히든 모드 타이머 모두 확실하게 정지
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
@@ -596,8 +597,19 @@ autoOff: "Auto OFF",
             const soundBtn = document.getElementById('sound-btn');
             if (soundBtn) { soundBtn.innerText = isSoundOn ? '🔊' : '🔇'; }
             Tone.Destination.mute = !isSoundOn;
+            
+            // 💡 음소거 시 BGM도 즉시 제어
+            if (!isSoundOn) {
+                stopBgm();
+            } else {
+                // 현재 화면 상태에 따라 BGM 다시 재생
+                if (document.getElementById('screen-menu').classList.contains('hidden') === false) {
+                    startBgm('menu');
+                } else if (document.getElementById('screen-game').classList.contains('hidden') === false) {
+                    startBgm(gameState.mode.includes('hard') ? 'hard' : 'game');
+                }
+            }
         }
-
         function playSound(type) {
             if (!isSoundOn) return;
             try {
@@ -617,7 +629,7 @@ autoOff: "Auto OFF",
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        function startGame(mode) {
+       function startGame(mode) {
             playSound('click');
             gameState.mode = mode;
             gameState.score = 0;
@@ -627,6 +639,10 @@ autoOff: "Auto OFF",
             gameState.startTime = Date.now();
             gameState.elapsedSeconds = 0;
             clearInterval(gameState.stopwatchTimer);
+
+            // 💡 화면 전환 및 BGM 재생
+            showScreen('screen-game');
+            startBgm(mode.includes('hard') ? 'hard' : 'game');
 
             let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
             const shieldDisplay = document.getElementById('active-buff-display');
@@ -678,7 +694,6 @@ autoOff: "Auto OFF",
             }
 
             updateUIStats();
-            showScreen('screen-game');
             nextRound();
         }
 
@@ -907,7 +922,10 @@ autoOff: "Auto OFF",
             gameState.isPlaying = false;
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
+
+            // 💡 화면 전환 및 BGM 재생 (중복 제거)
             showScreen('screen-result');
+            startBgm('result');
 
             checkMissionsProgress('any_game_play', 1);
 
@@ -938,7 +956,6 @@ autoOff: "Auto OFF",
                     checkMissionsProgress('timeattack_hard', 10);
                 }
             } else if (gameState.mode === 'hidden') {
-                // 💡 히든 모드 결과 처리 추가
                 resultLabel.innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
                 finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '단계' : ' stages');
                 resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 도전 실패! 총 ${gameState.score}단계 달성` : `Realm Over! Total ${gameState.score} Stages`;
@@ -1414,7 +1431,73 @@ listEl.innerHTML = itemsData.map(item => {
     });
     renderRankingList();
 }
+let isSoundOn = true;
+        
+        // 💡 [추가] 배경음악(BGM)을 위한 전역 변수들
+        let bgmSynth = null;
+        let bgmLoop = null;
+        let currentBgmMode = '';
+        // 💡 [추가] 게임 모드별 분위기에 맞는 BGM 재생 함수
+        function startBgm(modeType) {
+            if (!isSoundOn) return;
+            stopBgm(); // 기존 BGM 정지
+            
+            try {
+                Tone.start();
+                bgmSynth = new Tone.Synth({
+                    oscillator: { type: "triangle" },
+                    envelope: { attack: 0.05, decay: 0.2, sustain: 0.3, release: 0.5 }
+                }).toDestination();
+                bgmSynth.volume.value = -15; // 적절한 배경음 크기
 
+                let notes = [];
+                let tempo = "4n";
+
+                if (modeType === 'menu') {
+                    // 메인 화면: 밝고 경쾌한 멜로디
+                    notes = ["C4", "E4", "G4", "B4", "C5", "G4", "E4", "G4"];
+                    tempo = "4n";
+                } else if (modeType === 'hard') {
+                    // 하드/인피니트 하드: 긴장감 넘치는 빠른 멜로디
+                    notes = ["C3", "D#3", "G3", "C4", "B3", "G3", "D#3", "F3"];
+                    tempo = "8n";
+                } else if (modeType === 'game') {
+                    // 일반 게임 플레이 중: 통통 튀는 리듬
+                    notes = ["C4", "G4", "A4", "G4", "F4", "E4", "D4", "G4"];
+                    tempo = "4n";
+                } else if (modeType === 'result') {
+                    // 게임 오버 / 결과 화면: 차분한 멜로디
+                    notes = ["C4", "G3", "E3", "C3"];
+                    tempo = "2n";
+                }
+
+                let step = 0;
+                bgmLoop = new Tone.Loop(time => {
+                    if (isSoundOn && bgmSynth) {
+                        bgmSynth.triggerAttackRelease(notes[step % notes.length], tempo, time);
+                        step++;
+                    }
+                }, tempo).start(0);
+
+                Tone.Transport.start();
+                currentBgmMode = modeType;
+            } catch(e) {}
+        }
+
+        function stopBgm() {
+            try {
+                if (bgmLoop) {
+                    bgmLoop.stop();
+                    bgmLoop.dispose();
+                    bgmLoop = null;
+                }
+                if (bgmSynth) {
+                    bgmSynth.dispose();
+                    bgmSynth = null;
+                }
+                Tone.Transport.stop();
+            } catch(e) {}
+        }
         function showRanking(tab = 'infinite') {
             showScreen('screen-ranking');
             switchRankingTab(tab);
@@ -1677,7 +1760,9 @@ listEl.innerHTML = itemsData.map(item => {
             gameState.mode = 'hidden';
             gameState.score = hiddenScore; 
             
+            // 💡 결과 화면 전환 및 BGM 재생 (중복 제거)
             showScreen('screen-result');
+            startBgm('result');
             
             const nameInputContainer = document.getElementById('name-input-container');
             const resultDesc = document.getElementById('result-desc');
@@ -1766,6 +1851,7 @@ function exitHiddenMode() {
             updateUIStats();
             checkAndUnlockHiddenMode();
             updateEmojiButtonText();
+            startBgm('menu');
         });
     </script>
 </body>
