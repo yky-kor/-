@@ -290,42 +290,7 @@ body.hidden-universe-theme {
     <!-- 자바스크립트 게임 로직 -->
     <script>
         // 도전과제 모두 완료 체크 및 버튼 변형 / 최초 해금 축하 팝업 처리
-function checkAndUnlockHiddenMode() {
-    // 1. 도전과제 전체 완료 여부 확인 (achievements 배열이 모두 true라고 가정)
-    const allCompleted = achievements.every(ach => ach.completed === true);
-    const achievementBtn = document.getElementById('achievement-btn'); // 기존 도전과제 버튼 ID라고 가정
-    const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
 
-    if (allCompleted && achievementBtn) {
-        // 이미 버튼이 히든 모드 버튼으로 바뀌지 않았다면 변환
-        if (achievementBtn.dataset.mode !== 'hidden') {
-            achievementBtn.dataset.mode = 'hidden';
-            achievementBtn.className = 'mode-btn hidden-mode-btn'; // 특별한 CSS 적용 가능
-            achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
-            achievementBtn.onclick = () => startHiddenMode();
-
-            // 최초 해금 시 축하 팝업을 아직 안 띄웠다면 팝업 노출
-            if (!localStorage.getItem(hiddenUnlockedKey)) {
-                localStorage.setItem(hiddenUnlockedKey, 'true');
-                showHiddenUnlockPopup();
-            }
-        }
-    }
-}
-
-// 최초 해금 축하 팝업 함수
-function showHiddenUnlockPopup() {
-    const popup = document.createElement('div');
-    popup.className = 'hidden-popup-overlay';
-    popup.innerHTML = `
-        <div class="hidden-popup-box">
-            <h2>🎉 축하합니다!</h2>
-            <p>모든 도전과제 완료!<br><b>[히든 모드: 신들의 역가위바위보]</b>가 해금되었습니다!</p>
-            <button onclick="this.parentElement.parentElement.remove()">확인</button>
-        </div>
-    `;
-    document.body.appendChild(popup);
-}
         const translations = {
             ko: {
                 title: "🐸 청개구리 가위바위보", subtitle: "컴퓨터에게 져야만 점수를 얻는 반대로 게임!",
@@ -1405,78 +1370,13 @@ window.addEventListener('DOMContentLoaded', () => {
             updateEmojiButtonText();
             updateUIStats();
         });
-        let hiddenTimer = null;
-let hiddenTimeLeft = 2.0;
-let hiddenSequence = []; // 컴퓨터가 낸 5개 순서 [0, 1, 2...]
-let hiddenCurrentIndex = 0; // 현재 맞추어야 할 순서 (0 ~ 4)
 
-function startHiddenMode() {
-    // 1. 우주/네온 반짝이는 테마 클래스 바디에 부여
-    document.body.classList.add('hidden-universe-theme');
-
-    // 2. 게임 화면 구조 초기화 (필요시 기존 모드 화면 호출)
-    showGameScreen(); 
-
-    // 3. 첫 번째 5개 조합 생성 후 라운드 시작
-    initHiddenRound();
-}
-
-function initHiddenRound() {
-    hiddenCurrentIndex = 0;
-    // 0: 가위, 1: 바위, 2: 보 (게임 규칙에 맞게 조정 가능)
-    hiddenSequence = [];
-    for(let i=0; i<5; i++) {
-        hiddenSequence.push(Math.floor(Math.random() * 3));
-    }
-
-    renderHiddenUI();
-    startHiddenTimer();
-}
 
 // 히든 모드 UI 렌더링 (5가지 연속 제시 및 현재 맞출 순서 표시)
-function renderHiddenUI() {
-    const gameArea = document.getElementById('game-container'); // 게임판 DOM
-    const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
-    
-    let seqHtml = hiddenSequence.map((val, idx) => {
-        let style = "";
-        if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;"; // 이미 맞춘 것
-        else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2);"; // 현재 차례
-        return `<span style="margin: 0 5px; ${style}">${symbols[val]}</span>`;
-    }).join(' ➔ ');
 
-    gameArea.innerHTML = `
-        <div class="hidden-header">🌌 [히든 모드] 신들의 역가위바위보</div>
-        <div class="hidden-seq-box">컴퓨터의 순서: [ ${seqHtml} ]</div>
-        <div class="hidden-timer-bar"><div id="hidden-progress" style="width: 100%;"></div></div>
-        <div class="game-status">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
-        <div class="choice-buttons">
-            <button onclick="checkHiddenPlayerChoice(0)">✌️ 가위</button>
-            <button onclick="checkHiddenPlayerChoice(1)">✊ 바위</button>
-            <button onclick="checkHiddenPlayerChoice(2)">🖐️ 보</button>
-        </div>
-    `;
-}
 
 // 2초 타이머 시작
-function startHiddenTimer() {
-    hiddenTimeLeft = 2.0;
-    clearInterval(hiddenTimer);
-    
-    hiddenTimer = setInterval(() => {
-        hiddenTimeLeft -= 0.1;
-        const progressBar = document.getElementById('hidden-progress');
-        if (progressBar) {
-            progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
-        }
 
-        if (hiddenTimeLeft <= 0) {
-            clearInterval(hiddenTimer);
-            alert("시간 초과! 히든 모드 실패!");
-            exitHiddenMode();
-        }
-    }, 100);
-}
 
 // 플레이어가 버튼을 눌렀을 때 검증하는 로직 (컴퓨터 손을 '이기면' 패배, '지거나 비기면' 성공인 청개구리 룰 적용)
 function checkHiddenPlayerChoice(playerChoice) {
@@ -1503,11 +1403,6 @@ function checkHiddenPlayerChoice(playerChoice) {
     }
 }
 
-function exitHiddenMode() {
-    clearInterval(hiddenTimer);
-    document.body.classList.remove('hidden-universe-theme');
-    location.reload(); // 메인으로 복귀
-}
     // --- [히든 모드 관련 로직 시작] ---
 let hiddenTimer = null;
 let hiddenTimeLeft = 2.0;
