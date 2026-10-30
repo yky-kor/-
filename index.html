@@ -1420,7 +1420,7 @@ let achievements = [
                 if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
                 else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2); display: inline-block;";
                 return `<span style="margin: 0 4px; ${style}">${symbols[val]}</span>`;
-            }).join(' ➔ ');
+            }).join('');
 
             gameArea.innerHTML = `
                 <div class="w-full text-center py-2">
