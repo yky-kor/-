@@ -1655,7 +1655,9 @@ hiddenExit: "Exit",
                 if (elapsed >= targetDuration) {
                     clearInterval(hiddenTimer);
                     playSound('fail');
-                    alert("시간 초과! 히든 모드 게임 종료!");
+                    // 💡 언어에 따라 시간 초과 경고창 메시지 다국어 처리
+                    const timeoutMsg = currentLang === 'ko' ? '시간 초과! 히든 모드 게임 종료!' : 'Time Out! Hidden Mode Game Over!';
+                    alert(timeoutMsg);
                     triggerHiddenGameOver();
                 }
             }, 50); 
@@ -1723,8 +1725,10 @@ if (instructionEl) {
             } else {
                 clearInterval(hiddenTimer);
                 playSound('fail');
-                alert("틀렸습니다! 히든 모드 게임 종료!");
-                triggerHiddenGameOver(); // 💡 틀리면 게임 오버 및 랭킹 등록 화면으로 이동
+                // 💡 언어에 따라 경고창 메시지 다국어 처리
+                const alertMsg = currentLang === 'ko' ? '틀렸습니다! 히든 모드 게임 종료!' : 'Wrong! Hidden Mode Game Over!';
+                alert(alertMsg);
+                triggerHiddenGameOver(); 
             }
         }
 
