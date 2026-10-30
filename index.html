@@ -32,11 +32,6 @@
             50% { transform: translateY(-8px); }
         }
         .animate-float { animation: floatChar 2s ease-in-out infinite; }
-        @keyframes spinSlow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .animate-spin-slow { animation: spinSlow 3s linear infinite; }
     </style>
 </head>
 <body class="game-bg min-h-screen text-white flex flex-col items-center justify-between p-4 select-none">
@@ -102,7 +97,7 @@
                 <span class="block text-xs font-normal text-red-100" data-i18n="infiniteHardDesc">1초 제한 + 매 판 버튼 위치 셔플!</span>
             </button>
 
-            <!-- 하단 메뉴 버튼들 (출석체크, 일일미션, 도전과제, 상점, 랭킹) -->
+            <!-- 하단 메뉴 버튼들 -->
             <div class="grid grid-cols-5 gap-1 w-full pt-1">
                 <button onclick="openAttendanceModal()" class="py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     📅 <span data-i18n="attendanceBtn">출석</span>
@@ -150,14 +145,14 @@
             </div>
             <div id="feedback-msg" class="h-8 text-xl font-bold mb-2 text-center"></div>
             <div id="rps-buttons-container" class="grid grid-cols-3 gap-3 w-full mb-2">
-                <button onclick="playerChoice('scissor')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
-                    <span>✌️</span> <span class="text-xs text-gray-500 mt-1" data-i18n="scissor">가위</span>
+                <button onclick="playerChoice('scissor')" class="choice-btn py-3 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-2xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span id="btn-scissor-emoji">✌️</span> <span class="text-xs text-gray-500 mt-0.5" data-i18n="scissor">가위</span>
                 </button>
-                <button onclick="playerChoice('rock')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
-                    <span>✊</span> <span class="text-xs text-gray-500 mt-1" data-i18n="rock">바위</span>
+                <button onclick="playerChoice('rock')" class="choice-btn py-3 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-2xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span id="btn-rock-emoji">✊</span> <span class="text-xs text-gray-500 mt-0.5" data-i18n="rock">바위</span>
                 </button>
-                <button onclick="playerChoice('paper')" class="choice-btn py-4 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-4xl shadow transition transform active:scale-95 flex flex-col items-center">
-                    <span>🖐️</span> <span class="text-xs text-gray-500 mt-1" data-i18n="paper">보</span>
+                <button onclick="playerChoice('paper')" class="choice-btn py-3 bg-gray-50 hover:bg-green-50 border-2 border-gray-200 hover:border-green-500 rounded-2xl text-2xl shadow transition transform active:scale-95 flex flex-col items-center">
+                    <span id="btn-paper-emoji">🖐️</span> <span class="text-xs text-gray-500 mt-0.5" data-i18n="paper">보</span>
                 </button>
             </div>
         </div>
@@ -188,7 +183,6 @@
 
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-1">
-            <!-- 랭킹 카테고리 탭 (누적 / 주간) -->
             <div class="flex w-full mb-2 bg-gray-100 p-1 rounded-xl">
                 <button onclick="switchRankType('all')" id="rank-type-all" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="rankTypeAll">누적 랭킹</button>
                 <button onclick="switchRankType('weekly')" id="rank-type-weekly" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="rankTypeWeekly">주간 랭킹</button>
@@ -205,7 +199,7 @@
 
     </main>
 
-    <!-- 모달: 출석체크 -->
+    <!-- 모달들 -->
     <div id="modal-attendance" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
             <h3 class="text-xl font-bold text-green-700 mb-2" data-i18n="attendanceTitle">📅 매일 출석체크</h3>
@@ -217,7 +211,6 @@
         </div>
     </div>
 
-    <!-- 모달: 일일 미션 -->
     <div id="modal-mission" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
@@ -229,7 +222,6 @@
         </div>
     </div>
 
-    <!-- 모달: 도전과제 -->
     <div id="modal-achievement" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-3">
@@ -244,14 +236,12 @@
         </div>
     </div>
 
-    <!-- 모달: 캐릭터 상점 및 아이템 샵 -->
     <div id="modal-shop" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white text-gray-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-lg font-bold text-purple-700" data-i18n="shopTitle">🛍️ 상점 & 아이템 샵</h3>
                 <span id="shop-user-points" class="text-sm font-extrabold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">0 💰 P</span>
             </div>
-            <!-- 상점 내부 탭 (캐릭터 / 소모품) -->
             <div class="flex w-full mb-3 bg-gray-100 p-1 rounded-xl">
                 <button onclick="switchShopTab('chars')" id="shop-tab-chars" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-purple-700 shadow-sm" data-i18n="shopTabChars">캐릭터 상점</button>
                 <button onclick="switchShopTab('items')" id="shop-tab-items" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="shopTabItems">치트/버프 아이템</button>
@@ -393,18 +383,38 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 캐릭터 데이터
+        // 캐릭터 데이터 정의 (유령 스킨: 가위=👻👻, 주먹=👻, 보=👻👻👻)
         const charactersData = [
-            { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0 },
-            { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0 },
-            { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50 },
-            { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80 },
-            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120 },
-            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150 },
-            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200 }
+            { 
+                id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150,
+                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
+            },
+            { 
+                id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200,
+                hands: { scissor: '👻👻', rock: '👻', paper: '👻👻👻' } 
+            }
         ];
 
-        // 소모성 버프 아이템 데이터
         const itemsData = [
             { id: 'shield', nameKo: '🛡️ 실수 방어 보호막', nameEn: '🛡️ Mistake Shield', descKo: '무한 모드에서 오답/시간초과 1회 방어', descEn: 'Block 1 mistake/timeout in Infinite', price: 40 },
             { id: 'time_minus', nameKo: '⏱️ 타임어택 -2초 앰플', nameEn: '⏱️ TA -2s Booster', descKo: '타임어택 시작 시 기록 2초 보정(할인)', descEn: 'Start TA with 2s bonus deduction', price: 30 }
@@ -423,14 +433,24 @@
             localStorage.setItem('frog_friends_points', pts);
             updateUIStats();
         }
-        function getCurrentChar() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
+        function getCurrentCharEmoji() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
+
+        function getCurrentCharObj() {
+            const emoji = getCurrentCharEmoji();
+            return charactersData.find(c => c.emoji === emoji) || charactersData[0];
+        }
 
         function updateUIStats() {
             const pts = getUserPoints();
             document.getElementById('user-points').innerText = `${pts} 💰 P`;
-            const currentChar = getCurrentChar();
+            const currentChar = getCurrentCharEmoji();
             document.getElementById('header-char-avatar').innerText = currentChar;
             document.getElementById('card-char-display').innerText = currentChar;
+            
+            const charObj = getCurrentCharObj();
+            document.getElementById('btn-scissor-emoji').innerText = charObj.hands.scissor;
+            document.getElementById('btn-rock-emoji').innerText = charObj.hands.rock;
+            document.getElementById('btn-paper-emoji').innerText = charObj.hands.paper;
         }
 
         const synth = new Tone.Synth().toDestination();
@@ -473,25 +493,32 @@
             gameState.elapsedSeconds = 0;
             clearInterval(gameState.stopwatchTimer);
 
-            // 소모성 방어막 적용 확인
             let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
             const shieldDisplay = document.getElementById('active-buff-display');
-            if ((mode === 'infinite' || mode === 'infinite_hard') && items['shield'] && items['shield'] > 0) {
+            const charEmoji = getCurrentCharEmoji();
+
+            // 스킨별 패시브 효과 적용 (유령: 👻 = 보호막 + 앰플 / 유니콘: 🦄 = 보호막 / 로봇: 🤖 = 앰플)
+            let applyShield = (mode.includes('infinite') && ((items['shield'] && items['shield'] > 0) || charEmoji === '🦄' || charEmoji === '👻'));
+            let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charEmoji === '🤖' || charEmoji === '👻'));
+
+            if (applyShield) {
                 gameState.hasShield = true;
-                items['shield']--;
-                localStorage.setItem('frog_friends_items', JSON.stringify(items));
                 shieldDisplay.classList.remove('hidden');
+                // 인벤토리 아이템을 쓴 게 아니라 캐릭터 패시브인 경우엔 차감하지 않음
+                if (items['shield'] && items['shield'] > 0 && charEmoji !== '🦄' && charEmoji !== '👻') {
+                    items['shield']--;
+                    localStorage.setItem('frog_friends_items', JSON.stringify(items));
+                }
             } else {
                 gameState.hasShield = false;
                 shieldDisplay.classList.add('hidden');
             }
 
-            // 타임어택 아이템(-2초) 확인
-            if (mode === 'timeattack' || mode === 'timeattack_hard') {
-                if (items['time_minus'] && items['time_minus'] > 0) {
+            if (applyAmp) {
+                gameState.startTime -= 2000;
+                if (items['time_minus'] && items['time_minus'] > 0 && charEmoji !== '🤖' && charEmoji !== '👻') {
                     items['time_minus']--;
                     localStorage.setItem('frog_friends_items', JSON.stringify(items));
-                    gameState.startTime -= 2000; // 2초 앞당겨서 시작
                 }
             }
 
@@ -511,19 +538,26 @@
                 stopwatchDisplay.classList.add('hidden');
             }
 
+            updateUIStats();
             showScreen('screen-game');
             nextRound();
         }
 
-        const hands = {
-            'scissor': { emoji: '✌️', name: '가위', beats: 'paper', losesTo: 'rock' },
-            'rock': { emoji: '✊', name: '바위', beats: 'scissor', losesTo: 'paper' },
-            'paper': { emoji: '🖐️', name: '보', beats: 'rock', losesTo: 'scissor' }
-        };
         const handKeys = ['scissor', 'rock', 'paper'];
+
+        function getHandsForCurrentChar() {
+            const charObj = getCurrentCharObj();
+            return {
+                'scissor': { emoji: charObj.hands.scissor, beats: 'paper', losesTo: 'rock' },
+                'rock': { emoji: charObj.hands.rock, beats: 'scissor', losesTo: 'paper' },
+                'paper': { emoji: charObj.hands.paper, beats: 'rock', losesTo: 'scissor' }
+            };
+        }
 
         function nextRound() {
             if (!gameState.isPlaying) return;
+            const hands = getHandsForCurrentChar();
+
             if (gameState.mode === 'practice') {
                 gameState.round++;
                 if (gameState.round > gameState.maxRounds) { endGame(); return; }
@@ -625,6 +659,7 @@
             clearInterval(gameState.timer);
             playSound('click');
 
+            const hands = getHandsForCurrentChar();
             const comKey = gameState.comChoiceKey;
             const comHand = hands[comKey];
             const feedbackEl = document.getElementById('feedback-msg');
@@ -767,7 +802,6 @@
             });
         }
 
-        // 출석체크 기능
         function openAttendanceModal() {
             playSound('click');
             const today = new Date().toDateString();
@@ -793,7 +827,6 @@
             updateUIStats();
         }
 
-        // 일일 미션 시스템
         const dailyMissionsData = [
             { id: 'mission_login', titleKo: '📅 매일 출석하기', titleEn: '📅 Daily Attendance', reward: 20, goal: 1, type: 'attendance' },
             { id: 'mission_inf5', titleKo: '♾️ 무한 모드 5점 달성', titleEn: '♾️ Reach 5 pts in Infinite', reward: 30, goal: 5, type: 'infinite' },
@@ -877,7 +910,6 @@
             updateUIStats();
         }
 
-        // 도전과제 시스템
         const achievementsData = {
             infinite: [
                 { id: 'inf_5', titleKo: '🌱 초보 청개구리', titleEn: '🌱 Beginner Frog', descKo: '무한 모드에서 5점 달성하기', descEn: 'Reach 5 pts in Infinite Mode', reward: 30, check: (score) => score >= 5 },
@@ -956,7 +988,6 @@
             updateUIStats();
         }
 
-        // 상점 및 아이템 샵 기능
         let currentShopTab = 'chars';
         function switchShopTab(tab) {
             currentShopTab = tab;
@@ -984,11 +1015,11 @@
 
             if (currentShopTab === 'chars') {
                 let unlockedChars = JSON.parse(localStorage.getItem('frog_friends_unlocked_chars') || '["frog", "cat"]');
-                const equippedChar = getCurrentChar();
+                const equippedCharEmoji = getCurrentCharEmoji();
 
                 listEl.innerHTML = charactersData.map(c => {
                     const isUnlocked = unlockedChars.includes(c.id);
-                    const isEquipped = (c.emoji === equippedChar);
+                    const isEquipped = (c.emoji === equippedCharEmoji);
                     const charName = currentLang === 'ko' ? c.name : c.nameEn;
 
                     let btnHtml = '';
@@ -1047,7 +1078,9 @@
             localStorage.setItem('frog_friends_unlocked_chars', JSON.stringify(unlockedChars));
             
             const charObj = charactersData.find(c => c.id === charId);
-            if (charObj) { localStorage.setItem('frog_friends_equipped_char', charObj.emoji); }
+            if (charObj) { 
+                localStorage.setItem('frog_friends_equipped_char', charObj.emoji); 
+            }
             playSound('reward');
             renderShopContent();
             updateUIStats();
@@ -1081,11 +1114,10 @@
             updateUIStats();
         }
 
-        // 랭킹 저장 및 주간 랭킹 지원
         function saveRanking() {
             const nameInput = document.getElementById('player-name');
             const rawName = nameInput.value.trim() || translations[currentLang].anonymousName;
-            const currentChar = getCurrentChar();
+            const currentChar = getCurrentCharEmoji();
             const name = `${currentChar} ${rawName}`;
 
             let baseDbPath = '';
@@ -1117,7 +1149,7 @@
             return `${now.getFullYear()}_W${week}`;
         }
 
-        let currentRankType = 'all'; // all or weekly
+        let currentRankType = 'all';
         let currentRankingTab = 'infinite';
 
         function switchRankType(type) {
@@ -1159,9 +1191,7 @@
                 'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard'
             };
             let dbPath = dbPaths[currentRankingTab];
-            if (currentRankType === 'weekly') {
-                dbPath = `weekly_${getWeekKey()}_${dbPath}`;
-            }
+            if (currentRankType === 'weekly') { dbPath = `weekly_${getWeekKey()}_${dbPath}`; }
 
             rankingList.innerHTML = `<p class="text-center text-gray-400 py-4">${translations[currentLang].loadingRanking}</p>`;
 
