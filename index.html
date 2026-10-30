@@ -1548,12 +1548,20 @@
             }, 100);
         }
 
-        function checkHiddenPlayerChoice(playerChoice) {
+        function checkHiddenPlayerChoice(playerChoiceIndex) {
             const computerVal = hiddenSequence[hiddenCurrentIndex];
             const hands = getHandsForCurrentChar();
-            const comHandKey = handKeys[computerVal];
             
-            const isUserLossAgainstComputer = (playerChoice === hands[comHandKey].beats);
+            // 0: 가위('scissor'), 1: 바위('rock'), 2: 보('paper')
+            const choiceKeys = ['scissor', 'rock', 'paper'];
+            const playerKey = choiceKeys[playerChoiceIndex];
+            const comKey = choiceKeys[computerVal];
+            
+            const comHand = hands[comKey];
+            
+            // 🐸 청개구리 룰 핵심: 유저가 낸 손이 컴퓨터의 손을 '이기는 손'이면 오답(이겨버림!), 
+            // 컴퓨터의 손에게 '지는 손'(`comHand.beats`)이어야 정답(지기 성공)!
+            const isUserLossAgainstComputer = (playerKey === comHand.beats);
 
             if (isUserLossAgainstComputer) {
                 hiddenCurrentIndex++;
@@ -1563,6 +1571,7 @@
                     initHiddenRound();
                 } else {
                     renderHiddenUI();
+                    startHiddenTimer(); // 다음 순서로 넘어가면 타이머 리셋 후 재시작
                 }
             } else {
                 clearInterval(hiddenTimer);
@@ -1570,7 +1579,6 @@
                 exitHiddenMode();
             }
         }
-
         function exitHiddenMode() {
             clearInterval(hiddenTimer);
             stopHiddenBgm(); // 🌌 우주 배경음악 정지
