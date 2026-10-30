@@ -570,13 +570,14 @@ autoOff: "Auto OFF",
             document.getElementById('btn-rock-emoji').innerText = hands.rock.emoji;
             document.getElementById('btn-paper-emoji').innerText = hands.paper.emoji;
 
+            // 💡 [수정] 히든 모드 버튼은 스킨에 상관없이 항상 기본 가위·바위·보(✌️, ✊, 🖐️)로 고정
             const hs = document.getElementById('hidden-btn-scissor-emoji');
             const hr = document.getElementById('hidden-btn-rock-emoji');
             const hp = document.getElementById('hidden-btn-paper-emoji');
             if (hs && hr && hp) {
-                hs.innerText = hands.scissor.emoji;
-                hr.innerText = hands.rock.emoji;
-                hp.innerText = hands.paper.emoji;
+                hs.innerText = '✌️';
+                hr.innerText = '✊';
+                hp.innerText = '🖐️';
             }
         }
 
@@ -1609,8 +1610,7 @@ listEl.innerHTML = itemsData.map(item => {
         }
 
         function renderHiddenUI() {
-            const symbols = ['✌️', '✊', '🖐️'];
-            const hands = getHandsForCurrentChar();
+            const symbols = ['✌️', '✊', '🖐️']; // 💡 항상 기본 손 이모지 사용
             const choiceKeys = ['scissor', 'rock', 'paper'];
 
             let seqHtml = hiddenSequence.map((val, idx) => {
@@ -1626,8 +1626,8 @@ listEl.innerHTML = itemsData.map(item => {
             const playerAnswersEl = document.getElementById('hidden-player-answers');
             if (playerAnswersEl) {
                 let ansHtml = hiddenPlayerChoices.map((val) => {
-                    const key = choiceKeys[val];
-                    const emoji = hands[key].emoji;
+                    // 💡 [수정] 스킨 이모지가 아닌 기본 가위·바위·보 기호 사용
+                    const emoji = symbols[val];
                     return `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg text-sm">${emoji}</span>`;
                 }).join('');
                 playerAnswersEl.innerHTML = ansHtml;
