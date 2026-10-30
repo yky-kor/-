@@ -1533,19 +1533,28 @@
             hiddenTimeLeft = 2.0;
             clearInterval(hiddenTimer);
             
+            const progressBar = document.getElementById('hidden-progress');
+            if (progressBar) {
+                progressBar.style.width = '100%';
+            }
+            
+            let startTime = Date.now();
+            let duration = 2000; // 2초
+
             hiddenTimer = setInterval(() => {
-                hiddenTimeLeft -= 0.1;
-                const progressBar = document.getElementById('hidden-progress');
+                let elapsed = Date.now() - startTime;
+                hiddenTimeLeft = Math.max(0, 2.0 - (elapsed / 1000));
+                
                 if (progressBar) {
                     progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
                 }
 
-                if (hiddenTimeLeft <= 0) {
+                if (elapsed >= duration) {
                     clearInterval(hiddenTimer);
                     alert("시간 초과! 히든 모드 실패!");
                     exitHiddenMode();
                 }
-            }, 100);
+            }, 50); // 0.05초마다 부드럽게 갱신
         }
 
         function checkHiddenPlayerChoice(playerChoiceIndex) {
