@@ -471,7 +471,7 @@ autoOff: "Auto OFF",
         }
 
         function goHome() {
-            playSound('click');
+            
             gameState.isPlaying = false;
             showScreen('screen-menu');
 startBgm('menu'); // 💡 메인 화면 BGM 재생
@@ -629,7 +629,7 @@ else if (type === 'reward') synth.triggerAttackRelease("E6", "8n");
         }
 
        function startGame(mode) {
-            playSound('click');
+            
             gameState.mode = mode;
             gameState.score = 0;
             gameState.round = 0;
