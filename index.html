@@ -1437,19 +1437,25 @@ hiddenExit: "Exit",
 
                 if (currentRankingTab.includes('infinite') || currentRankingTab === 'hidden') {
                     rankings.sort((a, b) => b.score - a.score);
-                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
-                        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-purple-50 font-bold text-purple-700 rounded-lg' : ''}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
-                                <span class="truncate max-w-[130px]">${item.name}</span>
+                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => {
+                        // 💡 언어별 단계 클리어 표기 분기
+                        const scoreText = currentLang === 'ko' 
+                            ? `${item.score}단계 클리어` 
+                            : `${item.score} Stages Cleared`;
+
+                        return `
+                            <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-purple-50 font-bold text-purple-700 rounded-lg' : ''}">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
+                                    <span class="truncate max-w-[130px]">${item.name}</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-purple-600 font-extrabold">${scoreText}</span>
+                                    <span class="text-[11px] text-gray-400">${item.date}</span>
+                                </div>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <!-- 💡 [수정] '회 클리어' -> '단계 클리어' 로 표기 변경 -->
-                                <span class="text-purple-600 font-extrabold">${item.score}단계 클리어</span>
-                                <span class="text-[11px] text-gray-400">${item.date}</span>
-                            </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 } else {
                     rankings.sort((a, b) => a.time - b.time);
                     rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
