@@ -361,6 +361,8 @@ hiddenMyAns: "내가 낸 정답",
 hiddenMsgMemory: (count) => `순서 기억 중... (${count}초)`,
 hiddenMsgPlay: "순서대로 컴퓨터에게 져야 하는 손을 내세요!",
 hiddenExit: "나가기",
+                autoOn: "자동ON",
+autoOff: "자동OFF",
                 emojiOnText: "동물개수ON", defaultOnText: "기본손ON"
             },
             en: {
@@ -407,6 +409,8 @@ hiddenMyAns: "My Answer",
 hiddenMsgMemory: (count) => `Memorizing... (${count}s)`,
 hiddenMsgPlay: "Play the losing hands in order!",
 hiddenExit: "Exit",
+                autoOn: "Auto ON",
+autoOff: "Auto OFF",
                 emojiOnText: "Count ON", defaultOnText: "Default ON"
             }
         };
@@ -797,13 +801,8 @@ hiddenExit: "Exit",
             gameState.shieldAuto = !gameState.shieldAuto;
             const shopBtn = document.getElementById('shop-shield-auto-btn');
             if (shopBtn) {
-                if (gameState.shieldAuto) {
-                    shopBtn.innerText = "자동ON";
-                    shopBtn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
-                } else {
-                    shopBtn.innerText = "자동OFF";
-                    shopBtn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
-                }
+                shopBtn.innerText = gameState.shieldAuto ? translations[currentLang].autoOn : translations[currentLang].autoOff;
+                shopBtn.className = gameState.shieldAuto ? "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2" : "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
             }
         }
 
@@ -1228,52 +1227,50 @@ hiddenExit: "Exit",
                 }).join('');
             } else {
                 let items = JSON.parse(localStorage.getItem('frog_friends_items') || '{}');
-                listEl.innerHTML = itemsData.map(item => {
-                    const name = currentLang === 'ko' ? item.nameKo : item.nameEn;
-                    const desc = currentLang === 'ko' ? item.descKo : item.descEn;
-                    const count = items[item.id] || 0;
+listEl.innerHTML = itemsData.map(item => {
+    const name = currentLang === 'ko' ? item.nameKo : item.nameEn;
+    const desc = currentLang === 'ko' ? item.descKo : item.descEn;
+    const count = items[item.id] || 0;
 
-                    let extraHtml = '';
-                    if (item.id === 'shield') {
-                        const autoText = gameState.shieldAuto ? "자동ON" : "자동OFF";
-                        const autoClass = gameState.shieldAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
-                        extraHtml = ` <button onclick="toggleShieldAuto()" id="shop-shield-auto-btn" class="${autoClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${autoText}</button>`;
-                    } else if (item.id === 'time_minus') {
-                        const ampText = gameState.timeAmpAuto ? "자동ON" : "자동OFF";
-                        const ampClass = gameState.timeAmpAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
-                        extraHtml = ` <button onclick="toggleTimeAmpAuto()" id="shop-amp-auto-btn" class="${ampClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${ampText}</button>`;
-                    }
+    let extraHtml = '';
+    if (item.id === 'shield') {
+        // 💡 다국어 텍스트 적용
+        const autoText = gameState.shieldAuto ? translations[currentLang].autoOn : translations[currentLang].autoOff;
+        const autoClass = gameState.shieldAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
+        extraHtml = ` <button onclick="toggleShieldAuto()" id="shop-shield-auto-btn" class="${autoClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${autoText}</button>`;
+    } else if (item.id === 'time_minus') {
+        // 💡 다국어 텍스트 적용
+        const ampText = gameState.timeAmpAuto ? translations[currentLang].autoOn : translations[currentLang].autoOff;
+        const ampClass = gameState.timeAmpAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
+        extraHtml = ` <button onclick="toggleTimeAmpAuto()" id="shop-amp-auto-btn" class="${ampClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${ampText}</button>`;
+    }
 
-                    return `
-                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
-                            <div>
-                                <div class="font-bold text-gray-800">${name} <span class="text-xs text-amber-600">(${item.price}P)</span></div>
-                                <div class="text-gray-500 text-[11px] mb-1">${desc}</div>
-                                <div class="text-xs text-indigo-600 font-bold flex items-center">${translations[currentLang].itemOwned(count)}${extraHtml}</div>
-                            </div>
-                            <div>
-                                <button onclick="buyItem('${item.id}', ${item.price})" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs">${translations[currentLang].buyBtn(item.price)}</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+    return `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
+            <div>
+                <div class="font-bold text-gray-800">${name} <span class="text-xs text-amber-600">(${item.price}P)</span></div>
+                <div class="text-gray-500 text-[11px] mb-1">${desc}</div>
+                <div class="text-xs text-indigo-600 font-bold flex items-center">${translations[currentLang].itemOwned(count)}${extraHtml}</div>
+            </div>
+            <div>
+                <button onclick="buyItem('${item.id}', ${item.price})" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs">${translations[currentLang].buyBtn(item.price)}</button>
+            </div>
+        </div>
+    `;
+}).join('');
             }
         }
 
         function toggleTimeAmpAuto() {
-            playSound('click');
-            gameState.timeAmpAuto = !gameState.timeAmpAuto;
-            const shopBtn = document.getElementById('shop-amp-auto-btn');
-            if (shopBtn) {
-                if (gameState.timeAmpAuto) {
-                    shopBtn.innerText = "자동ON";
-                    shopBtn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
-                } else {
-                    shopBtn.innerText = "자동OFF";
-                    shopBtn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
-                }
-            }
-        }
+    playSound('click');
+    gameState.timeAmpAuto = !gameState.timeAmpAuto;
+    const shopBtn = document.getElementById('shop-amp-auto-btn');
+    if (shopBtn) {
+        // 💡 다국어 텍스트 적용
+        shopBtn.innerText = gameState.timeAmpAuto ? translations[currentLang].autoOn : translations[currentLang].autoOff;
+        shopBtn.className = gameState.timeAmpAuto ? "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2" : "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
+    }
+}
 
         function buyChar(charId, price) {
             const pts = getUserPoints();
