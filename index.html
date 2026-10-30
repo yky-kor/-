@@ -446,12 +446,26 @@ function showHiddenUnlockPopup() {
         }
 
         function goHome() {
-            playSound('click');
-            gameState.isPlaying = false;
-            clearInterval(gameState.timer);
-            clearInterval(gameState.stopwatchTimer);
-            showScreen('screen-menu');
-            updateUIStats();
+    playSound('click');
+    gameState.isPlaying = false;
+    clearInterval(gameState.timer);
+    clearInterval(gameState.stopwatchTimer);
+    showScreen('screen-menu');
+    
+    // 👇 이 줄을 추가해 주세요!
+    checkAndUnlockHiddenMode();
+    
+    updateUIStats();
+}
+
+// 페이지가 처음 켜졌을 때도 검사하도록 추가
+window.addEventListener('DOMContentLoaded', () => {
+    updateEmojiButtonText();
+    updateUIStats();
+    
+    // 👇 이 줄을 추가해 주세요!
+    checkAndUnlockHiddenMode();
+});
         }
 
         function updateModeLabel() {
@@ -1104,10 +1118,14 @@ function showHiddenUnlockPopup() {
         }
 
         function closeAchievementModal() {
-            playSound('click');
-            document.getElementById('modal-achievement').classList.add('hidden');
-            updateUIStats();
-        }
+    playSound('click');
+    document.getElementById('modal-achievement').classList.add('hidden');
+    
+    // 👇 이 줄을 추가해 주세요! (도전과제 창을 닫을 때 히든모드 조건 검사)
+    checkAndUnlockHiddenMode();
+    
+    updateUIStats();
+}
 
         let currentShopTab = 'chars';
         function switchShopTab(tab) {
