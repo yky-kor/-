@@ -1561,15 +1561,11 @@
             const computerVal = hiddenSequence[hiddenCurrentIndex];
             const hands = getHandsForCurrentChar();
             
-            // 0: 가위('scissor'), 1: 바위('rock'), 2: 보('paper')
             const choiceKeys = ['scissor', 'rock', 'paper'];
             const playerKey = choiceKeys[playerChoiceIndex];
             const comKey = choiceKeys[computerVal];
             
             const comHand = hands[comKey];
-            
-            // 🐸 청개구리 룰 핵심: 유저가 낸 손이 컴퓨터의 손을 '이기는 손'이면 오답(이겨버림!), 
-            // 컴퓨터의 손에게 '지는 손'(`comHand.beats`)이어야 정답(지기 성공)!
             const isUserLossAgainstComputer = (playerKey === comHand.beats);
 
             if (isUserLossAgainstComputer) {
@@ -1580,7 +1576,8 @@
                     initHiddenRound();
                 } else {
                     renderHiddenUI();
-                    startHiddenTimer(); // 다음 순서로 넘어가면 타이머 리셋 후 재시작
+                    // 💡 문제를 맞췄을 때 startHiddenTimer()를 절대 호출하지 않음으로써
+                    // 전체 2초 타이머가 끊김 없이 끝까지 쭈욱 줄어들게 유지합니다!
                 }
             } else {
                 clearInterval(hiddenTimer);
