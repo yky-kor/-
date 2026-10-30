@@ -231,8 +231,14 @@
 
         <!-- 5. 히든 모드 화면 (신들의 영역) -->
         <div id="screen-hidden" class="w-full flex flex-col items-center hidden py-2">
-            <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 영역</div>
-            <div id="hidden-seq-display" class="bg-gray-100 p-3 rounded-xl mb-3 text-sm w-full text-center">컴퓨터의 순서:<br><div id="hidden-seq-items" class="mt-1"></div></div>
+            <div class="text-lg font-bold text-purple-600 mb-2">신들의 영역</div>
+            <div id="hidden-seq-display" class="bg-gray-100 p-3 rounded-xl mb-3 text-sm w-full text-center">
+                <div class="text-gray-500 text-xs mb-1">컴퓨터의 순서</div>
+                <div id="hidden-seq-items" class="text-base font-bold mb-2"></div>
+                
+                <div class="text-gray-500 text-xs mb-1 border-t pt-2">내가 낸 정답</div>
+                <div id="hidden-player-answers" class="text-base font-bold flex justify-center space-x-2 min-h-[28px]"></div>
+            </div>
             <div class="hidden-timer-bar w-full"><div id="hidden-progress"></div></div>
             <div id="hidden-instruction-msg" class="text-xs text-gray-500 mb-4 text-center font-bold">순서를 기억하세요! (2초 후 시작)</div>
             <div class="grid grid-cols-3 gap-2 w-full mb-3">
@@ -1127,7 +1133,7 @@
         function openShopModal() {
             playSound('click');
             renderShopContent();
-            document.getElementById('modal-shop').classList.add('hidden');
+            document.getElementById('modal-shop').classList.remove('hidden');
         }
 
         function renderShopContent() {
@@ -1385,12 +1391,12 @@
             });
         }
 
-
         // --- [히든 모드 관련 로직 및 변수] ---
         let hiddenTimer = null;
         let hiddenTimeLeft = 2.0;
         let hiddenSequence = []; 
         let hiddenCurrentIndex = 0; 
+        let hiddenPlayerChoices = []; 
         let hiddenBgmSynth = null;
         let hiddenBgmLoop = null;
 
@@ -1432,21 +1438,19 @@
         function startHiddenMode() {
             document.body.classList.add('hidden-universe-theme');
             showScreen('screen-hidden');
-            startHiddenBgm(); // 🌌 우주 배경음악 시작
+            startHiddenBgm(); 
             initHiddenRound();
         }
 
-        // 🌌 우주 배경음악(BGM) 재생 함수
         function startHiddenBgm() {
             stopHiddenBgm();
             try {
                 Tone.start();
-                // 몽환적인 신디사이저 패드 사운드 설정
                 hiddenBgmSynth = new Tone.Synth({
                     oscillator: { type: "sine" },
                     envelope: { attack: 0.5, decay: 1, sustain: 0.8, release: 1 }
                 }).toDestination();
-                hiddenBgmSynth.volume.value = -12; // 소리 크기 적당히 조절
+                hiddenBgmSynth.volume.value = -12; 
 
                 const notes = ["C3", "G3", "D4", "F4", "A4", "G4"];
                 let step = 0;
@@ -1476,30 +1480,20 @@
             } catch(e) {}
         }
 
-        // --- [히든 모드 관련 로직 및 변수] ---
-        let hiddenTimer = null;
-        let hiddenTimeLeft = 2.0;
-        let hiddenSequence = []; 
-        let hiddenCurrentIndex = 0; 
-        let hiddenPlayerChoices = []; // 💡 내가 낸 정답들을 기록할 배열 추가
-        let hiddenBgmSynth = null;
-        let hiddenBgmLoop = null;
-
         function initHiddenRound() {
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
-            hiddenPlayerChoices = []; // 내가 낸 정답 기록 리셋
+            hiddenPlayerChoices = []; 
             for(let i=0; i<5; i++) {
                 hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
             
-            // 💡 2초 문제 기억 대기 시간 복구!
             const instructionEl = document.getElementById('hidden-instruction-msg');
             const progressBar = document.getElementById('hidden-progress');
             if (progressBar) progressBar.style.width = '100%';
             
-            setHiddenButtonsEnabled(false); // 생각하는 동안 버튼 잠금
+            setHiddenButtonsEnabled(false); 
             let count = 2;
             if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
 
@@ -1510,11 +1504,12 @@
                 } else {
                     clearInterval(memoTimer);
                     if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
-                    setHiddenButtonsEnabled(true); // 버튼 활성화
-                    startHiddenTimer(); // 2초 대기가 끝나면 5문제 전체 제한 타이머 시작!
+                    setHiddenButtonsEnabled(true); 
+                    startHiddenTimer(); 
                 }
             }, 1000);
         }
+
         function setHiddenButtonsEnabled(enabled) {
             const container = document.querySelector('#screen-hidden .grid');
             if (!container) return;
@@ -1527,7 +1522,6 @@
             const hands = getHandsForCurrentChar();
             const choiceKeys = ['scissor', 'rock', 'paper'];
 
-            // 1. 컴퓨터 순서 렌더링
             let seqHtml = hiddenSequence.map((val, idx) => {
                 let style = "";
                 if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
@@ -1538,7 +1532,6 @@
             const seqItemsEl = document.getElementById('hidden-seq-items');
             if (seqItemsEl) seqItemsEl.innerHTML = seqHtml;
 
-            // 2. 내가 낸 정답들 바로 아래 렌더링
             const playerAnswersEl = document.getElementById('hidden-player-answers');
             if (playerAnswersEl) {
                 let ansHtml = hiddenPlayerChoices.map((val) => {
@@ -1560,7 +1553,7 @@
             }
             
             let startTime = Date.now();
-            let duration = 2000; // 2초
+            let duration = 2000; 
 
             hiddenTimer = setInterval(() => {
                 let elapsed = Date.now() - startTime;
@@ -1575,7 +1568,7 @@
                     alert("시간 초과! 히든 모드 실패!");
                     exitHiddenMode();
                 }
-            }, 50); // 0.05초마다 부드럽게 갱신
+            }, 50); 
         }
 
         function checkHiddenPlayerChoice(playerChoiceIndex) {
@@ -1590,7 +1583,7 @@
             const isUserLossAgainstComputer = (playerKey === comHand.beats);
 
             if (isUserLossAgainstComputer) {
-                hiddenPlayerChoices.push(playerChoiceIndex); // 💡 내가 낸 정답 기록 저장
+                hiddenPlayerChoices.push(playerChoiceIndex); 
                 hiddenCurrentIndex++;
                 
                 if (hiddenCurrentIndex >= 5) {
@@ -1606,9 +1599,10 @@
                 exitHiddenMode();
             }
         }
+
         function exitHiddenMode() {
             clearInterval(hiddenTimer);
-            stopHiddenBgm(); // 🌌 우주 배경음악 정지
+            stopHiddenBgm(); 
             document.body.classList.remove('hidden-universe-theme');
             goHome();
         }
