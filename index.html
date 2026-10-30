@@ -219,11 +219,12 @@
                 <button onclick="switchRankType('all')" id="rank-type-all" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="rankTypeAll">누적 랭킹</button>
                 <button onclick="switchRankType('weekly')" id="rank-type-weekly" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="rankTypeWeekly">주간 랭킹</button>
             </div>
-            <div class="flex w-full mb-2 bg-gray-100 p-1 rounded-xl">
-                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
-                <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
-                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
-                <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
+            <div class="grid grid-cols-5 w-full mb-2 bg-gray-100 p-1 rounded-xl gap-1">
+                <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="py-1.5 text-[10px] font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
+                <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="py-1.5 text-[10px] font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
+                <button onclick="switchRankingTab('timeattack')" id="tab-timeattack" class="py-1.5 text-[10px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttack">타임어택</button>
+                <button onclick="switchRankingTab('timeattack_hard')" id="tab-timeattack-hard" class="py-1.5 text-[10px] font-bold rounded-lg text-gray-500" data-i18n="tabTimeAttackHard">타임하드</button>
+                <button onclick="switchRankingTab('hidden')" id="tab-hidden" class="py-1.5 text-[10px] font-bold rounded-lg text-purple-600" data-i18n="tabHidden">신들의영역</button>
             </div>
             <div id="ranking-list" class="w-full max-h-44 overflow-y-auto divide-y divide-gray-100 mb-3 text-xs"></div>
             <button onclick="goHome()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow text-xs" data-i18n="goHome">메인으로 돌아가기</button>
@@ -350,6 +351,9 @@
                 itemUseBtn: "사용하기", itemOwned: (count) => `보유: ${count}개`,
                 shieldSaved: "🛡️ 보호막 발동! 실수가 방어되었습니다!",
                 hiddenBtn: "신들의 영역 (히든 모드)",
+                tabHidden: "신들의영역",
+modeHidden: "신들의 영역 (히든 모드)",
+clearCountScore: "클리어 횟수",
                 emojiOnText: "동물개수ON", defaultOnText: "기본손ON"
             },
             en: {
@@ -387,6 +391,9 @@
                 itemUseBtn: "Use", itemOwned: (count) => `Owned: ${count}`,
                 shieldSaved: "🛡️ Shield Activated! Mistake blocked!",
                 hiddenBtn: "Realm of Gods (Hidden)",
+                tabHidden: "Realm",
+modeHidden: "Realm of Gods",
+clearCountScore: "Clear Count",
                 emojiOnText: "Count ON", defaultOnText: "Default ON"
             }
         };
@@ -1298,25 +1305,50 @@
             const rawName = nameInput.value.trim() || translations[currentLang].anonymousName;
             const currentChar = getCurrentCharEmoji();
             const name = `${currentChar} ${rawName}`;
-
             let baseDbPath = '';
+            
             if (gameState.mode === 'infinite') baseDbPath = 'rankings_infinite';
             else if (gameState.mode === 'infinite_hard') baseDbPath = 'rankings_infinite_hard';
             else if (gameState.mode === 'timeattack') baseDbPath = 'rankings_timeattack';
             else if (gameState.mode === 'timeattack_hard') baseDbPath = 'rankings_timeattack_hard';
+            else if (gameState.mode === 'hidden') baseDbPath = 'rankings_hidden';
 
             const weekKey = getWeekKey();
 
-            if (gameState.mode.includes('infinite')) {
+            if (gameState.mode.includes('infinite') || gameState.mode === 'hidden') {
                 const score = gameState.score;
                 if (score <= 0) { alert(translations[currentLang].alertZeroScore); return; }
-                db.ref(baseDbPath).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
-                db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
+
+                // 💡 [핵심 수정] 누적 합산이 아닌 '최고 점수/최고 클리어 횟수'로 갱신하는 로직
+                const updateBestScore = (path) => {
+                    db.ref(path).orderByChild('name').equalTo(name).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            // 이미 기록이 존재한다면 기존 기록과 비교
+                            let existingKey = Object.keys(data)[0];
+                            let existingScore = data[existingKey].score;
+                            
+                            if (score > existingScore) {
+                                // 현재 점수가 더 높을 때만 갱신
+                                db.ref(`${path}/${existingKey}`).update({ score: score, date: new Date().toLocaleDateString() });
+                            }
+                        } else {
+                            // 기록이 없으면 새로 등록
+                            db.ref(path).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
+                        }
+                    });
+                };
+
+                updateBestScore(baseDbPath);
+                updateBestScore(`weekly_${weekKey}_${baseDbPath}`);
+
             } else {
+                // 타임어택 등 시간 기록 모드 (시간은 짧을수록 좋으므로 기존 방식 유지 혹은 필요시 최소 시간 갱신 가능)
                 const timeTaken = parseFloat(gameState.elapsedSeconds);
                 db.ref(baseDbPath).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
                 db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
             }
+
             nameInput.value = '';
             showRanking(gameState.mode);
         }
@@ -1345,18 +1377,18 @@
         }
 
         function switchRankingTab(tab) {
-            currentRankingTab = tab;
-            ['infinite', 'infinite_hard', 'timeattack', 'timeattack_hard'].forEach(t => {
-                const btn = document.getElementById(`tab-${t.replace('_', '-')}`);
-                if (!btn) return;
-                if (t === tab) {
-                    btn.className = "flex-1 py-1.5 text-[11px] font-bold rounded-lg bg-white text-green-700 shadow-sm";
-                } else {
-                    btn.className = "flex-1 py-1.5 text-[11px] font-bold rounded-lg text-gray-500";
-                }
-            });
-            renderRankingList();
+    currentRankingTab = tab;
+    ['infinite', 'infinite_hard', 'timeattack', 'timeattack_hard', 'hidden'].forEach(t => {
+        const btn = document.getElementById(`tab-${t.replace('_', '-')}`);
+        if (!btn) return;
+        if (t === tab) {
+            btn.className = "py-1.5 text-[10px] font-bold rounded-lg bg-white text-green-700 shadow-sm";
+        } else {
+            btn.className = "py-1.5 text-[10px] font-bold rounded-lg text-gray-500";
         }
+    });
+    renderRankingList();
+}
 
         function showRanking(tab = 'infinite') {
             showScreen('screen-ranking');
@@ -1367,7 +1399,7 @@
             const rankingList = document.getElementById('ranking-list');
             const dbPaths = {
                 'infinite': 'rankings_infinite', 'infinite_hard': 'rankings_infinite_hard',
-                'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard'
+                'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard','hidden': 'rankings_hidden'
             };
             let dbPath = dbPaths[currentRankingTab];
             if (currentRankType === 'weekly') { dbPath = `weekly_${getWeekKey()}_${dbPath}`; }
@@ -1383,21 +1415,21 @@
                 let rankings = [];
                 for (let id in data) { rankings.push(data[id]); }
 
-                if (currentRankingTab.includes('infinite')) {
-                    rankings.sort((a, b) => b.score - a.score);
-                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
-                        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
-                            <div class="flex items-center space-x-3">
-                                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
-                                <span class="truncate max-w-[130px]">${item.name}</span>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-green-600 font-extrabold">${item.score} pts</span>
-                                <span class="text-[11px] text-gray-400">${item.date}</span>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
+                if (currentRankingTab.includes('infinite') || currentRankingTab === 'hidden') {
+    rankings.sort((a, b) => b.score - a.score);
+    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
+        <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-purple-50 font-bold text-purple-700 rounded-lg' : ''}">
+            <div class="flex items-center space-x-3">
+                <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
+                <span class="truncate max-w-[130px]">${item.name}</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="text-purple-600 font-extrabold">${item.score}회 클리어</span>
+                <span class="text-[11px] text-gray-400">${item.date}</span>
+            </div>
+        </div>
+    `).join('');
+} else {
                     rankings.sort((a, b) => a.time - b.time);
                     rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
@@ -1619,10 +1651,30 @@
                 hiddenCurrentIndex++;
                 
                 if (hiddenCurrentIndex >= 5) {
-                    clearInterval(hiddenTimer);
-                    alert("5가지 순서 클리어! 다음 스테이지로!");
-                    initHiddenRound();
-                } else {
+    clearInterval(hiddenTimer);
+    playSound('reward');
+    
+    // 히든 모드 클리어 시 점수를 1점(또는 누적 클리어 횟수)으로 설정하고 결과 화면 호출
+    gameState.mode = 'hidden';
+    gameState.score = (gameState.score || 0) + 1;
+    
+    stopHiddenBgm();
+    document.body.classList.remove('hidden-universe-theme');
+    showScreen('screen-result');
+    
+    const nameInputContainer = document.getElementById('name-input-container');
+    const resultDesc = document.getElementById('result-desc');
+    const resultLabel = document.getElementById('result-label');
+    const finalScoreEl = document.getElementById('final-score');
+    const cardModeName = document.getElementById('card-mode-name');
+
+    cardModeName.innerText = "신들의 영역 (히든 모드)";
+    resultLabel.innerText = currentLang === 'ko' ? '히든 모드 클리어 횟수' : 'Hidden Clear Count';
+    finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '회' : ' times');
+    resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 클리어 성공! 총 ${gameState.score}회 달성` : `Realm Cleared! Total ${gameState.score}`;
+    nameInputContainer.classList.remove('hidden');
+    updateUIStats();
+} else {
                     renderHiddenUI();
                 }
             } else {
