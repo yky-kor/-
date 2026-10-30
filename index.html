@@ -142,9 +142,9 @@ body.hidden-universe-theme {
                 <button onclick="openShopModal()" class="py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🛍️ <span data-i18n="shopBtn">상점</span>
                 </button>
-                <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
-                    🏆 <span data-i18n="rankingBtn">랭킹</span>
-                </button>
+               <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95"> 
+    🏆 <span data-i18n="rankingBtn"> 랭킹 </span> 
+</button>
             </div>
         </div>
 
@@ -1372,103 +1372,136 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
 
-// 히든 모드 UI 렌더링 (5가지 연속 제시 및 현재 맞출 순서 표시)
+// --- [히든 모드 관련 로직 및 변수] ---
+        let hiddenTimer = null;
+        let hiddenTimeLeft = 2.0;
+        let hiddenSequence = []; 
+        let hiddenCurrentIndex = 0; 
 
+        function checkAndUnlockHiddenMode() {
+            const allCompleted = achievements.every(ach => ach.completed === true);
+            const achievementBtn = document.getElementById('achievement-btn');
+            const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
 
-// 2초 타이머 시작
+            if (allCompleted && achievementBtn) {
+                if (achievementBtn.dataset.mode !== 'hidden') {
+                    achievementBtn.dataset.mode = 'hidden';
+                    achievementBtn.className = 'flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition animate-pulse';
+                    achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
+                    achievementBtn.onclick = () => startHiddenMode();
 
-
-// 플레이어가 버튼을 눌렀을 때 검증하는 로직 (컴퓨터 손을 '이기면' 패배, '지거나 비기면' 성공인 청개구리 룰 적용)
-function checkHiddenPlayerChoice(playerChoice) {
-    const computerVal = hiddenSequence[hiddenCurrentIndex];
-    
-    // 청개구리 룰: 컴퓨터를 '이기는' 선택을 해야 정답! (가위>보, 바위>가위, 보>바위)
-    const isWinAgainstComputer = (playerChoice === 0 && computerVal === 2) ||
-                                 (playerChoice === 1 && computerVal === 0) ||
-                                 (playerChoice === 2 && computerVal === 1);
-
-    if (isWinAgainstComputer) {
-        hiddenCurrentIndex++;
-        if (hiddenCurrentIndex >= 5) {
-            clearInterval(hiddenTimer);
-            alert("✨ 5가지 순서 클리어! 다음 스테이지로!");
-            initHiddenRound(); // 다음 5개 조합으로 계속 진행
-        } else {
-            renderHiddenUI(); // 다음 순서로 갱신 (시간은 유지하거나 리셋 선택 가능)
-        }
-    } else {
-        clearInterval(hiddenTimer);
-        alert("틀렸습니다! (컴퓨터를 이기는 손을 내야 합니다)");
-        exitHiddenMode();
-    }
-}
-
-    // --- [히든 모드 관련 로직 시작] ---
-let hiddenTimer = null;
-let hiddenTimeLeft = 2.0;
-let hiddenSequence = []; // 컴퓨터가 낸 5개 순서 [0, 1, 2...]
-let hiddenCurrentIndex = 0; // 현재 맞추어야 할 순서 (0 ~ 4)
-
-function checkAndUnlockHiddenMode() {
-    const allCompleted = achievements.every(ach => ach.completed === true);
-    const achievementBtn = document.getElementById('achievement-btn');
-    const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
-
-    if (allCompleted && achievementBtn) {
-        if (achievementBtn.dataset.mode !== 'hidden') {
-            achievementBtn.dataset.mode = 'hidden';
-            achievementBtn.className = 'mode-btn hidden-mode-btn';
-            achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
-            achievementBtn.onclick = () => startHiddenMode();
-
-            if (!localStorage.getItem(hiddenUnlockedKey)) {
-                localStorage.setItem(hiddenUnlockedKey, 'true');
-                showHiddenUnlockPopup();
+                    // 최초 해금 시 팝업 1회 노출
+                    if (!localStorage.getItem(hiddenUnlockedKey)) {
+                        localStorage.setItem(hiddenUnlockedKey, 'true');
+                        showHiddenUnlockPopup();
+                    }
+                }
             }
         }
-    }
-}
 
-function showHiddenUnlockPopup() {
-    const popup = document.createElement('div');
-    popup.className = 'hidden-popup-overlay';
-    popup.innerHTML = `
-        <div class="hidden-popup-box">
-            <h2>🎉 축하합니다!</h2>
-            <p>모든 도전과제 완료!<br><b>[히든 모드: 신들의 역가위바위보]</b>가 해금되었습니다!</p>
-            <button onclick="this.parentElement.parentElement.remove()">확인</button>
-        </div>
-    `;
-    document.body.appendChild(popup);
-}
-
-
-function startHiddenTimer() {
-    hiddenTimeLeft = 2.0;
-    clearInterval(hiddenTimer);
-    
-    hiddenTimer = setInterval(() => {
-        hiddenTimeLeft -= 0.1;
-        const progressBar = document.getElementById('hidden-progress');
-        if (progressBar) {
-            progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
+        function showHiddenUnlockPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'hidden-popup-overlay';
+            popup.innerHTML = `
+                <div class="hidden-popup-box">
+                    <h2 class="text-xl font-bold mb-2">🎉 축하합니다!</h2>
+                    <p class="text-sm mb-4">모든 도전과제 완료!<br><b>[히든 모드: 신들의 역가위바위보]</b>가 해금되었습니다!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 bg-pink-500 rounded-xl text-white font-bold">확인</button>
+                </div>
+            `;
+            document.body.appendChild(popup);
         }
 
-        if (hiddenTimeLeft <= 0) {
+        function startHiddenMode() {
+            document.body.classList.add('hidden-universe-theme');
+            showGameScreen(); 
+            initHiddenRound();
+        }
+
+        function initHiddenRound() {
+            hiddenCurrentIndex = 0;
+            hiddenSequence = [];
+            for(let i=0; i<5; i++) {
+                hiddenSequence.push(Math.floor(Math.random() * 3)); // 0: 가위, 1: 바위, 2: 보
+            }
+            renderHiddenUI();
+            startHiddenTimer();
+        }
+
+        function renderHiddenUI() {
+            const gameArea = document.getElementById('screen-game'); 
+            const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
+            
+            let seqHtml = hiddenSequence.map((val, idx) => {
+                let style = "";
+                if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
+                else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2); display: inline-block;";
+                return `<span style="margin: 0 4px; ${style}">${symbols[val]}</span>`;
+            }).join(' ➔ ');
+
+            gameArea.innerHTML = `
+                <div class="w-full text-center py-2">
+                    <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 역가위바위보</div>
+                    <div class="bg-gray-100 p-3 rounded-xl mb-3 text-sm">컴퓨터의 순서:<br><div class="mt-1">${seqHtml}</div></div>
+                    <div class="hidden-timer-bar"><div id="hidden-progress"></div></div>
+                    <div class="text-xs text-gray-500 mb-4">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="checkHiddenPlayerChoice(0)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">✌️ 가위</button>
+                        <button onclick="checkHiddenPlayerChoice(1)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">✊ 바위</button>
+                        <button onclick="checkHiddenPlayerChoice(2)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">🖐️ 보</button>
+                    </div>
+                    <button onclick="exitHiddenMode()" class="mt-4 text-xs text-red-500 underline cursor-pointer">나가기</button>
+                </div>
+            `;
+        }
+
+        function startHiddenTimer() {
+            hiddenTimeLeft = 2.0;
             clearInterval(hiddenTimer);
-            alert("시간 초과! 히든 모드 실패!");
-            exitHiddenMode();
+            
+            hiddenTimer = setInterval(() => {
+                hiddenTimeLeft -= 0.1;
+                const progressBar = document.getElementById('hidden-progress');
+                if (progressBar) {
+                    progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
+                }
+
+                if (hiddenTimeLeft <= 0) {
+                    clearInterval(hiddenTimer);
+                    alert("시간 초과! 히든 모드 실패!");
+                    exitHiddenMode();
+                }
+            }, 100);
         }
-    }, 100);
-}
 
+        function checkHiddenPlayerChoice(playerChoice) {
+            const computerVal = hiddenSequence[hiddenCurrentIndex];
+            // 청개구리 룰: 컴퓨터를 '이기는' 선택을 해야 정답 (가위>보, 바위>가위, 보>바위)
+            const isWinAgainstComputer = (playerChoice === 0 && computerVal === 2) ||
+                                         (playerChoice === 1 && computerVal === 0) ||
+                                         (playerChoice === 2 && computerVal === 1);
 
-function exitHiddenMode() {
-    clearInterval(hiddenTimer);
-    document.body.classList.remove('hidden-universe-theme');
-    location.reload();
-}
-// --- [히든 모드 관련 로직 끝] ---
+            if (isWinAgainstComputer) {
+                hiddenCurrentIndex++;
+                if (hiddenCurrentIndex >= 5) {
+                    clearInterval(hiddenTimer);
+                    alert("✨ 5가지 순서 클리어! 다음 스테이지로!");
+                    initHiddenRound();
+                } else {
+                    renderHiddenUI();
+                }
+            } else {
+                clearInterval(hiddenTimer);
+                alert("틀렸습니다! (컴퓨터를 이기는 손을 내야 합니다)");
+                exitHiddenMode();
+            }
+        }
+
+        function exitHiddenMode() {
+            clearInterval(hiddenTimer);
+            document.body.classList.remove('hidden-universe-theme');
+            goHome();
+        }
     </script>
 </body>
 </html>
