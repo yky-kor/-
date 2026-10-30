@@ -1601,7 +1601,12 @@
         }
 
         function exitHiddenMode() {
-            clearInterval(hiddenTimer);
+            if (hiddenTimer) {
+                clearInterval(hiddenTimer);
+                hiddenTimer = null;
+            }
+            hiddenTimeLeft = 2.0;
+
             stopHiddenBgm(); 
             document.body.classList.remove('hidden-universe-theme');
             goHome();
