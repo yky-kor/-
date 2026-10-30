@@ -422,9 +422,7 @@
             { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000, shieldCount: 2, descKo: '🛡️ 보호막 2개!', descEn: '🛡️ 2 Shields!' },
             { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000, shieldCount: 1, descKo: '⏱️ 타임어택 -2초 앰플 + 🛡️ 보호막 1개!', descEn: '⏱️ TA -2s Booster + 🛡️ 1 Shield!' },
             { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000, shieldCount: 2, descKo: '🛡️ 보호막 2개 + ⏱️ 타임어택 -2초 앰플!', descEn: '🛡️ 2 Shields + ⏱️ TA -2s Booster!' }
-        ];
-
-        const itemsData = [
+        ];const itemsData = [
             { id: 'shield', nameKo: '🛡️ 실수 방어 보호막', nameEn: '🛡️ Mistake Shield', descKo: '무한 모드에서 오답/시간초과 1회 방어', descEn: 'Block 1 mistake/timeout in Infinite', price: 40 },
             { id: 'time_minus', nameKo: '⏱️ 타임어택 -2초 앰플', nameEn: '⏱️ TA -2s Booster', descKo: '타임어택 시작 시 기록 2초 보정(할인)', descEn: 'Start TA with 2s bonus deduction', price: 30 }
         ];
@@ -514,7 +512,7 @@
                     localStorage.setItem('frog_friends_items', JSON.stringify(items));
                 }
                 totalShields += (charObj.shieldCount || 0);
-                if (charObj.id === 'unicorn') totalShields += 99; // 유니콘 영구 보호막 표현용
+                if (charObj.id === 'unicorn') totalShields += 99;
             }
 
             gameState.shieldsLeft = totalShields;
@@ -525,7 +523,6 @@
                 shieldDisplay.classList.add('hidden');
             }
 
-            // 타임어택 -2초 앰플 적용 (시작 시간에서 2초를 미리 보정하여 차감)
             let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charObj.id === 'robot' || charObj.id === 'ghost'));
             if (applyAmp) {
                 gameState.startTime += 2000;
@@ -705,7 +702,9 @@
                 }
 
                 if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
-                    checkMissionsProgress('timeattack_hard', gameState.score);
+                    if (gameState.mode === 'timeattack_hard') {
+                        checkMissionsProgress('timeattack_hard', gameState.score);
+                    }
                     if (gameState.score >= 10) {
                         setButtonsEnabled(false);
                         setTimeout(endGame, 300);
@@ -714,6 +713,9 @@
                     }
                     return;
                 } else if (gameState.mode === 'infinite' || gameState.mode === 'infinite_hard') {
+                    if (gameState.mode === 'infinite_hard') {
+                        checkMissionsProgress('infinite_hard', gameState.score);
+                    }
                     nextRound();
                     return;
                 }
@@ -767,6 +769,9 @@
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
             showScreen('screen-result');
+
+            // 미션: 모드 상관없이 게임 5회 완주 기록
+            checkMissionsProgress('any_game_play', 1);
 
             const nameInputContainer = document.getElementById('name-input-container');
             const resultDesc = document.getElementById('result-desc');
@@ -850,11 +855,13 @@
             updateUIStats();
         }
 
-        // 일일 미션 내용 변경: 타임어택 1회 완주 -> 타임어택 하드 모드 1회 완주
+        // 일일 미션 목록 (무한하드 1회 완주, 모드 상관없이 5회 완주 추가)
         const dailyMissionsData = [
             { id: 'mission_login', titleKo: '📅 매일 출석하기', titleEn: '📅 Daily Attendance', reward: 20, goal: 1, type: 'attendance' },
             { id: 'mission_inf5', titleKo: '♾️ 무한 모드 5점 달성', titleEn: '♾️ Reach 5 pts in Infinite', reward: 30, goal: 5, type: 'infinite' },
-            { id: 'mission_tahard', titleKo: '⚡ 타임어택 하드 1회 완주', titleEn: '⚡ Finish TA Hard Mode', reward: 50, goal: 10, type: 'timeattack_hard' }
+            { id: 'mission_tahard', titleKo: '⚡ 타임어택 하드 1회 완주', titleEn: '⚡ Finish TA Hard Mode', reward: 50, goal: 10, type: 'timeattack_hard' },
+            { id: 'mission_infhard1', titleKo: '🔥 무한 하드 모드 1회 완주', titleEn: '🔥 Finish Infinite Hard 1x', reward: 50, goal: 1, type: 'infinite_hard' },
+            { id: 'mission_any5', titleKo: '🎮 모드 상관없이 5회 완주', titleEn: '🎮 Complete 5 Games (Any Mode)', reward: 40, goal: 5, type: 'any_game_play' }
         ];
 
         function getTodayKey() { return new Date().toDateString(); }
@@ -874,6 +881,12 @@
                 if (m.type === type && !data.claimed[m.id]) {
                     if (type === 'infinite' || type === 'timeattack_hard') {
                         if (val >= m.goal) data.progress[m.id] = m.goal;
+                    } else if (type === 'infinite_hard') {
+                        data.progress[m.id] = (data.progress[m.id] || 0) + 1;
+                        if (data.progress[m.id] > m.goal) data.progress[m.id] = m.goal;
+                    } else if (type === 'any_game_play') {
+                        data.progress[m.id] = (data.progress[m.id] || 0) + val;
+                        if (data.progress[m.id] > m.goal) data.progress[m.id] = m.goal;
                     } else if (type === 'attendance') {
                         data.progress[m.id] = 1;
                     }
@@ -934,15 +947,19 @@
             updateUIStats();
         }
 
+        // 도전과제 목록 (무한 60점, 100점 / 타임어택 5초 이내 추가)
         const achievementsData = {
             infinite: [
                 { id: 'inf_5', titleKo: '🌱 초보 청개구리', titleEn: '🌱 Beginner Frog', descKo: '무한 모드에서 5점 달성하기', descEn: 'Reach 5 pts in Infinite Mode', reward: 30, check: (score) => score >= 5 },
                 { id: 'inf_15', titleKo: '⚡ 스피드 마스터', titleEn: '⚡ Speed Master', descKo: '무한 모드에서 15점 달성하기', descEn: 'Reach 15 pts in Infinite Mode', reward: 80, check: (score) => score >= 15 },
-                { id: 'inf_30', titleKo: '🏆 전설의 반대로러', titleEn: '🏆 Legendary Reverse', descKo: '무한 모드에서 30점 달성하기', descEn: 'Reach 30 pts in Infinite Mode', reward: 200, check: (score) => score >= 30 }
+                { id: 'inf_30', titleKo: '🏆 전설의 반대로러', titleEn: '🏆 Legendary Reverse', descKo: '무한 모드에서 30점 달성하기', descEn: 'Reach 30 pts in Infinite Mode', reward: 200, check: (score) => score >= 30 },
+                { id: 'inf_60', titleKo: '🔥 미친 반응속도', titleEn: '🔥 Crazy Reflexes', descKo: '무한 모드에서 60점 달성하기', descEn: 'Reach 60 pts in Infinite Mode', reward: 350, check: (score) => score >= 60 },
+                { id: 'inf_100', titleKo: '👑 가위바위보의 신', titleEn: '👑 God of RPS', descKo: '무한 모드에서 100점 달성하기', descEn: 'Reach 100 pts in Infinite Mode', reward: 600, check: (score) => score >= 100 }
             ],
             timeattack: [
                 { id: 'ta_10', titleKo: '⏱️ 타임어택 입문', titleEn: '⏱️ TA Beginner', descKo: '타임어택 모드 10초 이내 클리어', descEn: 'Clear Time Attack within 10s', reward: 50, check: (score, time) => time <= 10.0 },
-                { id: 'ta_7', titleKo: '🚀 빛의 속도', titleEn: '🚀 Speed of Light', descKo: '타임어택 모드 7초 이내 클리어', descEn: 'Clear Time Attack within 7s', reward: 120, check: (score, time) => time <= 7.0 }
+                { id: 'ta_7', titleKo: '🚀 빛의 속도', titleEn: '🚀 Speed of Light', descKo: '타임어택 모드 7초 이내 클리어', descEn: 'Clear Time Attack within 7s', reward: 120, check: (score, time) => time <= 7.0 },
+                { id: 'ta_5', titleKo: '⚡ 빛보다 빠른 손', titleEn: '⚡ Faster than Light', descKo: '타임어택 모드 5초 이내 클리어', descEn: 'Clear Time Attack within 5s', reward: 150, check: (score, time) => time <= 5.0 }
             ]
         };
 
