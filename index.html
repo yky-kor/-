@@ -1476,36 +1476,44 @@
             } catch(e) {}
         }
 
+        // --- [히든 모드 관련 로직 및 변수] ---
+        let hiddenTimer = null;
+        let hiddenTimeLeft = 2.0;
+        let hiddenSequence = []; 
+        let hiddenCurrentIndex = 0; 
+        let hiddenPlayerChoices = []; // 💡 내가 낸 정답들을 기록할 배열 추가
+        let hiddenBgmSynth = null;
+        let hiddenBgmLoop = null;
+
         function initHiddenRound() {
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
+            hiddenPlayerChoices = []; // 라운드 초기화 시 기록도 리셋
             for(let i=0; i<5; i++) {
                 hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
             
-            // 💡 2초 문제 인식 시간(기억 시간) 부여
             const instructionEl = document.getElementById('hidden-instruction-msg');
             const progressBar = document.getElementById('hidden-progress');
             if (progressBar) progressBar.style.width = '100%';
             
-            setHiddenButtonsEnabled(false); // 생각하는 동안 버튼 잠금
+            setHiddenButtonsEnabled(false);
             let count = 2;
-            if (instructionEl) instructionEl.innerHTML = `🧠 순서 기억 중... (${count}초)`;
+            if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
 
             let memoTimer = setInterval(() => {
                 count--;
                 if (count > 0) {
-                    if (instructionEl) instructionEl.innerHTML = `🧠 순서 기억 중... (${count}초)`;
+                    if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
                 } else {
                     clearInterval(memoTimer);
-                    if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 <b>'져야'</b> 하는 손을 내세요!`;
-                    setHiddenButtonsEnabled(true); // 버튼 활성화
-                    startHiddenTimer(); // 본격 타이머 시작
+                    if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
+                    setHiddenButtonsEnabled(true);
+                    startHiddenTimer();
                 }
             }, 1000);
         }
-
         function setHiddenButtonsEnabled(enabled) {
             const container = document.querySelector('#screen-hidden .grid');
             if (!container) return;
@@ -1514,18 +1522,30 @@
         }
 
         function renderHiddenUI() {
-            const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
-            
+            const symbols = ['가위', '바위', '보'];
+            const hands = getHandsForCurrentChar();
+            const choiceKeys = ['scissor', 'rock', 'paper'];
+
+            // 1. 컴퓨터 순서 렌더링
             let seqHtml = hiddenSequence.map((val, idx) => {
                 let style = "";
                 if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
-                else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2); display: inline-block;";
-                return `<span style="margin: 0 4px; ${style}">${symbols[val]}</span>`;
+                else if (idx === hiddenCurrentIndex) style = "color: #9333ea; font-weight: bold; transform: scale(1.1); display: inline-block;";
+                return `<span style="margin: 0 3px; ${style}">${symbols[val]}</span>`;
             }).join('');
 
             const seqItemsEl = document.getElementById('hidden-seq-items');
-            if (seqItemsEl) {
-                seqItemsEl.innerHTML = seqHtml;
+            if (seqItemsEl) seqItemsEl.innerHTML = seqHtml;
+
+            // 2. 내가 낸 정답들 바로 아래 렌더링
+            const playerAnswersEl = document.getElementById('hidden-player-answers');
+            if (playerAnswersEl) {
+                let ansHtml = hiddenPlayerChoices.map((val) => {
+                    const key = choiceKeys[val];
+                    const emoji = hands[key].emoji;
+                    return `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg text-sm">${emoji}</span>`;
+                }).join('');
+                playerAnswersEl.innerHTML = ansHtml;
             }
         }
 
@@ -1569,19 +1589,19 @@
             const isUserLossAgainstComputer = (playerKey === comHand.beats);
 
             if (isUserLossAgainstComputer) {
+                hiddenPlayerChoices.push(playerChoiceIndex); // 💡 내가 낸 정답 기록 저장
                 hiddenCurrentIndex++;
+                
                 if (hiddenCurrentIndex >= 5) {
                     clearInterval(hiddenTimer);
-                    alert("✨ 5가지 순서 클리어! 다음 스테이지로!");
+                    alert("5가지 순서 클리어! 다음 스테이지로!");
                     initHiddenRound();
                 } else {
                     renderHiddenUI();
-                    // 💡 문제를 맞췄을 때 startHiddenTimer()를 절대 호출하지 않음으로써
-                    // 전체 2초 타이머가 끊김 없이 끝까지 쭈욱 줄어들게 유지합니다!
                 }
             } else {
                 clearInterval(hiddenTimer);
-                alert("틀렸습니다! (컴퓨터에게 '져야' 합니다)");
+                alert("틀렸습니다! (컴퓨터에게 져야 합니다)");
                 exitHiddenMode();
             }
         }
