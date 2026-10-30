@@ -231,13 +231,14 @@
         </div>
 
         <!-- 5. 히든 모드 화면 (신들의 영역) -->
+        <!-- 5. 히든 모드 화면 (신들의 영역) -->
         <div id="screen-hidden" class="w-full flex flex-col items-center hidden py-2">
-            <div class="text-lg font-bold text-purple-600 mb-2">신들의 영역</div>
+            <div class="text-lg font-bold text-purple-600 mb-2" data-i18n="hiddenTitle">신들의 영역</div>
             <div id="hidden-seq-display" class="bg-gray-100 p-3 rounded-xl mb-3 text-sm w-full text-center">
-                <div class="text-gray-500 text-xs mb-1">컴퓨터의 순서</div>
+                <div class="text-gray-500 text-xs mb-1" data-i18n="hiddenComSeq">컴퓨터의 순서</div>
                 <div id="hidden-seq-items" class="text-base font-bold mb-2"></div>
                 
-                <div class="text-gray-500 text-xs mb-1 border-t pt-2">내가 낸 정답</div>
+                <div class="text-gray-500 text-xs mb-1 border-t pt-2" data-i18n="hiddenMyAns">내가 낸 정답</div>
                 <div id="hidden-player-answers" class="text-base font-bold flex justify-center space-x-2 min-h-[28px]"></div>
             </div>
             <div class="hidden-timer-bar w-full"><div id="hidden-progress"></div></div>
@@ -253,7 +254,7 @@
                     <span id="hidden-btn-paper-emoji">🖐️</span> <span class="text-xs" data-i18n="paper">보</span>
                 </button>
             </div>
-            <button onclick="exitHiddenMode()" class="text-xs text-red-500 underline cursor-pointer">나가기</button>
+            <button onclick="exitHiddenMode()" class="text-xs text-red-500 underline cursor-pointer" data-i18n="hiddenExit">나가기</button>
         </div>
     </main>
 
@@ -354,6 +355,12 @@
                 tabHidden: "신들의영역",
 modeHidden: "신들의 영역 (히든 모드)",
 clearCountScore: "클리어 횟수",
+                hiddenTitle: "신들의 영역",
+hiddenComSeq: "컴퓨터의 순서",
+hiddenMyAns: "내가 낸 정답",
+hiddenMsgMemory: (count) => `순서 기억 중... (${count}초)`,
+hiddenMsgPlay: "순서대로 컴퓨터에게 져야 하는 손을 내세요!",
+hiddenExit: "나가기",
                 emojiOnText: "동물개수ON", defaultOnText: "기본손ON"
             },
             en: {
@@ -394,6 +401,12 @@ clearCountScore: "클리어 횟수",
                 tabHidden: "Realm",
 modeHidden: "Realm of Gods",
 clearCountScore: "Clear Count",
+                hiddenTitle: "Realm of Gods",
+hiddenComSeq: "Computer's Sequence",
+hiddenMyAns: "My Answer",
+hiddenMsgMemory: (count) => `Memorizing... (${count}s)`,
+hiddenMsgPlay: "Play the losing hands in order!",
+hiddenExit: "Exit",
                 emojiOnText: "Count ON", defaultOnText: "Default ON"
             }
         };
@@ -1563,17 +1576,17 @@ clearCountScore: "Clear Count",
             }
 
             memoTimer = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
-                } else {
-                    clearInterval(memoTimer);
-                    memoTimer = null;
-                    if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
-                    setHiddenButtonsEnabled(true); 
-                    startHiddenTimer(); // 👈 여기서 타이머 시작
-                }
-            }, 1000);
+    count--;
+    if (count > 0) {
+        if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgMemory(count);
+    } else {
+        clearInterval(memoTimer);
+        memoTimer = null;
+        if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgPlay;
+        setHiddenButtonsEnabled(true); 
+        startHiddenTimer(); 
+    }
+}, 1000);
         }
 
         function setHiddenButtonsEnabled(enabled) {
@@ -1688,7 +1701,11 @@ clearCountScore: "Clear Count",
                     hiddenMaxSteps += 1;       // 다음 판엔 순서 개수 1개 추가!
                     
                     const instructionEl = document.getElementById('hidden-instruction-msg');
-                    if (instructionEl) instructionEl.innerHTML = `🎉 성공! 다음 단계로 진입합니다! (${hiddenScore}단계 달성)`;
+if (instructionEl) {
+    instructionEl.innerHTML = currentLang === 'ko' 
+        ? `🎉 성공! 다음 단계로 진입합니다! (${hiddenScore}단계 달성)` 
+        : `🎉 Success! Next Stage! (${hiddenScore} Stages)`;
+}
                     
                     setHiddenButtonsEnabled(false);
                     setTimeout(() => {
