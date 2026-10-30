@@ -1438,6 +1438,20 @@ let isSoundOn = true;
         let bgmLoop = null;
         let currentBgmMode = '';
         // 💡 [추가] 게임 모드별 분위기에 맞는 BGM 재생 함수
+        function stopBgm() {
+    try {
+        if (bgmLoop) {
+            bgmLoop.stop();
+            bgmLoop.dispose();
+            bgmLoop = null;
+        }
+        if (bgmSynth) {
+            bgmSynth.dispose();
+            bgmSynth = null;
+        }
+        Tone.Transport.stop();
+    } catch(e) {}
+}
         function startBgm(modeType) {
             if (!isSoundOn) return;
             stopBgm(); // 기존 BGM 정지
