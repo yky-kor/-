@@ -1655,6 +1655,12 @@ function exitHiddenMode() {
             checkAndUnlockHiddenMode();
             updateUIStats();
         }
+        // 💡 페이지가 처음 열리거나 새로고침되었을 때 저장된 데이터(포인트, 스킨, 도전과제)를 즉시 불러옵니다.
+        window.addEventListener('DOMContentLoaded', () => {
+            updateUIStats();
+            checkAndUnlockHiddenMode();
+            updateEmojiButtonText();
+        });
     </script>
 </body>
 </html>
