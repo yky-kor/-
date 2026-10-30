@@ -1485,7 +1485,8 @@ listEl.innerHTML = itemsData.map(item => {
 
         function checkAndUnlockHiddenMode() {
             let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
-            const allCompleted = Object.keys(claimed).length >= 5;
+            // 💡 [수정] 무한모드(5개) + 타임어택(3개) = 총 8개의 도전과제를 모두 완료해야 해금
+            const allCompleted = Object.keys(claimed).length >= 8;
             
             const achievementBtn = document.getElementById('achievement-btn');
             const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
@@ -1611,7 +1612,7 @@ listEl.innerHTML = itemsData.map(item => {
         }
 
         function renderHiddenUI() {
-            // 💡 무조건 기본 가위/바위/보 이모지만 사용하도록 고정
+            // 💡 히든 모드 화면 안에서도 무조건 기본 가위/바위/보 이모지만 사용하도록 고정
             const symbols = ['✌️', '✊', '🖐️'];
 
             let seqHtml = hiddenSequence.map((val, idx) => {
