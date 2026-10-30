@@ -1459,7 +1459,7 @@ let isSoundOn = true;
     notes = ["C5", "E5", "G5", "C6", "G5", "E5", "C5", "G5"]; // 높은 옥타브의 통통 튀는 음계
     tempo = "8n"; // 템포를 더 빠르게 (8분음표)
 }
-                } else if (modeType === 'hard') {
+                 else if (modeType === 'hard') {
                     // 하드/인피니트 하드: 긴장감 넘치는 빠른 멜로디
                     notes = ["C3", "D#3", "G3", "C4", "B3", "G3", "D#3", "F3"];
                     tempo = "8n";
@@ -1486,20 +1486,7 @@ let isSoundOn = true;
             } catch(e) {}
         }
 
-        function stopBgm() {
-            try {
-                if (bgmLoop) {
-                    bgmLoop.stop();
-                    bgmLoop.dispose();
-                    bgmLoop = null;
-                }
-                if (bgmSynth) {
-                    bgmSynth.dispose();
-                    bgmSynth = null;
-                }
-                Tone.Transport.stop();
-            } catch(e) {}
-        }
+     
         function showRanking(tab = 'infinite') {
             showScreen('screen-ranking');
             switchRankingTab(tab);
