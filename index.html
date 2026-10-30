@@ -1508,6 +1508,113 @@ function exitHiddenMode() {
     document.body.classList.remove('hidden-universe-theme');
     location.reload(); // 메인으로 복귀
 }
+    // --- [히든 모드 관련 로직 시작] ---
+let hiddenTimer = null;
+let hiddenTimeLeft = 2.0;
+let hiddenSequence = []; // 컴퓨터가 낸 5개 순서 [0, 1, 2...]
+let hiddenCurrentIndex = 0; // 현재 맞추어야 할 순서 (0 ~ 4)
+
+function checkAndUnlockHiddenMode() {
+    const allCompleted = achievements.every(ach => ach.completed === true);
+    const achievementBtn = document.getElementById('achievement-btn');
+    const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
+
+    if (allCompleted && achievementBtn) {
+        if (achievementBtn.dataset.mode !== 'hidden') {
+            achievementBtn.dataset.mode = 'hidden';
+            achievementBtn.className = 'mode-btn hidden-mode-btn';
+            achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
+            achievementBtn.onclick = () => startHiddenMode();
+
+            if (!localStorage.getItem(hiddenUnlockedKey)) {
+                localStorage.setItem(hiddenUnlockedKey, 'true');
+                showHiddenUnlockPopup();
+            }
+        }
+    }
+}
+
+function showHiddenUnlockPopup() {
+    const popup = document.createElement('div');
+    popup.className = 'hidden-popup-overlay';
+    popup.innerHTML = `
+        <div class="hidden-popup-box">
+            <h2>🎉 축하합니다!</h2>
+            <p>모든 도전과제 완료!<br><b>[히든 모드: 신들의 역가위바위보]</b>가 해금되었습니다!</p>
+            <button onclick="this.parentElement.parentElement.remove()">확인</button>
+        </div>
+    `;
+    document.body.appendChild(popup);
+}
+
+function startHiddenMode() {
+    document.body.classList.add('hidden-universe-theme');
+    showGameScreen(); 
+    initHiddenRound();
+}
+
+function initHiddenRound() {
+    hiddenCurrentIndex = 0;
+    hiddenSequence = [];
+    for(let i=0; i<5; i++) {
+        hiddenSequence.push(Math.floor(Math.random() * 3));
+    }
+    renderHiddenUI();
+    startHiddenTimer();
+}
+
+function renderHiddenUI() {
+    const gameArea = document.getElementById('screen-game'); // 게임 화면 영역
+    const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
+    
+    let seqHtml = hiddenSequence.map((val, idx) => {
+        let style = "";
+        if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
+        else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2);";
+        return `<span style="margin: 0 5px; ${style}">${symbols[val]}</span>`;
+    }).join(' ➔ ');
+
+    gameArea.innerHTML = `
+        <div class="w-full text-center py-4">
+            <div class="text-xl font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 역가위바위보</div>
+            <div class="bg-gray-100 p-3 rounded-xl mb-3 text-sm">컴퓨터의 순서: [ ${seqHtml} ]</div>
+            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-3"><div id="hidden-progress" class="bg-cyan-500 h-full" style="width: 100%;"></div></div>
+            <div class="text-xs text-gray-500 mb-4">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="checkHiddenPlayerChoice(0)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">✌️ 가위</button>
+                <button onclick="checkHiddenPlayerChoice(1)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">✊ 바위</button>
+                <button onclick="checkHiddenPlayerChoice(2)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">🖐️ 보</button>
+            </div>
+        </div>
+    `;
+}
+
+function startHiddenTimer() {
+    hiddenTimeLeft = 2.0;
+    clearInterval(hiddenTimer);
+    
+    hiddenTimer = setInterval(() => {
+        hiddenTimeLeft -= 0.1;
+        const progressBar = document.getElementById('hidden-progress');
+        if (progressBar) {
+            progressBar.style.width = (hiddenTimeLeft / 2.0 * 100) + '%';
+        }
+
+        if (hiddenTimeLeft <= 0) {
+            clearInterval(hiddenTimer);
+            alert("시간 초과! 히든 모드 실패!");
+            exitHiddenMode();
+        }
+    }, 100);
+}
+
+
+function exitHiddenMode() {
+    clearInterval(hiddenTimer);
+    document.body.classList.remove('hidden-universe-theme');
+    location.reload();
+}
+// --- [히든 모드 관련 로직 끝] ---
     </script>
 </body>
 </html>
