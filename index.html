@@ -444,8 +444,18 @@
         function goHome() {
             playSound('click');
             gameState.isPlaying = false;
+            
+            // 일반 게임 모드 및 히든 모드 타이머 모두 확실하게 정지
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
+            if (hiddenTimer) {
+                clearInterval(hiddenTimer);
+                hiddenTimer = null;
+            }
+
+            document.body.classList.remove('hidden-universe-theme');
+            stopHiddenBgm();
+
             showScreen('screen-menu');
             checkAndUnlockHiddenMode();
             updateUIStats();
@@ -1600,23 +1610,24 @@
             }
         }
 
-        function exitHiddenMode() {
+function exitHiddenMode() {
+            // 💡 모든 히든 모드 타이머와 인터벌을 완전히 정지 및 초기화
             if (hiddenTimer) {
                 clearInterval(hiddenTimer);
                 hiddenTimer = null;
             }
             hiddenTimeLeft = 2.0;
+            hiddenCurrentIndex = 0;
+            hiddenSequence = [];
+            hiddenPlayerChoices = [];
 
             stopHiddenBgm(); 
             document.body.classList.remove('hidden-universe-theme');
-            goHome();
-        }
-
-        // 페이지 최초 로드 시 실행
-        window.addEventListener('DOMContentLoaded', () => {
-            updateEmojiButtonText();
-            updateUIStats();
+            
+            // 메인 화면으로 안전하게 복귀
+            showScreen('screen-menu');
             checkAndUnlockHiddenMode();
+            updateUIStats();
         });
     </script>
 </body>
