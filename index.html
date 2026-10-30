@@ -1643,8 +1643,6 @@ listEl.innerHTML = itemsData.map(item => {
         }
 
         function startHiddenTimer() {
-            // 💡 [핵심 수정] 기본 2.5초 + (현재 순서 개수 - 5) * 0.5초 또는 개당 0.5초 비례 계산
-            // 예: 5개일 때 2.5초, 6개일 때 3.0초, 7개일 때 3.5초...
             let targetDuration = 2500 + (hiddenSequence.length - 5) * 500;
             
             hiddenTimeLeft = targetDuration / 1000;
@@ -1668,9 +1666,8 @@ listEl.innerHTML = itemsData.map(item => {
                 if (elapsed >= targetDuration) {
                     clearInterval(hiddenTimer);
                     playSound('fail');
-                    // 💡 시간 초과 시 alert 창 없이 곧바로 결과 화면으로 이동
                     triggerHiddenGameOver();
-                }}
+                }
             }, 50); 
         }
         function triggerHiddenGameOver() {
