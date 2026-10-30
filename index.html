@@ -53,6 +53,11 @@
         </div>
         <!-- 우측 버튼 그룹 -->
         <div class="flex items-center space-x-1.5 shrink-0">
+            <!-- 동물 이모티콘 개수 모드 토글 버튼 -->
+            <button onclick="toggleEmojiCountMode()" id="emoji-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1" title="이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)">
+                <span>🔢</span>
+                <span id="emoji-mode-text">동물개수ON</span>
+            </button>
             <button onclick="toggleLanguage()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-white/30 shadow flex items-center space-x-1">
                 <span>🌐</span>
                 <span id="lang-btn-text">EN</span>
@@ -383,36 +388,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 캐릭터 데이터 정의 (유령 스킨: 가위=👻👻, 주먹=👻, 보=👻👻👻)
+        // 캐릭터 데이터 정의
         const charactersData = [
-            { 
-                id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150,
-                hands: { scissor: '✌️', rock: '✊', paper: '🖐️' } 
-            },
-            { 
-                id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200,
-                hands: { scissor: '👻👻', rock: '👻', paper: '👻👻👻' } 
-            }
+            { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0 },
+            { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0 },
+            { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50 },
+            { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80 },
+            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120 },
+            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150 },
+            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200 }
         ];
 
         const itemsData = [
@@ -427,6 +411,24 @@
             hasShield: false
         };
 
+        // 이모티콘 개수 모드 토글 상태 (true: 가위=개수2개, 주먹=개수1개, 보=개수3개 / false: 기본 ✌️✊🖐️)
+        let isEmojiCountMode = true;
+
+        function toggleEmojiCountMode() {
+            isEmojiCountMode = !isEmojiCountMode;
+            playSound('click');
+            const btnText = document.getElementById('emoji-mode-text');
+            const btn = document.getElementById('emoji-mode-btn');
+            if (isEmojiCountMode) {
+                btnText.innerText = currentLang === 'ko' ? '동물개수ON' : 'Count ON';
+                btn.className = "bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1";
+            } else {
+                btnText.innerText = currentLang === 'ko' ? '기본손ON' : 'Default ON';
+                btn.className = "bg-gray-600 hover:bg-gray-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs sm:text-sm backdrop-blur-sm transition border border-gray-400 shadow flex items-center space-x-1";
+            }
+            updateUIStats();
+        }
+
         function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
         function addUserPoints(amount) {
             let pts = getUserPoints() + amount;
@@ -435,11 +437,6 @@
         }
         function getCurrentCharEmoji() { return localStorage.getItem('frog_friends_equipped_char') || '🐸'; }
 
-        function getCurrentCharObj() {
-            const emoji = getCurrentCharEmoji();
-            return charactersData.find(c => c.emoji === emoji) || charactersData[0];
-        }
-
         function updateUIStats() {
             const pts = getUserPoints();
             document.getElementById('user-points').innerText = `${pts} 💰 P`;
@@ -447,10 +444,10 @@
             document.getElementById('header-char-avatar').innerText = currentChar;
             document.getElementById('card-char-display').innerText = currentChar;
             
-            const charObj = getCurrentCharObj();
-            document.getElementById('btn-scissor-emoji').innerText = charObj.hands.scissor;
-            document.getElementById('btn-rock-emoji').innerText = charObj.hands.rock;
-            document.getElementById('btn-paper-emoji').innerText = charObj.hands.paper;
+            const hands = getHandsForCurrentChar();
+            document.getElementById('btn-scissor-emoji').innerText = hands.scissor.emoji;
+            document.getElementById('btn-rock-emoji').innerText = hands.rock.emoji;
+            document.getElementById('btn-paper-emoji').innerText = hands.paper.emoji;
         }
 
         const synth = new Tone.Synth().toDestination();
@@ -497,14 +494,12 @@
             const shieldDisplay = document.getElementById('active-buff-display');
             const charEmoji = getCurrentCharEmoji();
 
-            // 스킨별 패시브 효과 적용 (유령: 👻 = 보호막 + 앰플 / 유니콘: 🦄 = 보호막 / 로봇: 🤖 = 앰플)
             let applyShield = (mode.includes('infinite') && ((items['shield'] && items['shield'] > 0) || charEmoji === '🦄' || charEmoji === '👻'));
             let applyAmp = ((mode === 'timeattack' || mode === 'timeattack_hard') && ((items['time_minus'] && items['time_minus'] > 0) || charEmoji === '🤖' || charEmoji === '👻'));
 
             if (applyShield) {
                 gameState.hasShield = true;
                 shieldDisplay.classList.remove('hidden');
-                // 인벤토리 아이템을 쓴 게 아니라 캐릭터 패시브인 경우엔 차감하지 않음
                 if (items['shield'] && items['shield'] > 0 && charEmoji !== '🦄' && charEmoji !== '👻') {
                     items['shield']--;
                     localStorage.setItem('frog_friends_items', JSON.stringify(items));
@@ -546,12 +541,22 @@
         const handKeys = ['scissor', 'rock', 'paper'];
 
         function getHandsForCurrentChar() {
-            const charObj = getCurrentCharObj();
-            return {
-                'scissor': { emoji: charObj.hands.scissor, beats: 'paper', losesTo: 'rock' },
-                'rock': { emoji: charObj.hands.rock, beats: 'scissor', losesTo: 'paper' },
-                'paper': { emoji: charObj.hands.paper, beats: 'rock', losesTo: 'scissor' }
-            };
+            const charEmoji = getCurrentCharEmoji();
+            if (isEmojiCountMode) {
+                // 가위=2개, 주먹=1개, 보=3개 형식
+                return {
+                    'scissor': { emoji: charEmoji + charEmoji, beats: 'paper', losesTo: 'rock' },
+                    'rock': { emoji: charEmoji, beats: 'scissor', losesTo: 'paper' },
+                    'paper': { emoji: charEmoji + charEmoji + charEmoji, beats: 'rock', losesTo: 'scissor' }
+                };
+            } else {
+                // 기본 손 모양 스타일 (✌️, ✊, 🖐️)
+                return {
+                    'scissor': { emoji: '✌️', beats: 'paper', losesTo: 'rock' },
+                    'rock': { emoji: '✊', beats: 'scissor', losesTo: 'paper' },
+                    'paper': { emoji: '🖐️', beats: 'rock', losesTo: 'scissor' }
+                };
+            }
         }
 
         function nextRound() {
@@ -712,7 +717,7 @@
                         gameState.startTime -= 500;
                     }
                 } else {
-                    feedbackEl.innerHTML = `<span class="text-amber-500">${translations[currentLang].msgDraw}</span>`;
+                    feedbackEl.innerHTML = `<span class="text-amber-500 font-bold">${translations[currentLang].msgDraw}</span>`;
                     if (gameState.mode === 'timeattack' || gameState.mode === 'timeattack_hard') {
                         gameState.startTime -= 500;
                     }
@@ -1005,7 +1010,7 @@
         function openShopModal() {
             playSound('click');
             renderShopContent();
-            document.getElementById('modal-shop').classList.remove('hidden');
+            document.getElementById('modal-shop').classList.add('hidden');
         }
 
         function renderShopContent() {
@@ -1162,7 +1167,6 @@
                     btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
                 }
             });
-            renderRankingList();
         }
 
         function switchRankingTab(tab) {
