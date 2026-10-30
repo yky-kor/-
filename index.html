@@ -379,9 +379,12 @@ let achievements = [
             document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
-            });
+    // 만약 버튼이 히든 모드로 변신한 상태라면 언어 변경에 의해 덮어씌워지지 않도록 건너뜁니다!
+    if (el.id === 'achievement-btn' && el.dataset.mode === 'hidden') return;
+
+    const key = el.getAttribute('data-i18n');
+    if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
+});
 
             const homeBtnText = document.getElementById('home-btn-text');
             if (homeBtnText) { homeBtnText.innerText = translations[currentLang].goHomeMenu; }
@@ -1368,18 +1371,21 @@ let achievements = [
             const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
 
             if (allCompleted && achievementBtn) {
-                if (achievementBtn.dataset.mode !== 'hidden') {
-                    achievementBtn.dataset.mode = 'hidden';
-                    achievementBtn.className = 'flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition animate-pulse';
-                    achievementBtn.innerHTML = `🌌 <span data-i18n="hiddenBtn">신들의 영역 (히든 모드)</span>`;
-                    achievementBtn.onclick = () => startHiddenMode();
+    if (achievementBtn.dataset.mode !== 'hidden') {
+        achievementBtn.dataset.mode = 'hidden';
+        achievementBtn.className = 'flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] rounded-xl shadow transition animate-pulse';
+        
+        // 👇 이 부분이 핵심입니다! 버튼을 누를 때 startHiddenMode가 실행되도록 설정합니다.
+        achievementBtn.onclick = () => startHiddenMode();
+        
+        achievementBtn.innerHTML = `🌌 <span data-i18n="hiddenBtn">신들의 영역 (히든 모드)</span>`;
 
-                    if (!localStorage.getItem(hiddenUnlockedKey)) {
-                        localStorage.setItem(hiddenUnlockedKey, 'true');
-                        showHiddenUnlockPopup();
-                    }
-                }
-            }
+        if (!localStorage.getItem(hiddenUnlockedKey)) {
+            localStorage.setItem(hiddenUnlockedKey, 'true');
+            showHiddenUnlockPopup();
+        }
+    }
+}
         }
 
         function showHiddenUnlockPopup() {
