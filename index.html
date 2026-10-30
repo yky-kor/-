@@ -930,6 +930,12 @@ hiddenExit: "Exit",
                 if (gameState.mode === 'timeattack_hard') {
                     checkMissionsProgress('timeattack_hard', 10);
                 }
+            } else if (gameState.mode === 'hidden') {
+                // 💡 히든 모드 결과 처리 추가
+                resultLabel.innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
+                finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '단계' : ' stages');
+                resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 도전 실패! 총 ${gameState.score}단계 달성` : `Realm Over! Total ${gameState.score} Stages`;
+                nameInputContainer.classList.remove('hidden');
             } else {
                 resultLabel.innerText = currentLang === 'ko' ? '연습 모드 획득 점수' : 'Practice Score';
                 finalScoreEl.innerText = gameState.score + (currentLang === 'ko' ? '점' : ' pts');
@@ -945,7 +951,8 @@ hiddenExit: "Exit",
                 'timeattack': currentLang === 'ko' ? '⏱️ 타임어택 모드' : '⏱️ Time Attack',
                 'timeattack_hard': currentLang === 'ko' ? '⚡ 타임어택 하드 모드' : '⚡ Time Attack Hard',
                 'infinite': currentLang === 'ko' ? '♾️ 무한 모드 (스피드)' : '♾️ Infinite (Speed)',
-                'infinite_hard': currentLang === 'ko' ? '🔥 무한 하드 모드' : '🔥 Infinite Hard'
+                'infinite_hard': currentLang === 'ko' ? '🔥 무한 하드 모드' : '🔥 Infinite Hard',
+                'hidden': currentLang === 'ko' ? '🌌 신들의 영역 (히든 모드)' : '🌌 Realm of Gods (Hidden)'
             };
             return map[gameState.mode] || 'Game Result';
         }
@@ -1668,8 +1675,7 @@ hiddenExit: "Exit",
             const finalScoreEl = document.getElementById('final-score');
             const cardModeName = document.getElementById('card-mode-name');
 
-            cardModeName.innerText = "🌌 신들의 영역 (히든 모드)";
-            // 💡 [수정] 랭킹 단위 변경
+            cardModeName.innerText = updateModeCardTitle();
             resultLabel.innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
             finalScoreEl.innerText = hiddenScore + (currentLang === 'ko' ? '단계' : ' stages');
             resultDesc.innerText = currentLang === 'ko' ? `신들의 영역 도전 실패! 총 ${hiddenScore}단계 달성` : `Realm Over! Total ${hiddenScore} Stages`;
