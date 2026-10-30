@@ -1575,7 +1575,9 @@ hiddenExit: "Exit",
             
             setHiddenButtonsEnabled(false); 
             let count = 2;
-            if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
+            
+            // 💡 [수정] 처음 시작할 때도 다국어 번역 함수를 사용하도록 수정
+            if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgMemory(count);
 
             if (memoTimer) {
                 clearInterval(memoTimer);
@@ -1583,17 +1585,17 @@ hiddenExit: "Exit",
             }
 
             memoTimer = setInterval(() => {
-    count--;
-    if (count > 0) {
-        if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgMemory(count);
-    } else {
-        clearInterval(memoTimer);
-        memoTimer = null;
-        if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgPlay;
-        setHiddenButtonsEnabled(true); 
-        startHiddenTimer(); 
-    }
-}, 1000);
+                count--;
+                if (count > 0) {
+                    if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgMemory(count);
+                } else {
+                    clearInterval(memoTimer);
+                    memoTimer = null;
+                    if (instructionEl) instructionEl.innerHTML = translations[currentLang].hiddenMsgPlay;
+                    setHiddenButtonsEnabled(true); 
+                    startHiddenTimer(); 
+                }
+            }, 1000);
         }
 
         function setHiddenButtonsEnabled(enabled) {
