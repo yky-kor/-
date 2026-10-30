@@ -678,13 +678,17 @@
         function toggleShieldAuto() {
             playSound('click');
             gameState.shieldAuto = !gameState.shieldAuto;
-            const btn = document.getElementById('shield-auto-btn');
-            if (gameState.shieldAuto) {
-                btn.innerText = "자동ON";
-                btn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition";
-            } else {
-                btn.innerText = "자동OFF";
-                btn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition";
+            
+            // 상점 화면의 버튼 동기화
+            const shopBtn = document.getElementById('shop-shield-auto-btn');
+            if (shopBtn) {
+                if (gameState.shieldAuto) {
+                    shopBtn.innerText = "자동ON";
+                    shopBtn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
+                } else {
+                    shopBtn.innerText = "자동OFF";
+                    shopBtn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2";
+                }
             }
         }
         function playerChoice(choiceKey) {
@@ -1107,12 +1111,20 @@
                     const desc = currentLang === 'ko' ? item.descKo : item.descEn;
                     const count = items[item.id] || 0;
 
+                    // 보호막 아이템(shield)인 경우에만 보유 개수 옆에 자동 사용 버튼 추가
+                    let extraHtml = '';
+                    if (item.id === 'shield') {
+                        const autoText = gameState.shieldAuto ? "자동ON" : "자동OFF";
+                        const autoClass = gameState.shieldAuto ? "bg-green-600 text-white" : "bg-gray-400 text-white";
+                        extraHtml = ` <button onclick="toggleShieldAuto()" id="shop-shield-auto-btn" class="${autoClass} px-2 py-0.5 rounded-lg text-[11px] font-bold shadow transition ml-2">${autoText}</button>`;
+                    }
+
                     return `
                         <div class="flex items-center justify-between p-2.5 rounded-xl bg-gray-50">
                             <div>
                                 <div class="font-bold text-gray-800">${name} <span class="text-xs text-amber-600">(${item.price}P)</span></div>
                                 <div class="text-gray-500 text-[11px] mb-1">${desc}</div>
-                                <div class="text-xs text-indigo-600 font-bold">${translations[currentLang].itemOwned(count)}</div>
+                                <div class="text-xs text-indigo-600 font-bold flex items-center">${translations[currentLang].itemOwned(count)}${extraHtml}</div>
                             </div>
                             <div>
                                 <button onclick="buyItem('${item.id}', ${item.price})" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs">${translations[currentLang].buyBtn(item.price)}</button>
