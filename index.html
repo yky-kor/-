@@ -1795,7 +1795,6 @@ let isSoundOn = true;
                 hiddenPlayerChoices.push(playerChoiceIndex); 
                 hiddenCurrentIndex++;
                 
-                // 💡 [수정] 5개가 아니라 현재 시퀀스 길이 전체를 다 맞혔을 때 다음 단계로 연쇄 진입!
                 if (hiddenCurrentIndex >= hiddenSequence.length) {
                     clearInterval(hiddenTimer);
                     playSound('reward');
