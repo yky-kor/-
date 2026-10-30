@@ -15,32 +15,32 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
         /* 우주/네온 반짝이는 테마 배경 연출 */
-body.hidden-universe-theme {
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
-    animation: neonGlowBackground 3s infinite alternate;
-}
+        body.hidden-universe-theme {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
+            animation: neonGlowBackground 3s infinite alternate;
+        }
 
-@keyframes neonGlowBackground {
-    0% { filter: hue-rotate(0deg) brightness(1); }
-    100% { filter: hue-rotate(60deg) brightness(1.2); box-shadow: inset 0 0 50px #ff00ff; }
-}
+        @keyframes neonGlowBackground {
+            0% { filter: hue-rotate(0deg) brightness(1); }
+            100% { filter: hue-rotate(60deg) brightness(1.2); box-shadow: inset 0 0 50px #ff00ff; }
+        }
 
-/* 해금 축하 팝업 스타일 */
-.hidden-popup-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 9999;
-}
-.hidden-popup-box {
-    background: #1a1a2e; border: 2px solid #00ffff; padding: 30px; border-radius: 15px;
-    text-align: center; color: white; box-shadow: 0 0 20px #00ffff;
-}
-.hidden-popup-box button {
-    margin-top: 15px; padding: 10px 20px; background: #ff00ff; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;
-}
+        /* 해금 축하 팝업 스타일 */
+        .hidden-popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .hidden-popup-box {
+            background: #1a1a2e; border: 2px solid #00ffff; padding: 30px; border-radius: 15px;
+            text-align: center; color: white; box-shadow: 0 0 20px #00ffff;
+        }
+        .hidden-popup-box button {
+            margin-top: 15px; padding: 10px 20px; background: #ff00ff; border: none; color: white; border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
 
-/* 히든모드 타이머 바 */
-.hidden-timer-bar { width: 100%; height: 8px; background: #444; border-radius: 4px; overflow: hidden; margin: 15px 0; }
-#hidden-progress { height: 100%; background: #00ffff; transition: width 0.1s linear; }
+        /* 히든모드 타이머 바 */
+        .hidden-timer-bar { width: 100%; height: 8px; background: #444; border-radius: 4px; overflow: hidden; margin: 15px 0; }
+        #hidden-progress { height: 100%; background: #00ffff; transition: width 0.1s linear; }
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body { font-family: 'Jua', sans-serif; }
         .game-bg { background: linear-gradient(135deg, #22c55e 0%, #1d4ed8 100%); }
@@ -136,15 +136,15 @@ body.hidden-universe-theme {
                 <button onclick="openMissionModal()" class="py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🎯 <span data-i18n="missionBtn">미션</span>
                 </button>
-                <button onclick="openAchievementModal()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
+                <button id="achievement-btn" onclick="openAchievementModal()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🏅 <span data-i18n="achievementBtn">도전과제</span>
                 </button>
                 <button onclick="openShopModal()" class="py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🛍️ <span data-i18n="shopBtn">상점</span>
                 </button>
-               <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95"> 
-    🏆 <span data-i18n="rankingBtn"> 랭킹 </span> 
-</button>
+                <button onclick="showRanking()" class="py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95"> 
+                    🏆 <span data-i18n="rankingBtn">랭킹</span> 
+                </button>
             </div>
         </div>
 
@@ -155,9 +155,9 @@ body.hidden-universe-theme {
                     <span>🏠</span> <span id="home-btn-text" data-i18n="goHomeMenu">메인으로</span>
                 </button>
                 <div id="active-buff-display" class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-1 rounded-xl hidden flex items-center space-x-1.5">
-    <span>🛡️ 보호막 (<span id="shield-count">0</span>)</span>
-    <button onclick="toggleShieldAuto()" id="shield-auto-btn" class="bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition">자동ON</button>
-</div>
+                    <span>🛡️ 보호막 (<span id="shield-count">0</span>)</span>
+                    <button onclick="toggleShieldAuto()" id="shield-auto-btn" class="bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition">자동ON</button>
+                </div>
             </div>
             <div class="w-full flex justify-between items-center mb-2 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
@@ -289,8 +289,6 @@ body.hidden-universe-theme {
 
     <!-- 자바스크립트 게임 로직 -->
     <script>
-        // 도전과제 모두 완료 체크 및 버튼 변형 / 최초 해금 축하 팝업 처리
-
         const translations = {
             ko: {
                 title: "🐸 청개구리 가위바위보", subtitle: "컴퓨터에게 져야만 점수를 얻는 반대로 게임!",
@@ -411,26 +409,13 @@ body.hidden-universe-theme {
         }
 
         function goHome() {
-    playSound('click');
-    gameState.isPlaying = false;
-    clearInterval(gameState.timer);
-    clearInterval(gameState.stopwatchTimer);
-    showScreen('screen-menu');
-    
-    // 👇 이 줄을 추가해 주세요!
-    checkAndUnlockHiddenMode();
-    
-    updateUIStats();
-}
-
-// 페이지가 처음 켜졌을 때도 검사하도록 추가
-window.addEventListener('DOMContentLoaded', () => {
-    updateEmojiButtonText();
-    updateUIStats();
-    
-    // 👇 이 줄을 추가해 주세요!
-    checkAndUnlockHiddenMode();
-});
+            playSound('click');
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            clearInterval(gameState.stopwatchTimer);
+            showScreen('screen-menu');
+            checkAndUnlockHiddenMode();
+            updateUIStats();
         }
 
         function updateModeLabel() {
@@ -457,7 +442,6 @@ window.addEventListener('DOMContentLoaded', () => {
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 캐릭터 데이터 반영: 사자/공룡(500P, 보호막1), 유니콘(보호막2개), 로봇(앰플 + 보호막1), 유령(앰플 + 보호막2)
         const charactersData = [
             { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0, shieldCount: 0, descKo: '기본 캐릭터', descEn: 'Default Character' },
             { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0, shieldCount: 0, descKo: '귀여운 아기 고양이', descEn: 'Cute Baby Cat' },
@@ -466,7 +450,9 @@ window.addEventListener('DOMContentLoaded', () => {
             { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000, shieldCount: 2, descKo: '🛡️ 보호막 2개!', descEn: '🛡️ 2 Shields!' },
             { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000, shieldCount: 1, descKo: '⏱️ 타임어택 -2초 앰플 + 🛡️ 보호막 1개!', descEn: '⏱️ TA -2s Booster + 🛡️ 1 Shield!' },
             { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000, shieldCount: 2, descKo: '🛡️ 보호막 2개 + ⏱️ 타임어택 -2초 앰플!', descEn: '🛡️ 2 Shields + ⏱️ TA -2s Booster!' }
-        ];const itemsData = [
+        ];
+
+        const itemsData = [
             { id: 'shield', nameKo: '🛡️ 실수 방어 보호막', nameEn: '🛡️ Mistake Shield', descKo: '무한 모드에서 오답/시간초과 1회 방어', descEn: 'Block 1 mistake/timeout in Infinite', price: 40 },
             { id: 'time_minus', nameKo: '⏱️ 타임어택 -2초 앰플', nameEn: '⏱️ TA -2s Booster', descKo: '타임어택 시작 시 기록 2초 보정(할인)', descEn: 'Start TA with 2s bonus deduction', price: 30 }
         ];
@@ -718,11 +704,10 @@ window.addEventListener('DOMContentLoaded', () => {
             area.appendChild(el);
             setTimeout(() => el.remove(), 600);
         }
+
         function toggleShieldAuto() {
             playSound('click');
             gameState.shieldAuto = !gameState.shieldAuto;
-            
-            // 상점 화면의 버튼 동기화
             const shopBtn = document.getElementById('shop-shield-auto-btn');
             if (shopBtn) {
                 if (gameState.shieldAuto) {
@@ -734,6 +719,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
         function playerChoice(choiceKey) {
             if (!gameState.isPlaying) return;
             clearInterval(gameState.timer);
@@ -829,7 +815,6 @@ window.addEventListener('DOMContentLoaded', () => {
             clearInterval(gameState.stopwatchTimer);
             showScreen('screen-result');
 
-            // 미션: 모드 상관없이 게임 5회 완주 기록
             checkMissionsProgress('any_game_play', 1);
 
             const nameInputContainer = document.getElementById('name-input-container');
@@ -906,15 +891,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 statusEl.innerHTML = translations[currentLang].attendanceReward(count);
                 checkMissionsProgress('attendance', 1);
             }
-            document.getElementById('modal-attendance').classList.add('hidden');
+            document.getElementById('modal-attendance').classList.remove('hidden');
         }
+
         function closeAttendanceModal() {
             playSound('click');
             document.getElementById('modal-attendance').classList.add('hidden');
             updateUIStats();
         }
 
-        // 일일 미션 목록 (무한하드 1회 완주, 모드 상관없이 5회 완주 추가)
         const dailyMissionsData = [
             { id: 'mission_login', titleKo: '📅 매일 출석하기', titleEn: '📅 Daily Attendance', reward: 20, goal: 1, type: 'attendance' },
             { id: 'mission_inf5', titleKo: '♾️ 무한 모드 5점 달성', titleEn: '♾️ Reach 5 pts in Infinite', reward: 30, goal: 5, type: 'infinite' },
@@ -1006,7 +991,6 @@ window.addEventListener('DOMContentLoaded', () => {
             updateUIStats();
         }
 
-        // 도전과제 목록 (무한 60점, 100점 / 타임어택 5초 이내 추가)
         const achievementsData = {
             infinite: [
                 { id: 'inf_5', titleKo: '🌱 초보 청개구리', titleEn: '🌱 Beginner Frog', descKo: '무한 모드에서 5점 달성하기', descEn: 'Reach 5 pts in Infinite Mode', reward: 30, check: (score) => score >= 5 },
@@ -1083,14 +1067,11 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         function closeAchievementModal() {
-    playSound('click');
-    document.getElementById('modal-achievement').classList.add('hidden');
-    
-    // 👇 이 줄을 추가해 주세요! (도전과제 창을 닫을 때 히든모드 조건 검사)
-    checkAndUnlockHiddenMode();
-    
-    updateUIStats();
-}
+            playSound('click');
+            document.getElementById('modal-achievement').classList.add('hidden');
+            checkAndUnlockHiddenMode();
+            updateUIStats();
+        }
 
         let currentShopTab = 'chars';
         function switchShopTab(tab) {
@@ -1199,6 +1180,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
         function buyChar(charId, price) {
             const pts = getUserPoints();
             if (pts < price) { alert(translations[currentLang].notEnoughPts); return; }
@@ -1366,13 +1348,8 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            updateEmojiButtonText();
-            updateUIStats();
-        });
 
-
-// --- [히든 모드 관련 로직 및 변수] ---
+        // --- [히든 모드 관련 로직 및 변수] ---
         let hiddenTimer = null;
         let hiddenTimeLeft = 2.0;
         let hiddenSequence = []; 
@@ -1390,7 +1367,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
                     achievementBtn.onclick = () => startHiddenMode();
 
-                    // 최초 해금 시 팝업 1회 노출
                     if (!localStorage.getItem(hiddenUnlockedKey)) {
                         localStorage.setItem(hiddenUnlockedKey, 'true');
                         showHiddenUnlockPopup();
@@ -1422,7 +1398,7 @@ window.addEventListener('DOMContentLoaded', () => {
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
             for(let i=0; i<5; i++) {
-                hiddenSequence.push(Math.floor(Math.random() * 3)); // 0: 가위, 1: 바위, 2: 보
+                hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
             startHiddenTimer();
@@ -1476,7 +1452,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
         function checkHiddenPlayerChoice(playerChoice) {
             const computerVal = hiddenSequence[hiddenCurrentIndex];
-            // 청개구리 룰: 컴퓨터를 '이기는' 선택을 해야 정답 (가위>보, 바위>가위, 보>바위)
             const isWinAgainstComputer = (playerChoice === 0 && computerVal === 2) ||
                                          (playerChoice === 1 && computerVal === 0) ||
                                          (playerChoice === 2 && computerVal === 1);
@@ -1502,6 +1477,13 @@ window.addEventListener('DOMContentLoaded', () => {
             document.body.classList.remove('hidden-universe-theme');
             goHome();
         }
+
+        // 페이지 최초 로드 시 실행
+        window.addEventListener('DOMContentLoaded', () => {
+            updateEmojiButtonText();
+            updateUIStats();
+            checkAndUnlockHiddenMode();
+        });
     </script>
 </body>
 </html>
