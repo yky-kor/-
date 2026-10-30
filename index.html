@@ -1804,11 +1804,11 @@ let isSoundOn = true;
                     hiddenMaxSteps += 1;       // 다음 판엔 순서 개수 1개 추가!
                     
                     const instructionEl = document.getElementById('hidden-instruction-msg');
-if (instructionEl) {
-    instructionEl.innerHTML = currentLang === 'ko' 
-        ? `🎉 성공! 다음 단계로 진입합니다! (${hiddenScore}단계 달성)` 
-        : `🎉 Success! Next Stage! (${hiddenScore} Stages)`;
-}
+                    if (instructionEl) {
+                        instructionEl.innerHTML = currentLang === 'ko' 
+                            ? `🎉 성공! 다음 단계로 진입합니다! (${hiddenScore}단계 달성)` 
+                            : `🎉 Success! Next Stage! (${hiddenScore} Stages)`;
+                    }
                     
                     setHiddenButtonsEnabled(false);
                     setTimeout(() => {
@@ -1820,11 +1820,9 @@ if (instructionEl) {
             } else {
                 clearInterval(hiddenTimer);
                 playSound('fail');
-                // 💡 alert 창을 띄우지 않고 곧바로 결과 화면(랭킹 등록 창)으로 이동
                 triggerHiddenGameOver(); 
             }
         }
-
 function exitHiddenMode() {
             // 💡 대기 타이머(memoTimer)와 게임 타이머(hiddenTimer) 모두 확실하게 정지 및 초기화
             if (memoTimer) {
