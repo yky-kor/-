@@ -234,7 +234,7 @@
             <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 영역</div>
             <div id="hidden-seq-display" class="bg-gray-100 p-3 rounded-xl mb-3 text-sm w-full text-center">컴퓨터의 순서:<br><div id="hidden-seq-items" class="mt-1"></div></div>
             <div class="hidden-timer-bar w-full"><div id="hidden-progress"></div></div>
-            <div class="text-xs text-gray-500 mb-4 text-center">순서대로 컴퓨터에게 <b>'져야'</b> 하는 손을 내세요! (반대로 패배하기)</div>
+            <div id="hidden-instruction-msg" class="text-xs text-gray-500 mb-4 text-center font-bold">순서를 기억하세요! (2초 후 시작)</div>
             <div class="grid grid-cols-3 gap-2 w-full mb-3">
                 <button onclick="checkHiddenPlayerChoice(0)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100 flex flex-col items-center">
                     <span id="hidden-btn-scissor-emoji">✌️</span> <span class="text-xs" data-i18n="scissor">가위</span>
@@ -512,12 +512,10 @@
             
             const hands = getHandsForCurrentChar();
             
-            // 일반 게임 화면 손 이모티콘 업데이트
             document.getElementById('btn-scissor-emoji').innerText = hands.scissor.emoji;
             document.getElementById('btn-rock-emoji').innerText = hands.rock.emoji;
             document.getElementById('btn-paper-emoji').innerText = hands.paper.emoji;
 
-            // 💡 히든 모드 화면 손 이모티콘도 함께 2개/1개/3개 모양으로 연동 업데이트!
             const hs = document.getElementById('hidden-btn-scissor-emoji');
             const hr = document.getElementById('hidden-btn-rock-emoji');
             const hp = document.getElementById('hidden-btn-paper-emoji');
@@ -1129,7 +1127,7 @@
         function openShopModal() {
             playSound('click');
             renderShopContent();
-            document.getElementById('modal-shop').classList.remove('hidden');
+            document.getElementById('modal-shop').classList.add('hidden');
         }
 
         function renderShopContent() {
@@ -1393,6 +1391,8 @@
         let hiddenTimeLeft = 2.0;
         let hiddenSequence = []; 
         let hiddenCurrentIndex = 0; 
+        let hiddenBgmSynth = null;
+        let hiddenBgmLoop = null;
 
         function checkAndUnlockHiddenMode() {
             let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
@@ -1432,7 +1432,48 @@
         function startHiddenMode() {
             document.body.classList.add('hidden-universe-theme');
             showScreen('screen-hidden');
+            startHiddenBgm(); // 🌌 우주 배경음악 시작
             initHiddenRound();
+        }
+
+        // 🌌 우주 배경음악(BGM) 재생 함수
+        function startHiddenBgm() {
+            stopHiddenBgm();
+            try {
+                Tone.start();
+                // 몽환적인 신디사이저 패드 사운드 설정
+                hiddenBgmSynth = new Tone.Synth({
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.5, decay: 1, sustain: 0.8, release: 1 }
+                }).toDestination();
+                hiddenBgmSynth.volume.value = -12; // 소리 크기 적당히 조절
+
+                const notes = ["C3", "G3", "D4", "F4", "A4", "G4"];
+                let step = 0;
+                hiddenBgmLoop = new Tone.Loop(time => {
+                    if (isSoundOn) {
+                        hiddenBgmSynth.triggerAttackRelease(notes[step % notes.length], "2n", time);
+                        step++;
+                    }
+                }, "2n").start(0);
+
+                Tone.Transport.start();
+            } catch(e) {}
+        }
+
+        function stopHiddenBgm() {
+            try {
+                if (hiddenBgmLoop) {
+                    hiddenBgmLoop.stop();
+                    hiddenBgmLoop.dispose();
+                    hiddenBgmLoop = null;
+                }
+                if (hiddenBgmSynth) {
+                    hiddenBgmSynth.dispose();
+                    hiddenBgmSynth = null;
+                }
+                Tone.Transport.stop();
+            } catch(e) {}
         }
 
         function initHiddenRound() {
@@ -1442,7 +1483,34 @@
                 hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
-            startHiddenTimer();
+            
+            // 💡 2초 문제 인식 시간(기억 시간) 부여
+            const instructionEl = document.getElementById('hidden-instruction-msg');
+            const progressBar = document.getElementById('hidden-progress');
+            if (progressBar) progressBar.style.width = '100%';
+            
+            setHiddenButtonsEnabled(false); // 생각하는 동안 버튼 잠금
+            let count = 2;
+            if (instructionEl) instructionEl.innerHTML = `🧠 순서 기억 중... (${count}초)`;
+
+            let memoTimer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    if (instructionEl) instructionEl.innerHTML = `🧠 순서 기억 중... (${count}초)`;
+                } else {
+                    clearInterval(memoTimer);
+                    if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 <b>'져야'</b> 하는 손을 내세요!`;
+                    setHiddenButtonsEnabled(true); // 버튼 활성화
+                    startHiddenTimer(); // 본격 타이머 시작
+                }
+            }, 1000);
+        }
+
+        function setHiddenButtonsEnabled(enabled) {
+            const container = document.querySelector('#screen-hidden .grid');
+            if (!container) return;
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = !enabled);
         }
 
         function renderHiddenUI() {
@@ -1485,7 +1553,6 @@
             const hands = getHandsForCurrentChar();
             const comHandKey = handKeys[computerVal];
             
-            // 💡 청개구리 룰 적용: 컴퓨터를 '이기는' 손이 아니라 컴퓨터에게 '지는' 손을 내야 성공!
             const isUserLossAgainstComputer = (playerChoice === hands[comHandKey].beats);
 
             if (isUserLossAgainstComputer) {
@@ -1506,6 +1573,7 @@
 
         function exitHiddenMode() {
             clearInterval(hiddenTimer);
+            stopHiddenBgm(); // 🌌 우주 배경음악 정지
             document.body.classList.remove('hidden-universe-theme');
             goHome();
         }
