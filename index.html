@@ -1488,17 +1488,18 @@
         function initHiddenRound() {
             hiddenCurrentIndex = 0;
             hiddenSequence = [];
-            hiddenPlayerChoices = []; // 라운드 초기화 시 기록도 리셋
+            hiddenPlayerChoices = []; // 내가 낸 정답 기록 리셋
             for(let i=0; i<5; i++) {
                 hiddenSequence.push(Math.floor(Math.random() * 3));
             }
             renderHiddenUI();
             
+            // 💡 2초 문제 기억 대기 시간 복구!
             const instructionEl = document.getElementById('hidden-instruction-msg');
             const progressBar = document.getElementById('hidden-progress');
             if (progressBar) progressBar.style.width = '100%';
             
-            setHiddenButtonsEnabled(false);
+            setHiddenButtonsEnabled(false); // 생각하는 동안 버튼 잠금
             let count = 2;
             if (instructionEl) instructionEl.innerHTML = `순서 기억 중... (${count}초)`;
 
@@ -1509,8 +1510,8 @@
                 } else {
                     clearInterval(memoTimer);
                     if (instructionEl) instructionEl.innerHTML = `순서대로 컴퓨터에게 져야 하는 손을 내세요!`;
-                    setHiddenButtonsEnabled(true);
-                    startHiddenTimer();
+                    setHiddenButtonsEnabled(true); // 버튼 활성화
+                    startHiddenTimer(); // 2초 대기가 끝나면 5문제 전체 제한 타이머 시작!
                 }
             }, 1000);
         }
