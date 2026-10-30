@@ -614,11 +614,17 @@ startBgm('menu'); // 💡 메인 화면 BGM 재생
             if (!isSoundOn) return;
             try {
                 Tone.start();
-                if (type === 'success') synth.triggerAttackRelease("C5", "8n");
+                if (type === 'success') synth.triggerAttackRelease("G5", "16n"); // 더 높은 음과 짧은 박자
+else if (type === 'reward') {
+    // 보상 받을 때 딩가딩딩 올라가는 화음 효과
+    synth.triggerAttackRelease("C5", "16.n");
+    setTimeout(() => synth.triggerAttackRelease("E5", "16.n"), 100);
+    setTimeout(() => synth.triggerAttackRelease("G5", "8n"), 200);
+}
                 else if (type === 'fail') synth.triggerAttackRelease("C3", "8n");
                 else if (type === 'click') synth.triggerAttackRelease("G4", "32n");
                 else if (type === 'combo') synth.triggerAttackRelease("E5", "16n");
-                else if (type === 'reward') synth.triggerAttackRelease("E6", "8n");
+                
             } catch(e) {}
         }
 
@@ -1456,9 +1462,9 @@ let isSoundOn = true;
                 let tempo = "4n";
 
                 if (modeType === 'menu') {
-                    // 메인 화면: 밝고 경쾌한 멜로디
-                    notes = ["C4", "E4", "G4", "B4", "C5", "G4", "E4", "G4"];
-                    tempo = "4n";
+    notes = ["C5", "E5", "G5", "C6", "G5", "E5", "C5", "G5"]; // 높은 옥타브의 통통 튀는 음계
+    tempo = "8n"; // 템포를 더 빠르게 (8분음표)
+}
                 } else if (modeType === 'hard') {
                     // 하드/인피니트 하드: 긴장감 넘치는 빠른 멜로디
                     notes = ["C3", "D#3", "G3", "C4", "B3", "G3", "D#3", "F3"];
