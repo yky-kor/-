@@ -228,7 +228,19 @@
             <div id="ranking-list" class="w-full max-h-44 overflow-y-auto divide-y divide-gray-100 mb-3 text-xs"></div>
             <button onclick="goHome()" class="w-full py-2.5 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow text-xs" data-i18n="goHome">메인으로 돌아가기</button>
         </div>
-
+<!-- 5. 히든 모드 화면 (신들의 영역) -->
+        <div id="screen-hidden" class="w-full flex flex-col items-center hidden py-2">
+            <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 영역</div>
+            <div id="hidden-seq-display" class="bg-gray-100 p-3 rounded-xl mb-3 text-sm w-full text-center">컴퓨터의 순서:<br><div id="hidden-seq-items" class="mt-1"></div></div>
+            <div class="hidden-timer-bar w-full"><div id="hidden-progress"></div></div>
+            <div class="text-xs text-gray-500 mb-4 text-center">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
+            <div class="grid grid-cols-3 gap-2 w-full mb-3">
+                <button onclick="checkHiddenPlayerChoice(0)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100 flex flex-col items-center">✌️ <span class="text-xs">가위</span></button>
+                <button onclick="checkHiddenPlayerChoice(1)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100 flex flex-col items-center">✊ <span class="text-xs">바위</span></button>
+                <button onclick="checkHiddenPlayerChoice(2)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100 flex flex-col items-center">🖐️ <span class="text-xs">보</span></button>
+            </div>
+            <button onclick="exitHiddenMode()" class="text-xs text-red-500 underline cursor-pointer">나가기</button>
+        </div>
     </main>
 
     <!-- 모달들 -->
@@ -522,11 +534,12 @@ let achievements = [
         }
 
         function showScreen(screenId) {
-            ['screen-menu', 'screen-game', 'screen-result', 'screen-ranking'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(screenId).classList.remove('hidden');
-        }
+    // 💡 screen-hidden 도 숨김 목록에 추가합니다.
+    ['screen-menu', 'screen-game', 'screen-result', 'screen-ranking', 'screen-hidden'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById(screenId).classList.remove('hidden');
+}
 
         function startGame(mode) {
             playSound('click');
@@ -1366,27 +1379,27 @@ let achievements = [
         let hiddenCurrentIndex = 0; 
 
         function checkAndUnlockHiddenMode() {
-            const allCompleted = achievements.every(ach => ach.completed === true);
-            const achievementBtn = document.getElementById('achievement-btn');
-            const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
+    // 플레이어가 실제로 달성한 과제 목록을 확인합니다 (예시로 획득한 과제가 일정 개수 이상일 때 해금)
+    let claimed = JSON.parse(localStorage.getItem('frog_friends_claimed_achievements') || '{}');
+    const allCompleted = Object.keys(claimed).length >= 5; // 예: 도전과제 5개 이상 클리어 시
+    
+    const achievementBtn = document.getElementById('achievement-btn');
+    const hiddenUnlockedKey = 'frog_hidden_mode_unlocked_shown';
 
-            if (allCompleted && achievementBtn) {
-    if (achievementBtn.dataset.mode !== 'hidden') {
-        achievementBtn.dataset.mode = 'hidden';
-        achievementBtn.className = 'flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] rounded-xl shadow transition animate-pulse';
-        
-        // 👇 이 부분이 핵심입니다! 버튼을 누를 때 startHiddenMode가 실행되도록 설정합니다.
-        achievementBtn.onclick = () => startHiddenMode();
-        
-        achievementBtn.innerHTML = `🌌 <span data-i18n="hiddenBtn">신들의 영역 (히든 모드)</span>`;
+    if (allCompleted && achievementBtn) {
+        if (achievementBtn.dataset.mode !== 'hidden') {
+            achievementBtn.dataset.mode = 'hidden';
+            achievementBtn.className = 'py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] rounded-xl shadow transition animate-pulse';
+            achievementBtn.onclick = () => startHiddenMode();
+            achievementBtn.innerHTML = `🌌 <span data-i18n="hiddenBtn">신들의 영역 (히든 모드)</span>`;
 
-        if (!localStorage.getItem(hiddenUnlockedKey)) {
-            localStorage.setItem(hiddenUnlockedKey, 'true');
-            showHiddenUnlockPopup();
+            if (!localStorage.getItem(hiddenUnlockedKey)) {
+                localStorage.setItem(hiddenUnlockedKey, 'true');
+                showHiddenUnlockPopup();
+            }
         }
     }
 }
-        }
 
         function showHiddenUnlockPopup() {
             const popup = document.createElement('div');
@@ -1402,10 +1415,10 @@ let achievements = [
         }
 
         function startHiddenMode() {
-            document.body.classList.add('hidden-universe-theme');
-            showGameScreen(); 
-            initHiddenRound();
-        }
+    document.body.classList.add('hidden-universe-theme');
+    showScreen('screen-hidden'); // 💡 전용 히든 화면으로 전환
+    initHiddenRound();
+}
 
         function initHiddenRound() {
             hiddenCurrentIndex = 0;
@@ -1418,7 +1431,6 @@ let achievements = [
         }
 
         function renderHiddenUI() {
-            const gameArea = document.getElementById('screen-game'); 
             const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
             
             let seqHtml = hiddenSequence.map((val, idx) => {
@@ -1428,20 +1440,11 @@ let achievements = [
                 return `<span style="margin: 0 4px; ${style}">${symbols[val]}</span>`;
             }).join('');
 
-            gameArea.innerHTML = `
-                <div class="w-full text-center py-2">
-                    <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 영역</div>
-                    <div class="bg-gray-100 p-3 rounded-xl mb-3 text-sm">컴퓨터의 순서:<br><div class="mt-1">${seqHtml}</div></div>
-                    <div class="hidden-timer-bar"><div id="hidden-progress"></div></div>
-                    <div class="text-xs text-gray-500 mb-4">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="checkHiddenPlayerChoice(0)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">✌️ 가위</button>
-                        <button onclick="checkHiddenPlayerChoice(1)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">✊ 바위</button>
-                        <button onclick="checkHiddenPlayerChoice(2)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100">🖐️ 보</button>
-                    </div>
-                    <button onclick="exitHiddenMode()" class="mt-4 text-xs text-red-500 underline cursor-pointer">나가기</button>
-                </div>
-            `;
+            // HTML에 이미 만들어 둔 #screen-hidden 안의 순서 표시 영역만 깔끔하게 업데이트합니다.
+            const seqItemsEl = document.getElementById('hidden-seq-items');
+            if (seqItemsEl) {
+                seqItemsEl.innerHTML = seqHtml;
+            }
         }
 
         function startHiddenTimer() {
