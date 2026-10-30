@@ -127,9 +127,10 @@
                 <button onclick="goHome()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-3 py-1.5 rounded-xl text-sm transition shadow-sm flex items-center space-x-1">
                     <span>🏠</span> <span id="home-btn-text" data-i18n="goHomeMenu">메인으로</span>
                 </button>
-                <div id="active-buff-display" class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-xl hidden">
-                    🛡️ 보호막 ON (<span id="shield-count">0</span>)
-                </div>
+                <div id="active-buff-display" class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-1 rounded-xl hidden flex items-center space-x-1.5">
+    <span>🛡️ 보호막 (<span id="shield-count">0</span>)</span>
+    <button onclick="toggleShieldAuto()" id="shield-auto-btn" class="bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition">자동ON</button>
+</div>
             </div>
             <div class="w-full flex justify-between items-center mb-2 text-sm font-semibold text-gray-500 bg-gray-100 px-4 py-2 rounded-xl">
                 <span id="game-mode-label">모드</span>
@@ -431,7 +432,7 @@
             mode: 'practice', score: 0, round: 0, maxRounds: 10,
             isPlaying: false, comChoiceKey: '', timer: null, timeLeft: 100,
             startTime: 0, stopwatchTimer: null, elapsedSeconds: 0, streak: 0,
-            shieldsLeft: 0
+            shieldsLeft: 0, shieldAuto: true
         };
 
         function getUserPoints() { return parseInt(localStorage.getItem('frog_friends_points') || '0'); }
@@ -639,7 +640,7 @@
             setButtonsEnabled(false);
             
             const charObj = getCurrentCharObj();
-            if (gameState.shieldsLeft > 0 && (gameState.mode.includes('infinite'))) {
+            if (gameState.shieldsLeft > 0 && gameState.shieldAuto && (gameState.mode.includes('infinite'))) {
                 if (charObj.id !== 'unicorn') {
                     gameState.shieldsLeft--;
                 }
@@ -674,7 +675,18 @@
             area.appendChild(el);
             setTimeout(() => el.remove(), 600);
         }
-
+        function toggleShieldAuto() {
+            playSound('click');
+            gameState.shieldAuto = !gameState.shieldAuto;
+            const btn = document.getElementById('shield-auto-btn');
+            if (gameState.shieldAuto) {
+                btn.innerText = "자동ON";
+                btn.className = "bg-green-600 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition";
+            } else {
+                btn.innerText = "자동OFF";
+                btn.className = "bg-gray-400 text-white px-2 py-0.5 rounded-lg text-[11px] shadow transition";
+            }
+        }
         function playerChoice(choiceKey) {
             if (!gameState.isPlaying) return;
             clearInterval(gameState.timer);
@@ -721,7 +733,7 @@
                 }
             } else {
                 const charObj = getCurrentCharObj();
-                if (gameState.shieldsLeft > 0 && (gameState.mode.includes('infinite'))) {
+                if (gameState.shieldsLeft > 0 && gameState.shieldAuto && (gameState.mode.includes('infinite'))) {
                     if (charObj.id !== 'unicorn') {
                         gameState.shieldsLeft--;
                     }
