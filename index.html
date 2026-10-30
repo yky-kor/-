@@ -53,7 +53,7 @@
         </div>
         <!-- 하단 컨트롤 버튼 그룹 -->
         <div class="flex justify-end items-center space-x-1.5 w-full">
-            <button onclick="toggleEmojiCountMode()" id="emoji-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1" title="이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)">
+            <button onclick="toggleEmojiCountMode()" id="emoji-mode-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-purple-400 shadow flex items-center space-x-1" title="이모티콘 개수 스타일 전환">
                 <span>🔢</span>
                 <span id="emoji-mode-text">동물개수ON</span>
             </button>
@@ -343,7 +343,6 @@
             currentLang = currentLang === 'ko' ? 'en' : 'ko';
             document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
             
-            // 모든 일반 data-i18n 텍스트 번역
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
@@ -355,7 +354,6 @@
             if (nameInput) { nameInput.placeholder = translations[currentLang].namePlaceholder; }
             if (gameState.isPlaying) { updateModeLabel(); }
 
-            // 동물개수 / 기본손 토글 버튼 텍스트도 언어에 맞게 즉시 동기화!
             updateEmojiButtonText();
             
             if (!document.getElementById('modal-achievement').classList.contains('hidden')) { renderAchievements(); }
@@ -415,6 +413,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // 캐릭터 데이터에 고유 능력 설명(descKo, descEn) 추가 완료!
         const charactersData = [
             { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0, descKo: '기본 캐릭터', descEn: 'Default Character' },
             { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0, descKo: '귀여운 아기 고양이', descEn: 'Cute Baby Cat' },
@@ -1032,6 +1031,7 @@
                     const isUnlocked = unlockedChars.includes(c.id);
                     const isEquipped = (c.emoji === equippedCharEmoji);
                     const charName = currentLang === 'ko' ? c.name : c.nameEn;
+                    const charDesc = currentLang === 'ko' ? c.descKo : c.descEn;
 
                     let btnHtml = '';
                     if (isEquipped) {
@@ -1049,8 +1049,8 @@
                             <div class="flex items-center space-x-3">
                                 <span class="text-2xl">${c.emoji}</span>
                                 <div>
-                                    <div class="font-bold text-gray-800">${charName}</div>
-                                    <div class="text-gray-400 text-[11px]">${priceText}</div>
+                                    <div class="font-bold text-gray-800">${charName} <span class="text-[11px] text-purple-600 font-normal">(${priceText})</span></div>
+                                    <div class="text-indigo-600 text-[11px] font-semibold">${charDesc}</div>
                                 </div>
                             </div>
                             <div>${btnHtml}</div>
