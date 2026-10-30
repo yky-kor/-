@@ -474,7 +474,7 @@ autoOff: "Auto OFF",
             
             gameState.isPlaying = false;
             showScreen('screen-menu');
-startBgm('menu'); // 💡 메인 화면 BGM 재생
+
             // 일반 게임 모드 및 히든 모드 타이머 모두 확실하게 정지
             clearInterval(gameState.timer);
             clearInterval(gameState.stopwatchTimer);
@@ -1613,6 +1613,7 @@ let isSoundOn = true;
         function startHiddenMode() {
             document.body.classList.add('hidden-universe-theme');
             showScreen('screen-hidden');
+            stopBgm();
             startHiddenBgm(); 
             initHiddenRound();
             updateUIStats(); // 💡 진입 시 히든 모드 전용 이모지 강제 적용
@@ -1849,7 +1850,7 @@ function exitHiddenMode() {
             updateUIStats();
             checkAndUnlockHiddenMode();
             updateEmojiButtonText();
-            startBgm('menu');
+            
         });
     </script>
 </body>
