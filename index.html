@@ -136,7 +136,7 @@
                 <button onclick="openMissionModal()" class="py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🎯 <span data-i18n="missionBtn">미션</span>
                 </button>
-                <button id="achievement-btn" onclick="openAchievementModal()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
+                <button id="achievement-btn" onclick="startHiddenMode()" class="py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
                     🏅 <span data-i18n="achievementBtn">도전과제</span>
                 </button>
                 <button onclick="openShopModal()" class="py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold text-[11px] rounded-xl shadow transition transform active:scale-95">
@@ -1369,7 +1369,7 @@ let achievements = [
                 if (achievementBtn.dataset.mode !== 'hidden') {
                     achievementBtn.dataset.mode = 'hidden';
                     achievementBtn.className = 'flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition animate-pulse';
-                    achievementBtn.innerHTML = `🌌 신들의 역가위바위보 (히든 모드)`;
+                    achievementBtn.innerHTML = `🌌 신들의 영역 (히든 모드)`;
                     achievementBtn.onclick = () => startHiddenMode();
 
                     if (!localStorage.getItem(hiddenUnlockedKey)) {
@@ -1386,7 +1386,7 @@ let achievements = [
             popup.innerHTML = `
                 <div class="hidden-popup-box">
                     <h2 class="text-xl font-bold mb-2">🎉 축하합니다!</h2>
-                    <p class="text-sm mb-4">모든 도전과제 완료!<br><b>[히든 모드: 신들의 역가위바위보]</b>가 해금되었습니다!</p>
+                    <p class="text-sm mb-4">모든 도전과제 완료!<br><b>[히든 모드: 신들의 영역]</b>가 해금되었습니다!</p>
                     <button onclick="this.parentElement.parentElement.remove()" class="px-4 py-2 bg-pink-500 rounded-xl text-white font-bold">확인</button>
                 </div>
             `;
@@ -1422,7 +1422,7 @@ let achievements = [
 
             gameArea.innerHTML = `
                 <div class="w-full text-center py-2">
-                    <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 역가위바위보</div>
+                    <div class="text-lg font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 영역</div>
                     <div class="bg-gray-100 p-3 rounded-xl mb-3 text-sm">컴퓨터의 순서:<br><div class="mt-1">${seqHtml}</div></div>
                     <div class="hidden-timer-bar"><div id="hidden-progress"></div></div>
                     <div class="text-xs text-gray-500 mb-4">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
