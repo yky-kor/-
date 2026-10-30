@@ -296,9 +296,7 @@
                 shopTabChars: "캐릭터 상점", shopTabItems: "치트/버프 아이템",
                 itemUseBtn: "사용하기", itemOwned: (count) => `보유: ${count}개`,
                 shieldSaved: "🛡️ 보호막 발동! 실수가 방어되었습니다!",
-                emojiOnText: "동물개수ON", defaultOnText: "기본손ON",
-                emojiTooltipKo: "이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)",
-                emojiTooltipEn: "Toggle emoji count style (Scissor:2, Rock:1, Paper:3)"
+                emojiOnText: "동물개수ON", defaultOnText: "기본손ON"
             },
             en: {
                 title: "🐸 Reverse RPS", subtitle: "The opposite game: Lose to the computer to score!",
@@ -334,9 +332,7 @@
                 shopTabChars: "Characters", shopTabItems: "Buff Items",
                 itemUseBtn: "Use", itemOwned: (count) => `Owned: ${count}`,
                 shieldSaved: "🛡️ Shield Activated! Mistake blocked!",
-                emojiOnText: "Count ON", defaultOnText: "Default ON",
-                emojiTooltipKo: "이모티콘 개수 스타일 전환 (가위2, 주먹1, 보3)",
-                emojiTooltipEn: "Toggle emoji count style (Scissor:2, Rock:1, Paper:3)"
+                emojiOnText: "Count ON", defaultOnText: "Default ON"
             }
         };
 
@@ -375,8 +371,6 @@
                 btnText.innerText = translations[currentLang].defaultOnText;
                 btn.className = "bg-gray-600 hover:bg-gray-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs backdrop-blur-sm transition border border-gray-400 shadow flex items-center space-x-1";
             }
-            // 툴팁(마우스 오버 설명)도 언어에 맞게 즉시 변경!
-            btn.title = currentLang === 'ko' ? translations[currentLang].emojiTooltipKo : translations[currentLang].emojiTooltipEn;
         }
 
         function toggleEmojiCountMode() {
@@ -419,14 +413,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // 요청하신 가격 반영 (유니콘: 1000, 로봇: 1000, 유령: 2000)
         const charactersData = [
             { id: 'frog', name: '청개구리', nameEn: 'Frog', emoji: '🐸', price: 0, descKo: '기본 캐릭터', descEn: 'Default Character' },
             { id: 'cat', name: '아기 고양이', nameEn: 'Baby Cat', emoji: '🐱', price: 0, descKo: '귀여운 아기 고양이', descEn: 'Cute Baby Cat' },
             { id: 'lion', name: '용감한 사자', nameEn: 'Brave Lion', emoji: '🦁', price: 50, descKo: '용맹한 사자 스킨', descEn: 'Brave Lion Skin' },
             { id: 'dino', name: '초록 공룡', nameEn: 'Green Dino', emoji: '🦖', price: 80, descKo: '귀여운 공룡 스킨', descEn: 'Green Dino Skin' },
-            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 120, descKo: '🛡️ 무한모드 영구 보호막 능력!', descEn: '🛡️ Permanent Infinite Shield!' },
-            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 150, descKo: '⏱️ 타임어택 -2초 앰플 효과!', descEn: '⏱️ TA -2s Time Booster!' },
-            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 200, descKo: '🛡️보호막 + ⏱️타임어택 앰플 동시 적용!', descEn: '🛡️ Shield + ⏱️ TA Booster both!' }
+            { id: 'unicorn', name: '신비로운 유니콘', nameEn: 'Mystic Unicorn', emoji: '🦄', price: 1000, descKo: '🛡️ 무한모드 영구 보호막 능력!', descEn: '🛡️ Permanent Infinite Shield!' },
+            { id: 'robot', name: '꼬마 로봇', nameEn: 'Little Robot', emoji: '🤖', price: 1000, descKo: '⏱️ 타임어택 -2초 앰플 효과!', descEn: '⏱️ TA -2s Time Booster!' },
+            { id: 'ghost', name: '귀여운 유령', nameEn: 'Cute Ghost', emoji: '👻', price: 2000, descKo: '🛡️보호막 + ⏱️타임어택 앰플 동시 적용!', descEn: '🛡️ Shield + ⏱️ TA Booster both!' }
         ];
 
         const itemsData = [
@@ -1222,8 +1217,8 @@
 
                 if (currentRankingTab.includes('infinite')) {
                     rankings.sort((a, b) => b.score - a.score);
-                    rankings = rankings.slice(0, 10);
-                    rankingList.innerHTML = rankings.map((item, index) => `
+                    rankingList.items = rankings.slice(0, 10);
+                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-amber-50 font-bold text-amber-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
                                 <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
@@ -1237,8 +1232,7 @@
                     `).join('');
                 } else {
                     rankings.sort((a, b) => a.time - b.time);
-                    rankings = rankings.slice(0, 10);
-                    rankingList.innerHTML = rankings.map((item, index) => `
+                    rankingList.innerHTML = rankings.slice(0, 10).map((item, index) => `
                         <div class="flex justify-between items-center py-2 px-3 ${index === 0 ? 'bg-indigo-50 font-bold text-indigo-700 rounded-lg' : ''}">
                             <div class="flex items-center space-x-3">
                                 <span class="w-6 text-center">${index + 1}${(currentLang === 'ko' ? '위' : '')}</span>
