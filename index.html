@@ -1442,47 +1442,6 @@ function showHiddenUnlockPopup() {
     document.body.appendChild(popup);
 }
 
-function startHiddenMode() {
-    document.body.classList.add('hidden-universe-theme');
-    showGameScreen(); 
-    initHiddenRound();
-}
-
-function initHiddenRound() {
-    hiddenCurrentIndex = 0;
-    hiddenSequence = [];
-    for(let i=0; i<5; i++) {
-        hiddenSequence.push(Math.floor(Math.random() * 3));
-    }
-    renderHiddenUI();
-    startHiddenTimer();
-}
-
-function renderHiddenUI() {
-    const gameArea = document.getElementById('screen-game'); // 게임 화면 영역
-    const symbols = ['✌️ 가위', '✊ 바위', '🖐️ 보'];
-    
-    let seqHtml = hiddenSequence.map((val, idx) => {
-        let style = "";
-        if (idx < hiddenCurrentIndex) style = "color: gray; text-decoration: line-through;";
-        else if (idx === hiddenCurrentIndex) style = "color: #ff00ff; font-weight: bold; transform: scale(1.2);";
-        return `<span style="margin: 0 5px; ${style}">${symbols[val]}</span>`;
-    }).join(' ➔ ');
-
-    gameArea.innerHTML = `
-        <div class="w-full text-center py-4">
-            <div class="text-xl font-bold text-purple-600 mb-2">🌌 [히든 모드] 신들의 역가위바위보</div>
-            <div class="bg-gray-100 p-3 rounded-xl mb-3 text-sm">컴퓨터의 순서: [ ${seqHtml} ]</div>
-            <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden mb-3"><div id="hidden-progress" class="bg-cyan-500 h-full" style="width: 100%;"></div></div>
-            <div class="text-xs text-gray-500 mb-4">순서대로 컴퓨터를 '이기는' 손을 내세요! (반대로 져야 함)</div>
-            <div class="grid grid-cols-3 gap-3">
-                <button onclick="checkHiddenPlayerChoice(0)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">✌️ 가위</button>
-                <button onclick="checkHiddenPlayerChoice(1)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">✊ 바위</button>
-                <button onclick="checkHiddenPlayerChoice(2)" class="py-4 bg-gray-50 border rounded-2xl text-2xl">🖐️ 보</button>
-            </div>
-        </div>
-    `;
-}
 
 function startHiddenTimer() {
     hiddenTimeLeft = 2.0;
