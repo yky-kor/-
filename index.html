@@ -1448,7 +1448,7 @@ updateBestScore(`daily_${baseDbPath}`); // 👈 일간 랭킹 경로 추가
 
         function switchRankType(type) {
     const btnAll = document.getElementById('rank-type-all');
-    const btnDaily = document.getElementById('rank-type-daily'); // 주간(weekly)에서 일간(daily)으로 변경된 ID
+    const btnDaily = document.getElementById('rank-type-daily');
 
     if (type === 'all') {
         btnAll.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
@@ -1457,9 +1457,12 @@ updateBestScore(`daily_${baseDbPath}`); // 👈 일간 랭킹 경로 추가
         btnDaily.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
         btnAll.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
     }
-    currentRankType = type; // 'all' 또는 'daily'
-    loadRanking(currentRankingTab);
+    currentRankType = type; 
+
+    // 💡 버튼을 누르는 즉시 해당 랭킹 목록을 다시 불러옵니다!
+    renderRankingList();
 }
+
 
         function switchRankingTab(tab) {
     currentRankingTab = tab;
