@@ -245,7 +245,7 @@
                 <div id="hidden-player-answers" class="text-base font-bold flex justify-center space-x-2 min-h-[28px]"></div>
             </div>
             <div class="hidden-timer-bar w-full"><div id="hidden-progress"></div></div>
-            <div id="hidden-instruction-msg" class="text-xs text-gray-500 mb-4 text-center font-bold">순서를 기억하세요! (2초 후 시작)</div>
+            <div id="hidden-instruction-msg" class="text-xs text-gray-500 mb-4 text-center font-bold" data-i18n="hiddenMsgWait">순서를 기억하세요! (2초 후 시작)</div>
             <div class="grid grid-cols-3 gap-2 w-full mb-3">
                 <button onclick="checkHiddenPlayerChoice(0)" class="py-3 bg-gray-50 border rounded-xl text-xl hover:bg-gray-100 flex flex-col items-center">
                     <span id="hidden-btn-scissor-emoji">✌️</span> <span class="text-xs" data-i18n="scissor">가위</span>
@@ -259,7 +259,6 @@
             </div>
             <button onclick="exitHiddenMode()" class="text-xs text-red-500 underline cursor-pointer" data-i18n="hiddenExit">나가기</button>
         </div>
-    </main>
 
     <!-- 모달들 -->
     <div id="modal-attendance" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50 p-4">
@@ -430,10 +429,11 @@ autoOff: "Auto OFF",
         let currentLang = 'ko';
         let isEmojiCountMode = false;
 
-        function toggleLanguage() {
+       function toggleLanguage() {
     currentLang = currentLang === 'ko' ? 'en' : 'ko';
     document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
     
+    // 1. 문서 전체의 [data-i18n] 속성을 가진 요소들 언어 전환
     document.querySelectorAll('[data-i18n]').forEach(el => {
         if (el.id === 'achievement-btn' && el.dataset.mode === 'hidden') return;
         const key = el.getAttribute('data-i18n');
@@ -442,14 +442,16 @@ autoOff: "Auto OFF",
         }
     });
 
-    // 💡 [추가] 닉네임 입력창의 placeholder를 언어에 맞춰 실시간으로 변경합니다!
+    // 2. 닉네임 입력창 placeholder 실시간 전환
     const playerNameInput = document.getElementById('player-name');
     if (playerNameInput) {
         playerNameInput.placeholder = translations[currentLang].namePlaceholder;
     }
 
+    // 3. 동물 개수 버튼 텍스트 갱신
     updateEmojiButtonText();
 
+    // 4. 열려 있는 모달이나 화면이 있다면 그 안의 텍스트들도 실시간 갱신
     if (!document.getElementById('screen-ranking').classList.contains('hidden')) {
         renderRankingList();
     }
@@ -462,6 +464,8 @@ autoOff: "Auto OFF",
     if (!document.getElementById('modal-shop').classList.contains('hidden')) {
         renderShopContent();
     }
+    
+    // 5. 결과 화면이 열려 있다면 타이틀 및 라벨 갱신
     if (!document.getElementById('screen-result').classList.contains('hidden')) {
         document.getElementById('card-mode-name').innerText = updateModeCardTitle();
         if (gameState.mode.includes('infinite')) {
@@ -470,6 +474,18 @@ autoOff: "Auto OFF",
             document.getElementById('result-label').innerText = currentLang === 'ko' ? '10점 달성 소요 시간' : 'Time to 10 points';
         } else if (gameState.mode === 'hidden') {
             document.getElementById('result-label').innerText = currentLang === 'ko' ? '히든 모드 최고 달성 단계' : 'Hidden Max Stage';
+        }
+    }
+
+    // 6. 히든 모드 화면이 열려 있다면 안내 문구 갱신
+    if (!document.getElementById('screen-hidden').classList.contains('hidden')) {
+        const instructionEl = document.getElementById('hidden-instruction-msg');
+        if (instructionEl) {
+            if (instructionEl.innerText.includes('초') || instructionEl.innerText.includes('s')) {
+                // 카운트다운 중일 때는 유지
+            } else {
+                instructionEl.innerHTML = translations[currentLang].hiddenMsgPlay;
+            }
         }
     }
 }
