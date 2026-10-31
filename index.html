@@ -220,9 +220,9 @@
         <!-- 4. 랭킹 화면 -->
         <div id="screen-ranking" class="w-full flex flex-col items-center hidden py-1">
             <div class="flex w-full mb-2 bg-gray-100 p-1 rounded-xl">
-                <button onclick="switchRankType('all')" id="rank-type-all" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="rankTypeAll">누적 랭킹</button>
-                <button onclick="switchRankType('weekly')" id="rank-type-weekly" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500" data-i18n="rankTypeWeekly">주간 랭킹</button>
-            </div>
+    <button onclick="switchRankType('all')" id="rank-type-all" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="rankTypeAll">누적 랭킹</button>
+    <button onclick="switchRankType('daily')" id="rank-type-daily" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500">일간 랭킹</button>
+</div>
             <div class="grid grid-cols-5 w-full mb-2 bg-gray-100 p-1 rounded-xl gap-1">
                 <button onclick="switchRankingTab('infinite')" id="tab-infinite" class="py-1.5 text-[10px] font-bold rounded-lg bg-white text-green-700 shadow-sm" data-i18n="tabInfinite">무한모드</button>
                 <button onclick="switchRankingTab('infinite_hard')" id="tab-infinite-hard" class="py-1.5 text-[10px] font-bold rounded-lg text-gray-500" data-i18n="tabInfiniteHard">무한하드</button>
@@ -1406,17 +1406,19 @@ listEl.innerHTML = itemsData.map(item => {
         let currentRankingTab = 'infinite';
 
         function switchRankType(type) {
-            currentRankType = type;
-            ['all', 'weekly'].forEach(t => {
-                const btn = document.getElementById(`rank-type-${t}`);
-                if (t === type) {
-                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
-                } else {
-                    btn.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
-                }
-            });
-            renderRankingList();
-        }
+    const btnAll = document.getElementById('rank-type-all');
+    const btnDaily = document.getElementById('rank-type-daily'); // 주간(weekly)에서 일간(daily)으로 변경된 ID
+
+    if (type === 'all') {
+        btnAll.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
+        btnDaily.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
+    } else {
+        btnDaily.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-green-700 shadow-sm";
+        btnAll.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-500";
+    }
+    currentRankType = type; // 'all' 또는 'daily'
+    loadRanking(currentRankingTab);
+}
 
         function switchRankingTab(tab) {
     currentRankingTab = tab;
@@ -1611,13 +1613,18 @@ let isSoundOn = true;
         }
 
         function startHiddenMode() {
-            document.body.classList.add('hidden-universe-theme');
-            showScreen('screen-hidden');
-            stopBgm();
-            startHiddenBgm(); 
-            initHiddenRound();
-            updateUIStats(); // 💡 진입 시 히든 모드 전용 이모지 강제 적용
-        }
+    document.body.classList.add('hidden-universe-theme');
+    showScreen('screen-hidden');
+    stopBgm();        
+    startHiddenBgm(); 
+
+    // 💡 [수정] 히든 모드 시작 시 무조건 5개(또는 초기 단계)부터 시작하도록 강제 설정
+    hiddenGame.stage = 1; // 스테이지 초기화 (또는 필요한 변수)
+    hiddenGame.sequenceLength = 5; // 👈 순서 개수를 5개로 고정!
+
+    initHiddenRound();
+    updateUIStats();
+}
 
         function startHiddenBgm() {
             stopHiddenBgm();
