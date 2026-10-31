@@ -1405,40 +1405,38 @@ listEl.innerHTML = itemsData.map(item => {
 
             const weekKey = getWeekKey();
 
-            if (gameState.mode.includes('infinite') || gameState.mode === 'hidden') {
-                const score = gameState.score;
-                if (score <= 0) { alert(translations[currentLang].alertZeroScore); return; }
+                      if (gameState.mode.includes('infinite') || gameState.mode === 'hidden') {
+              const score = gameState.score;
+              if (score <= 0) { alert(translations[currentLang].alertZeroScore); return; }
 
-                // 💡 [핵심 수정] 누적 합산이 아닌 '최고 점수/최고 클리어 횟수'로 갱신하는 로직
-                const updateBestScore = (path) => {
-                    db.ref(path).orderByChild('name').equalTo(name).once('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            // 이미 기록이 존재한다면 기존 기록과 비교
-                            let existingKey = Object.keys(data)[0];
-                            let existingScore = data[existingKey].score;
-                            
-                            if (score > existingScore) {
-                                // 현재 점수가 더 높을 때만 갱신
-                                db.ref(`${path}/${existingKey}`).update({ score: score, date: new Date().toLocaleDateString() });
-                            }
-                        } else {
-                            // 기록이 없으면 새로 등록
-                            db.ref(path).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
-                        }
-                    });
-                };
+              const updateBestScore = (path) => {
+                  db.ref(path).orderByChild('name').equalTo(name).once('value', (snapshot) => {
+                      const data = snapshot.val();
+                      if (data) {
+                          let existingKey = Object.keys(data)[0];
+                          let existingScore = data[existingKey].score;
 
-                // 누적 랭킹 저장과 함께 일간 랭킹에도 저장되도록 추가
-updateBestScore(baseDbPath);
-updateBestScore(`daily_${baseDbPath}`); // 👈 일간 랭킹 경로 추가
+                          if (score > existingScore) {
+                              db.ref(`${path}/${existingKey}`).update({ score: score, date: new Date().toLocaleDateString() });
+                          }
+                      } else {
+                          db.ref(path).push().set({ name: name, score: score, date: new Date().toLocaleDateString() });
+                      }
+                  });
+              };
 
-            } else {
-                // 타임어택 등 시간 기록 모드 (시간은 짧을수록 좋으므로 기존 방식 유지 혹은 필요시 최소 시간 갱신 가능)
-                const timeTaken = parseFloat(gameState.elapsedSeconds);
-                db.ref(baseDbPath).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
-                db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
-            }
+              updateBestScore(baseDbPath);
+              updateBestScore(`daily_${baseDbPath}`); // 👈 일간 랭킹 최고기록 갱신 경로 추가!
+              updateBestScore(`weekly_${weekKey}_${baseDbPath}`);
+
+                      } else {
+              // 타임어택 등 시간 기록 모드
+              const timeTaken = parseFloat(gameState.elapsedSeconds);
+              db.ref(baseDbPath).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
+              db.ref(`daily_${baseDbPath}`).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() }); // 👈 일간 타임어택 경로 추가
+              db.ref(`weekly_${weekKey}_${baseDbPath}`).push().set({ name: name, time: timeTaken, date: new Date().toLocaleDateString() });
+          }
+
 
             nameInput.value = '';
             showRanking(gameState.mode);
