@@ -627,8 +627,14 @@ autoOff: "Auto OFF",
             }
         }
 
-        const synth = new Tone.Synth().toDestination();
-    
+        // 💡 볼륨을 아예 낮게(-22dB) 설정하여 귀에 거슬리지 않도록 부드럽게 만듭니다
+const synth = new Tone.Synth({
+    oscillator: { type: "sine" }, // 뾰족한 소리 대신 부드러운 사인파 사용
+    envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+}).toDestination();
+synth.volume.value = -22; // 소리 크기 대폭 낮춤 (안 거슬리게 조용함)
+
+
 
         function toggleSound() {
             isSoundOn = !isSoundOn;
@@ -649,17 +655,18 @@ autoOff: "Auto OFF",
             }
         }
         function playSound(type) {
-            if (!isSoundOn) return;
-            try {
-                Tone.start();
-                if (type === 'success') synth.triggerAttackRelease("C5", "8n");
-else if (type === 'reward') synth.triggerAttackRelease("E6", "8n");
-                else if (type === 'fail') synth.triggerAttackRelease("C3", "8n");
-                else if (type === 'click') synth.triggerAttackRelease("G4", "32n");
-                else if (type === 'combo') synth.triggerAttackRelease("E5", "16n");
-                
-            } catch(e) {}
-        }
+    if (!isSoundOn) return;
+    try {
+        Tone.start();
+        // 💡 버튼 종류마다 소리 높낮이를 다르게 주어 심심하지 않고 부드럽게 피드백
+        if (type === 'success') synth.triggerAttackRelease("C5", "8n");
+        else if (type === 'reward') synth.triggerAttackRelease("E5", "8n");
+        else if (type === 'fail') synth.triggerAttackRelease("G2", "8n");
+        else if (type === 'click') synth.triggerAttackRelease("C4", "32n"); // 일반 버튼 (낮고 가벼운 톡 소리)
+        else if (type === 'rps') synth.triggerAttackRelease("A4", "32n");  // 가위바위보 누를 때 (부드러운 음)
+        else if (type === 'combo') synth.triggerAttackRelease("E5", "16n");
+    } catch(e) {}
+}
 
         function showScreen(screenId) {
             ['screen-menu', 'screen-game', 'screen-result', 'screen-ranking', 'screen-hidden'].forEach(id => {
