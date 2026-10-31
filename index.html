@@ -429,27 +429,25 @@ autoOff: "Auto OFF",
         let isEmojiCountMode = true;
 
         function toggleLanguage() {
-            currentLang = currentLang === 'ko' ? 'en' : 'ko';
-            document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
-            
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                if (el.id === 'achievement-btn' && el.dataset.mode === 'hidden') return;
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) { el.innerText = translations[currentLang][key]; }
-            });
-
-            const homeBtnText = document.getElementById('home-btn-text');
-            if (homeBtnText) { homeBtnText.innerText = translations[currentLang].goHomeMenu; }
-            const nameInput = document.getElementById('player-name');
-            if (nameInput) { nameInput.placeholder = translations[currentLang].namePlaceholder; }
-            if (gameState.isPlaying) { updateModeLabel(); }
-
-            updateEmojiButtonText();
-            
-            if (!document.getElementById('modal-achievement').classList.contains('hidden')) { renderAchievements(); }
-            if (!document.getElementById('modal-shop').classList.contains('hidden')) { renderShopContent(); }
-            if (!document.getElementById('modal-mission').classList.contains('hidden')) { renderMissions(); }
+    currentLang = currentLang === 'ko' ? 'en' : 'ko';
+    document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        if (el.id === 'achievement-btn' && el.dataset.mode === 'hidden') return;
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+            el.innerText = translations[currentLang][key];
         }
+    });
+    // ... (중간 생략) ...
+    if (!document.getElementById('modal-mission').classList.contains('hidden')) {
+        renderMissions();
+    }
+
+    // 💡 [추가] 랭킹 화면(screen-ranking)이 켜져 있는 상태라면 언어에 맞춰 랭킹 리스트를 다시 렌더링합니다!
+    if (!document.getElementById('screen-ranking').classList.contains('hidden')) {
+        renderRankingList();
+    }
+}
 
         function updateEmojiButtonText() {
             const btnText = document.getElementById('emoji-mode-text');
