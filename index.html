@@ -878,7 +878,8 @@ synth.volume.value = -22; // 소리 크기 대폭 낮춤 (안 거슬리게 조�
         function playerChoice(choiceKey) {
             if (!gameState.isPlaying) return;
             clearInterval(gameState.timer);
-            playSound('click');
+            playSound('rps'); // 가위바위보 전용 부드러운 소리
+
 
             const hands = getHandsForCurrentChar();
             const comKey = gameState.comChoiceKey;
