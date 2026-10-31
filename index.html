@@ -431,6 +431,8 @@ autoOff: "Auto OFF",
         function toggleLanguage() {
     currentLang = currentLang === 'ko' ? 'en' : 'ko';
     document.getElementById('lang-btn-text').innerText = currentLang === 'ko' ? 'EN' : 'KR';
+
+    // 💡 [수정] 숨겨진 화면이나 모달창을 포함해 문서 전체의 [data-i18n] 요소를 모두 찾아 완벽하게 번역을 갱신합니다!
     document.querySelectorAll('[data-i18n]').forEach(el => {
         if (el.id === 'achievement-btn' && el.dataset.mode === 'hidden') return;
         const key = el.getAttribute('data-i18n');
@@ -438,14 +440,25 @@ autoOff: "Auto OFF",
             el.innerText = translations[currentLang][key];
         }
     });
-    // ... (중간 생략) ...
+
+    // 동물 개수 버튼 텍스트도 언어에 맞춰 갱신
+    updateEmojiButtonText();
+
+    // 만약 랭킹 창이 켜져 있다면 랭킹 리스트도 새로고침
+    if (!document.getElementById('screen-ranking').classList.contains('hidden')) {
+        renderRankingList();
+    }
+    // 만약 미션 모달이 켜져 있다면 미션 리스트도 새로고침
     if (!document.getElementById('modal-mission').classList.contains('hidden')) {
         renderMissions();
     }
-
-    // 💡 [추가] 랭킹 화면(screen-ranking)이 켜져 있는 상태라면 언어에 맞춰 랭킹 리스트를 다시 렌더링합니다!
-    if (!document.getElementById('screen-ranking').classList.contains('hidden')) {
-        renderRankingList();
+    // 만약 도전과제 모달이 켜져 있다면 도전과제 리스트도 새로고침
+    if (!document.getElementById('modal-achievement').classList.contains('hidden')) {
+        renderAchievements();
+    }
+    // 만약 상점 모달이 켜져 있다면 상점 내용도 새로고침
+    if (!document.getElementById('modal-shop').classList.contains('hidden')) {
+        renderShopContent();
     }
 }
 
