@@ -1421,8 +1421,9 @@ listEl.innerHTML = itemsData.map(item => {
                     });
                 };
 
-                updateBestScore(baseDbPath);
-                updateBestScore(`weekly_${weekKey}_${baseDbPath}`);
+                // 누적 랭킹 저장과 함께 일간 랭킹에도 저장되도록 추가
+updateBestScore(baseDbPath);
+updateBestScore(`daily_${baseDbPath}`); // 👈 일간 랭킹 경로 추가
 
             } else {
                 // 타임어택 등 시간 기록 모드 (시간은 짧을수록 좋으므로 기존 방식 유지 혹은 필요시 최소 시간 갱신 가능)
@@ -1547,13 +1548,17 @@ let isSoundOn = true;
         }
 
         function renderRankingList() {
-            const rankingList = document.getElementById('ranking-list');
-            const dbPaths = {
-                'infinite': 'rankings_infinite', 'infinite_hard': 'rankings_infinite_hard',
-                'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard','hidden': 'rankings_hidden'
-            };
-            let dbPath = dbPaths[currentRankingTab];
-            if (currentRankType === 'weekly') { dbPath = `weekly_${getWeekKey()}_${dbPath}`; }
+    const rankingList = document.getElementById('ranking-list');
+    const dbPaths = {
+        'infinite': 'rankings_infinite', 'infinite_hard': 'rankings_infinite_hard',
+        'timeattack': 'rankings_timeattack', 'timeattack_hard': 'rankings_timeattack_hard','hidden': 'rankings_hidden'
+    };
+    let dbPath = dbPaths[currentRankingTab];
+
+    // 💡 일간 랭킹일 때와 누적 랭킹일 때의 데이터 경로 분기
+    if (currentRankType === 'daily') {
+        dbPath = `daily_${dbPath}`;
+    }
 
             rankingList.innerHTML = `<p class="text-center text-gray-400 py-4">${translations[currentLang].loadingRanking}</p>`;
 
